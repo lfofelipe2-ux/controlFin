@@ -1,27 +1,27 @@
 # ControlFin Backend - Cursor AI Rules
 
 ## Project Context
-You are working on ControlFin, a RESTful API for personal finance management. This is the BACKEND repository built with Node.js 22+, TypeScript, Fastify, MongoDB, and Zod.
+You are working on ControlFin, a RESTful API for personal finance management.This is the BACKEND repository built with Node.js 22 +, TypeScript, Fastify, MongoDB, and Zod.
 
 ## Core Principles
-1. **Security First**: Validate all inputs, sanitize outputs, never trust client data.
-2. **Type Safety**: Strict TypeScript, Zod schemas for all external data.
-3. **Performance**: Optimize queries, use indexes, cache when appropriate.
-4. **Error Handling**: Meaningful error messages, proper HTTP status codes.
-5. **Auditability**: Log all important operations (who did what when).
+1. ** Security First **: Validate all inputs, sanitize outputs, never trust client data.
+2. ** Type Safety **: Strict TypeScript, Zod schemas for all external data.
+3. ** Performance **: Optimize queries, use indexes, cache when appropriate.
+4. ** Error Handling **: Meaningful error messages, proper HTTP status codes.
+5. ** Auditability **: Log all important operations(who did what when).
 
 ## Code Style
 
 ### File Naming
-- Controllers: `*.controller.ts`
-- Services: `*.service.ts`
-- Routes: `*.routes.ts`
-- Models: `*.model.ts`
-- Schemas: `*.schemas.ts` (Zod schemas)
-- Types: `*.types.ts`
+    - Controllers: `*.controller.ts`
+        - Services: `*.service.ts`
+            - Routes: `*.routes.ts`
+                - Models: `*.model.ts`
+                    - Schemas: `*.schemas.ts`(Zod schemas)
+                        - Types: `*.types.ts`
 
-### Module Structure (Feature-Based)
-```
+### Module Structure(Feature - Based)
+    ```
 modules/
 └── transactions/
     ├── transaction.controller.ts   # HTTP handlers
@@ -33,7 +33,7 @@ modules/
 ```
 
 ### Controller Pattern
-```typescript
+    ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { transactionService } from './transaction.service';
 import { createTransactionSchema } from './transaction.schemas';
@@ -82,7 +82,7 @@ export const createTransaction = async (
 ```
 
 ### Service Pattern
-```typescript
+    ```typescript
 // Services contain ALL business logic (no logic in controllers)
 export const transactionService = {
   async create(data: CreateTransactionDTO) {
@@ -115,7 +115,7 @@ export const transactionService = {
 ```
 
 ### Zod Schema Pattern
-```typescript
+    ```typescript
 import { z } from 'zod';
 
 // Base schema
@@ -152,7 +152,7 @@ export type QueryTransactionsDTO = z.infer<typeof queryTransactionsSchema>;
 ```
 
 ### Mongoose Model Pattern
-```typescript
+    ```typescript
 import mongoose from 'mongoose';
 import type { Transaction } from './transaction.types';
 
@@ -188,7 +188,7 @@ export const TransactionModel = mongoose.model<Transaction>('Transaction', trans
 ```
 
 ## Route Definition Pattern
-```typescript
+    ```typescript
 import type { FastifyInstance } from 'fastify';
 import { createTransaction, listTransactions } from './transaction.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
@@ -233,29 +233,29 @@ export const transactionRoutes = async (fastify: FastifyInstance) => {
 ```
 
 ## Forbidden Patterns
-❌ NEVER store passwords in plain text (bcrypt always)
-❌ NEVER expose sensitive data in responses (filter out password, refreshTokens)
-❌ NEVER trust request.body without validation (Zod schemas mandatory)
-❌ NEVER use string concatenation for queries (use Mongoose methods)
-❌ NEVER log sensitive data (passwords, tokens, credit card numbers)
+❌ NEVER store passwords in plain text(bcrypt always)
+❌ NEVER expose sensitive data in responses(filter out password, refreshTokens)
+❌ NEVER trust request.body without validation(Zod schemas mandatory)
+❌ NEVER use string concatenation for queries(use Mongoose methods)
+❌ NEVER log sensitive data(passwords, tokens, credit card numbers)
 ❌ NEVER use `any` type
-❌ NEVER return stack traces to client (only in development)
-❌ NEVER use `==` (always `===`)
+❌ NEVER return stack traces to client(only in development)
+❌ NEVER use`==`(always`===`)
 
 ## Required Patterns
 ✅ ALWAYS validate inputs with Zod
-✅ ALWAYS use async/await (no raw promises)
-✅ ALWAYS use proper HTTP status codes (201 for created, 204 for no content, etc.)
+✅ ALWAYS use async / await(no raw promises)
+✅ ALWAYS use proper HTTP status codes(201 for created, 204 for no content, etc.)
 ✅ ALWAYS add `index: true` to frequently queried fields in Mongoose
-✅ ALWAYS use transactions for multi-document operations (MongoDB transactions)
-✅ ALWAYS hash sensitive data (passwords with bcrypt, refresh tokens)
+✅ ALWAYS use transactions for multi - document operations(MongoDB transactions)
+✅ ALWAYS hash sensitive data(passwords with bcrypt, refresh tokens)
 ✅ ALWAYS use environment variables for configuration
 ✅ ALWAYS sanitize user inputs to prevent injection
-✅ ALWAYS rate limit public endpoints (use @fastify/rate-limit)
-✅ ALWAYS add request IDs for tracing (use @fastify/request-id)
+✅ ALWAYS rate limit public endpoints(use @fastify / rate - limit)
+✅ ALWAYS add request IDs for tracing(use @fastify / request - id)
 
 ## Error Handling
-```typescript
+    ```typescript
 // Custom error classes
 export class AppError extends Error {
   constructor(
@@ -310,7 +310,7 @@ fastify.setErrorHandler((error, request, reply) => {
 ```
 
 ## MongoDB Query Optimization
-```typescript
+    ```typescript
 // BAD: Multiple queries
 const transactions = await TransactionModel.find({ spaceId });
 for (const transaction of transactions) {
@@ -333,7 +333,7 @@ const summary = await TransactionModel.aggregate([
 ```
 
 ## Security Checklist
-- [ ] All routes except /auth/* require authentication
+    - [] All routes except / auth/* require authentication
 - [ ] JWT tokens expire in 15 minutes (access) and 7 days (refresh)
 - [ ] Passwords hashed with bcrypt (salt rounds: 10)
 - [ ] Refresh tokens hashed before storing in DB

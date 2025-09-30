@@ -1,0 +1,97 @@
+# ControlFin - Cursor AI Rules (Context-Aware)
+
+## Project Context Detection
+This is the main ControlFin repository with both frontend and backend. The AI should automatically detect which context it's working in based on the file path and apply the appropriate rules.
+
+## Auto-Detection Logic
+- **Frontend files** (controlfin-frontend/): Use frontend rules
+- **Backend files** (controlfin-backend/): Use backend rules  
+- **Root files** (docs/, etc.): Use general project rules
+
+## General Project Rules (Root Level)
+
+### Core Principles
+1. **TypeScript First**: Always use strict TypeScript
+2. **Security First**: Never commit secrets, always validate inputs
+3. **Performance**: Optimize for speed and user experience
+4. **Documentation**: Keep PROJECT_BRIEF.md updated with decisions
+
+### File Organization
+- Keep frontend and backend completely separate
+- Use absolute imports with proper path mapping
+- Follow the folder structure defined in PROJECT_BRIEF.md
+
+### Git Workflow
+- Use conventional commits (feat:, fix:, docs:, etc.)
+- Always test before committing
+- Keep commits atomic and focused
+
+### When Working on Frontend Files
+```bash
+# Load frontend-specific rules
+@cursor Load .cursor/frontend.cursorrules and apply to current file
+```
+
+### When Working on Backend Files  
+```bash
+# Load backend-specific rules
+@cursor Load .cursor/backend.cursorrules and apply to current file
+```
+
+### When Working on Documentation
+- Always reference PROJECT_BRIEF.md for technical decisions
+- Update documentation when making architectural changes
+- Use clear, concise language
+
+## Context Switching Commands
+
+### For Frontend Development
+```
+@cursor I'm working on frontend files. Load .cursor/frontend.cursorrules and apply those rules to all frontend-related tasks.
+```
+
+### For Backend Development
+```
+@cursor I'm working on backend files. Load .cursor/backend.cursorrules and apply those rules to all backend-related tasks.
+```
+
+### For Full-Stack Tasks
+```
+@cursor I need to work on both frontend and backend. Load both .cursor/frontend.cursorrules and .cursor/backend.cursorrules and apply the appropriate rules based on the file context.
+```
+
+## Design System Reference
+- **Colors**: Always use BlockAI color palette from PROJECT_BRIEF.md
+- **Typography**: Inter, Poppins, or Roboto fonts
+- **Spacing**: 8px grid system
+- **Components**: Ant Design 5 with custom theme
+
+## Common Tasks
+- **New Feature**: Create both frontend and backend components
+- **Bug Fix**: Identify if it's frontend, backend, or full-stack issue
+- **Refactoring**: Maintain separation of concerns between layers
+- **Testing**: Frontend (Vitest), Backend (Vitest + MongoDB)
+
+## Error Handling
+- Frontend: User-friendly error messages with Ant Design components
+- Backend: Proper HTTP status codes and structured error responses
+- Always log errors appropriately for debugging
+
+## Performance Guidelines
+- Frontend: Lazy loading, code splitting, memoization
+- Backend: Database indexing, query optimization, caching
+- Both: Bundle size optimization, memory management
+
+## Security Checklist
+- Never expose API keys or secrets
+- Validate all inputs with Zod schemas
+- Use proper authentication and authorization
+- Sanitize user inputs
+- Follow OWASP guidelines
+
+## When I Ask for Help
+1. First identify if it's frontend, backend, or full-stack
+2. Load the appropriate .cursorrules file
+3. Apply the specific patterns and guidelines
+4. Consider the impact on both layers if applicable
+5. Provide complete, production-ready solutions
