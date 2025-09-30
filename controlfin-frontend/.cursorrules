@@ -1,0 +1,238 @@
+# ControlFin Frontend - Cursor AI Rules
+
+## Project Context
+You are working on ControlFin, a Progressive Web App for personal finance management. This is the FRONTEND repository built with React 18, TypeScript, Vite, Ant Design 5, and Zustand.
+
+**Design Reference:** BlockAI Admin Dashboard - See `/docs/assets/design-reference/` for visual reference images.
+
+## Core Principles
+1. **TypeScript First**: Always use strict TypeScript. Never use `any` - use `unknown` or proper types.
+2. **Functional Components**: Only functional components with hooks (no classes).
+3. **Performance**: Memoize expensive computations, lazy load routes, code split intelligently.
+4. **Accessibility**: All interactive elements must be keyboard accessible (WCAG AA minimum).
+5. **Error Handling**: Every async operation must have error handling with user feedback.
+6. **Design Fidelity**: Follow BlockAI design system precisely - colors, spacing, typography.
+
+## Design System (BlockAI)
+
+### Colors (ALWAYS use these exact values)
+```scss
+// Backgrounds
+$bg-primary: #2d3561;      // Background principal
+$bg-sidebar: #1f2347;      // Sidebar
+$bg-card: #363d65;         // Cards
+$bg-hover: #3d4570;        // Hover state
+
+// Text
+$text-primary: #ffffff;    // Texto principal
+$text-secondary: #a0a4b8;  // Texto secundário
+
+// Accent
+$accent-primary: #00d9ff;  // Ciano (botões, links)
+$accent-secondary: #2196f3; // Azul royal
+
+// Semantic
+$color-success: #00ff88;   // Verde
+$color-warning: #ffaa00;   // Laranja  
+$color-error: #ff3366;     // Vermelho
+```
+
+### Typography
+- **Font:** Inter, Poppins ou Roboto (Google Fonts)
+- **Weights:** 300 (light), 400 (regular), 600 (semibold)
+- **Sizes:** 11px (xs), 12px (sm), 14px (base), 16px (md), 18px (lg), 24px (xl), 32px (2xl)
+
+### Spacing
+Use múltiplos de 8px: 4px, 8px, 16px, 24px, 32px, 48px, 64px
+
+### Layout
+- Sidebar: 240px width, fixed left, background `#1f2347`
+- Border radius: 8px (cards), 4px (inputs)
+- Shadows: `0 2px 8px rgba(0,0,0,0.15)` (small), `0 4px 16px rgba(0,0,0,0.25)` (medium)
+
+## Code Style
+
+### File Naming
+- Components: PascalCase (e.g., `TransactionList.tsx`)
+- Utilities: kebab-case (e.g., `format-currency.ts`)
+- Hooks: camelCase with `use` prefix (e.g., `useTransactions.ts`)
+- Types: kebab-case (e.g., `transaction.types.ts`)
+
+### Component Structure (MANDATORY ORDER)
+```typescript
+// 1. External imports (React, libraries)
+import React, { useState, useEffect } from 'react';
+import { Button, Card } from 'antd';
+
+// 2. Internal imports (components, hooks, utils)
+import { useAuth } from '@/hooks/useAuth';
+import { formatCurrency } from '@/utils/formatters';
+
+// 3. Type imports
+import type { Transaction } from '@/types/transaction.types';
+
+// 4. Styles
+import './TransactionCard.scss';
+
+// 5. Types/Interfaces (local to file)
+interface Props {
+  transaction: Transaction;
+  onEdit: (id: string) => void;
+}
+
+// 6. Component
+export const TransactionCard: React.FC<Props> = ({ transaction, onEdit }) => {
+  // 6.1 Hooks (state, context, custom hooks)
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  
+  // 6.2 Effects
+  useEffect(() => {
+    // Effect logic
+  }, []);
+  
+  // 6.3 Handlers (prefix with `handle`)
+  const handleEdit = () => {
+    onEdit(transaction.id);
+  };
+  
+  // 6.4 Computed values
+  const formattedAmount = formatCurrency(transaction.amount);
+  
+  // 6.5 Early returns (loading, error states)
+  if (isLoading) return <Spin />;
+  
+  // 6.6 Main render
+  return (
+    <Card>
+      <p>{formattedAmount}</p>
+      <Button onClick={handleEdit}>Edit</Button>
+    </Card>
+  );
+};
+```
+
+### Zustand Store Pattern
+```typescript
+// Pattern for all stores
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+
+interface State {
+  // State properties
+}
+
+interface Actions {
+  // Action methods
+}
+
+export const useStoreName = create<State & Actions>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        // Initial state
+        
+        // Actions
+      }),
+      { name: 'store-name' }
+    )
+  )
+);
+```
+
+### API Calls Pattern
+```typescript
+// Always wrap in try-catch with proper error handling
+try {
+  setLoading(true);
+  const response = await api.get('/endpoint');
+  setData(response.data);
+  message.success('Success message');
+} catch (error) {
+  console.error('Context of error:', error);
+  message.error(error.response?.data?.message || 'Generic error message');
+} finally {
+  setLoading(false);
+}
+```
+
+## Forbidden Patterns
+❌ NEVER use `any` type
+❌ NEVER use inline styles (always SCSS)
+❌ NEVER use `var` (only `const` or `let`)
+❌ NEVER use `function` keyword for components (arrow functions only)
+❌ NEVER mutate state directly (use setState or Zustand actions)
+❌ NEVER use `console.log` in production code (use proper logger or remove)
+❌ NEVER hardcode API URLs (use environment variables)
+❌ NEVER commit sensitive data (.env files excluded)
+
+## Required Patterns
+✅ ALWAYS destructure props
+✅ ALWAYS use optional chaining for nested objects (`user?.name`)
+✅ ALWAYS validate form inputs with Ant Design Form validation
+✅ ALWAYS show loading states for async operations
+✅ ALWAYS show error boundaries for components that fetch data
+✅ ALWAYS use semantic HTML (`<button>` not `<div onClick>`)
+✅ ALWAYS add `alt` text to images
+✅ ALWAYS use `key` prop in lists (unique, stable IDs)
+
+## Ant Design Guidelines
+- Use `message` for brief notifications
+- Use `notification` for detailed feedback
+- Use `Modal.confirm` for destructive actions
+- Use `Form` component for all forms (never uncontrolled)
+- Use `ConfigProvider` for theme customization
+- Use responsive props: `xs`, `sm`, `md`, `lg`, `xl`
+
+## Performance Optimization
+- Lazy load routes: `const Dashboard = lazy(() => import('./pages/Dashboard'));`
+- Memoize expensive calculations: `const total = useMemo(() => calculateTotal(transactions), [transactions]);`
+- Memoize callbacks passed to children: `const handleClick = useCallback(() => {...}, [deps]);`
+- Use `React.memo` for pure components that re-render often
+- Debounce search inputs: Use lodash debounce or custom hook
+
+## Testing Hints
+- For new components, suggest where tests would add value (complex logic, critical flows)
+- Don't auto-generate tests unless explicitly asked
+
+## When Creating New Files
+1. Ask if I want the file in a specific location if path is ambiguous
+2. Always include proper TypeScript types
+3. Add inline comments for complex logic
+4. Follow the structure patterns defined above
+
+## When Modifying Existing Files
+1. Preserve existing patterns and style
+2. If you notice an anti-pattern, suggest improvements but don't auto-fix unless asked
+3. Always run type checking mentally before suggesting changes
+
+## Error Messages
+- User-facing: Simple, actionable (e.g., "Could not save transaction. Please try again.")
+- Console: Detailed, with context (e.g., "Failed to POST /transactions: 400 Bad Request - Invalid categoryId")
+
+## Accessibility Checklist (for new components)
+- [ ] Keyboard navigable (Tab, Enter, Space, Esc)
+- [ ] Screen reader friendly (aria-labels where needed)
+- [ ] Color contrast ratio ≥ 4.5:1
+- [ ] Focus states visible
+- [ ] Error messages associated with inputs (aria-describedby)
+
+## Common Gotchas
+- Ant Design DatePicker uses Day.js, not native Date (import dayjs)
+- Zustand persist middleware can cause hydration issues (use `hasHydrated` check)
+- Vite env variables must start with `VITE_` prefix
+- Service Worker updates require page refresh (implement update notification)
+
+## When I Ask for "Generate Component X"
+Provide:
+1. Component file with full implementation
+2. Types file if types are complex
+3. SCSS file with responsive styles
+4. Zustand store if state management needed
+5. Brief explanation of key decisions
+
+## Additional Context
+- This is an MVP, prioritize speed but not at the cost of type safety or security
+- User experience is critical: loading states, error messages, empty states must always be considered
+- Dark mode is the only theme (no light mode toggle)
+- All monetary values are stored as integers in cents (divide by 100 for display)

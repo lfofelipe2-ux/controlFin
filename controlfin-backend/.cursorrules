@@ -1,0 +1,411 @@
+# ControlFin Backend - Cursor AI Rules
+
+## Project Context
+You are working on ControlFin, a RESTful API for personal finance management. This is the BACKEND repository built with Node.js 22+, TypeScript, Fastify, MongoDB, and Zod.
+
+## Core Principles
+1. **Security First**: Validate all inputs, sanitize outputs, never trust client data.
+2. **Type Safety**: Strict TypeScript, Zod schemas for all external data.
+3. **Performance**: Optimize queries, use indexes, cache when appropriate.
+4. **Error Handling**: Meaningful error messages, proper HTTP status codes.
+5. **Auditability**: Log all important operations (who did what when).
+
+## Code Style
+
+### File Naming
+- Controllers: `*.controller.ts`
+- Services: `*.service.ts`
+- Routes: `*.routes.ts`
+- Models: `*.model.ts`
+- Schemas: `*.schemas.ts` (Zod schemas)
+- Types: `*.types.ts`
+
+### Module Structure (Feature-Based)
+```
+modules/
+└── transactions/
+    ├── transaction.controller.ts   # HTTP handlers
+    ├── transaction.service.ts       # Business logic
+    ├── transaction.routes.ts        # Route definitions
+    ├── transaction.model.ts         # Mongoose model
+    ├── transaction.schemas.ts       # Zod validation schemas
+    └── transaction.types.ts         # TypeScript types
+```
+
+### Controller Pattern
+```typescript
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { transactionService } from './transaction.service';
+import { createTransactionSchema } from './transaction.schemas';
+
+export const createTransaction = async (
+  request: FastifyRequest<{ Body: unknown }>,
+  reply: FastifyReply
+) => {
+  try {
+    // 1. Validate input with Zod
+    const data = createTransactionSchema.parse(request.body);
+    
+    // 2. Extract user from JWT (set by auth middleware)
+    const userId = request.user.sub;
+    const spaceId = request.user.spaceId;
+    
+    // 3. Call service
+    const transaction = await transactionService.create({
+      ...data,
+      userId,
+      spaceId,
+    });
+    
+    // 4. Return response
+    return reply.status(201).send({
+      success: true,
+      data: transaction,
+    });
+  } catch (error) {
+    // 5. Handle errors
+    if (error instanceof ZodError) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Validation error',
+        details: error.errors,
+      });
+    }
+    
+    request.log.error({ error }, 'Failed to create transaction');
+    return reply.status(500).send({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+};
+```
+
+### Service Pattern
+```typescript
+// Services contain ALL business logic (no logic in controllers)
+export const transactionService = {
+  async create(data: CreateTransactionDTO) {
+    // 1. Additional validations
+    await this.validateCategory(data.categoryId);
+    
+    // 2. Transform data if needed
+    const amountInCents = Math.round(data.amount * 100);
+    
+    // 3. Database operation
+    const transaction = await TransactionModel.create({
+      ...data,
+      amount: amountInCents,
+    });
+    
+    // 4. Side effects (notifications, analytics, etc.)
+    await notificationService.checkBudgetAlert(data.spaceId);
+    
+    // 5. Return
+    return transaction;
+  },
+  
+  async validateCategory(categoryId: string) {
+    const exists = await CategoryModel.exists({ _id: categoryId });
+    if (!exists) {
+      throw new NotFoundError('Category not found');
+    }
+  },
+};
+```
+
+### Zod Schema Pattern
+```typescript
+import { z } from 'zod';
+
+// Base schema
+export const transactionBaseSchema = z.object({
+  type: z.enum(['income', 'expense']),
+  amount: z.number().positive(),
+  categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
+  description: z.string().min(1).max(500),
+  date: z.string().datetime(),
+  paymentMethod: z.enum(['cash', 'debit', 'pix', 'credit_card']),
+  creditCardId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+});
+
+// Create schema (might have required fields)
+export const createTransactionSchema = transactionBaseSchema;
+
+// Update schema (all fields optional)
+export const updateTransactionSchema = transactionBaseSchema.partial();
+
+// Query schema (for GET requests)
+export const queryTransactionsSchema = z.object({
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+  type: z.enum(['income', 'expense']).optional(),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+});
+
+// Type inference
+export type CreateTransactionDTO = z.infer<typeof createTransactionSchema>;
+export type UpdateTransactionDTO = z.infer<typeof updateTransactionSchema>;
+export type QueryTransactionsDTO = z.infer<typeof queryTransactionsSchema>;
+```
+
+### Mongoose Model Pattern
+```typescript
+import mongoose from 'mongoose';
+import type { Transaction } from './transaction.types';
+
+const transactionSchema = new mongoose.Schema<Transaction>(
+  {
+    spaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'FinancialSpace', required: true, index: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    type: { type: String, enum: ['income', 'expense'], required: true },
+    amount: { type: Number, required: true }, // In cents
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true, index: true },
+    description: { type: String, required: true },
+    date: { type: Date, required: true, index: true },
+    paymentMethod: { type: String, enum: ['cash', 'debit', 'pix', 'credit_card'], required: true },
+    creditCardId: { type: mongoose.Schema.Types.ObjectId, ref: 'CreditCard' },
+    status: { type: String, enum: ['completed', 'pending', 'scheduled'], default: 'completed' },
+    isDeleted: { type: Boolean, default: false },
+  },
+  {
+    timestamps: true,
+    collection: 'transactions',
+  }
+);
+
+// Compound indexes
+transactionSchema.index({ spaceId: 1, date: -1 });
+
+// Virtual for amount in currency format
+transactionSchema.virtual('amountInCurrency').get(function() {
+  return this.amount / 100;
+});
+
+export const TransactionModel = mongoose.model<Transaction>('Transaction', transactionSchema);
+```
+
+## Route Definition Pattern
+```typescript
+import type { FastifyInstance } from 'fastify';
+import { createTransaction, listTransactions } from './transaction.controller';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+
+export const transactionRoutes = async (fastify: FastifyInstance) => {
+  // Apply auth middleware to all routes in this module
+  fastify.addHook('onRequest', authMiddleware);
+  
+  fastify.post('/transactions', {
+    schema: {
+      description: 'Create a new transaction',
+      tags: ['transactions'],
+      body: {
+        type: 'object',
+        // JSON Schema for OpenAPI (can be auto-generated from Zod)
+      },
+      response: {
+        201: {
+          description: 'Transaction created successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+    handler: createTransaction,
+  });
+  
+  fastify.get('/transactions', {
+    schema: {
+      description: 'List transactions with filters',
+      tags: ['transactions'],
+      querystring: {
+        // Query parameters schema
+      },
+    },
+    handler: listTransactions,
+  });
+};
+```
+
+## Forbidden Patterns
+❌ NEVER store passwords in plain text (bcrypt always)
+❌ NEVER expose sensitive data in responses (filter out password, refreshTokens)
+❌ NEVER trust request.body without validation (Zod schemas mandatory)
+❌ NEVER use string concatenation for queries (use Mongoose methods)
+❌ NEVER log sensitive data (passwords, tokens, credit card numbers)
+❌ NEVER use `any` type
+❌ NEVER return stack traces to client (only in development)
+❌ NEVER use `==` (always `===`)
+
+## Required Patterns
+✅ ALWAYS validate inputs with Zod
+✅ ALWAYS use async/await (no raw promises)
+✅ ALWAYS use proper HTTP status codes (201 for created, 204 for no content, etc.)
+✅ ALWAYS add `index: true` to frequently queried fields in Mongoose
+✅ ALWAYS use transactions for multi-document operations (MongoDB transactions)
+✅ ALWAYS hash sensitive data (passwords with bcrypt, refresh tokens)
+✅ ALWAYS use environment variables for configuration
+✅ ALWAYS sanitize user inputs to prevent injection
+✅ ALWAYS rate limit public endpoints (use @fastify/rate-limit)
+✅ ALWAYS add request IDs for tracing (use @fastify/request-id)
+
+## Error Handling
+```typescript
+// Custom error classes
+export class AppError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: number,
+    public code: string
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
+    super(message, 404, 'NOT_FOUND');
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(message = 'Unauthorized') {
+    super(message, 401, 'UNAUTHORIZED');
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message = 'Validation failed', public details?: unknown) {
+    super(message, 400, 'VALIDATION_ERROR');
+  }
+}
+
+// Global error handler
+fastify.setErrorHandler((error, request, reply) => {
+  request.log.error({ error, requestId: request.id }, 'Request error');
+  
+  if (error instanceof AppError) {
+    return reply.status(error.statusCode).send({
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error instanceof ValidationError ? error.details : undefined,
+    });
+  }
+  
+  // Unknown error
+  return reply.status(500).send({
+    success: false,
+    error: 'Internal server error',
+    code: 'INTERNAL_ERROR',
+  });
+});
+```
+
+## MongoDB Query Optimization
+```typescript
+// BAD: Multiple queries
+const transactions = await TransactionModel.find({ spaceId });
+for (const transaction of transactions) {
+  transaction.category = await CategoryModel.findById(transaction.categoryId);
+}
+
+// GOOD: Single query with population
+const transactions = await TransactionModel
+  .find({ spaceId })
+  .populate('categoryId', 'name icon color')
+  .lean(); // Use .lean() when you don't need Mongoose document methods
+
+// GOOD: Aggregation for complex queries
+const summary = await TransactionModel.aggregate([
+  { $match: { spaceId: new mongoose.Types.ObjectId(spaceId), date: { $gte: startDate } } },
+  { $group: { _id: '$categoryId', total: { $sum: '$amount' } } },
+  { $sort: { total: -1 } },
+  { $limit: 10 },
+]);
+```
+
+## Security Checklist
+- [ ] All routes except /auth/* require authentication
+- [ ] JWT tokens expire in 15 minutes (access) and 7 days (refresh)
+- [ ] Passwords hashed with bcrypt (salt rounds: 10)
+- [ ] Refresh tokens hashed before storing in DB
+- [ ] Rate limiting on auth endpoints (5 attempts per minute)
+- [ ] CORS configured to allow only frontend origin
+- [ ] Helmet enabled for security headers
+- [ ] Input validation with Zod on all routes
+- [ ] MongoDB injection prevented (use Mongoose, never string concatenation)
+- [ ] Sensitive data never logged (passwords, tokens)
+
+## Logging Strategy
+```typescript
+// Use Fastify's built-in logger (Pino)
+request.log.info({ userId, action: 'create_transaction' }, 'Transaction created');
+request.log.error({ error, userId }, 'Failed to create transaction');
+request.log.warn({ spaceId, budgetUsage: 0.95 }, 'Budget near limit');
+
+// NEVER log:
+// - Passwords
+// - JWT tokens
+// - Credit card numbers (even last 4 digits, store separately)
+// - Personal identifiable information in production
+```
+
+## Testing Strategy
+- Unit tests for services (business logic)
+- Integration tests for routes (with in-memory MongoDB)
+- Test critical flows: auth, transaction creation, budget calculations
+- Use `vitest` for speed
+
+## When Creating New Endpoints
+1. Create Zod schemas first (input validation)
+2. Define types from schemas (z.infer)
+3. Implement service logic (business rules)
+4. Create controller (HTTP handling)
+5. Add route definition with OpenAPI schema
+6. Add tests for happy path and error cases
+7. Update openapi.yaml if not auto-generated
+
+## Common Pitfalls
+- Forgetting to add indexes (check slow queries with MongoDB profiler)
+- Not using `.lean()` when populating (causes memory issues)
+- Exposing too much data in responses (use projection or DTO pattern)
+- Not handling MongoDB connection errors (retry logic needed)
+- Forgetting to validate ObjectId format (use Zod regex)
+
+## Performance Tips
+- Use `.select()` to limit returned fields: `.find().select('name amount date')`
+- Use `.limit()` and `.skip()` for pagination
+- Create indexes on fields used in filters: `{ spaceId: 1, date: -1 }`
+- Use aggregation pipeline for complex calculations
+- Cache frequently accessed, rarely changed data (categories)
+
+## Environment Variables (Required)
+```
+NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=...
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+FRONTEND_URL=http://localhost:5173
+```
+
+## When I Ask "Generate Endpoint for X"
+Provide:
+1. Zod schemas for validation
+2. Types inferred from schemas
+3. Service with business logic
+4. Controller with error handling
+5. Route definition with OpenAPI schema
+6. Suggest tests to add
+7. Explain security considerations
