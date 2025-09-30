@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint . --ext .ts --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,md}\"",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
@@ -15,8 +19,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "db:seed": "tsx scripts/seed.ts",
-    "openapi:generate": "tsx scripts/generate-openapi.ts",
-    "prepare": "husky install"
+    "openapi:generate": "tsx scripts/generate-openapi.ts"
   },
   "keywords": [],
   "author": "",
@@ -37,5 +40,11 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.2",
     "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2"
   }
 }

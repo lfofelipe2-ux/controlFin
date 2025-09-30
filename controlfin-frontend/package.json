@@ -15,8 +15,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "analyze": "vite-bundle-visualizer",
-    "clean": "rm -rf dist node_modules",
-    "prepare": "husky install"
+    "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",
