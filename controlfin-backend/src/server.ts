@@ -32,7 +32,7 @@ fastify.get('/', async () => {
 const start = async (): Promise<void> => {
   try {
     await fastify.listen({ port: 3000, host: '0.0.0.0' });
-        fastify.log.info('Server listening on http://localhost:3000');
+    fastify.log.info('Server listening on http://0.0.0.0:3000');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
