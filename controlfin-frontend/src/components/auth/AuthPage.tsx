@@ -5,17 +5,18 @@
  * login and registration forms, following the BlockAI design system.
  */
 
-import React, { useState, useEffect } from 'react';
-import { Layout, Row, Col, Typography, Space, Button, Card } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Col, Layout, Row, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
+import ForgotPasswordForm from './ForgotPasswordForm';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import ResetPasswordForm from './ResetPasswordForm';
 
 const { Content } = Layout;
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 type AuthMode = 'login' | 'register' | 'forgot-password' | 'reset-password';
 
@@ -128,106 +129,10 @@ const AuthPage: React.FC<AuthPageProps> = ({
         return <RegisterForm onSuccess={handleAuthSuccess} onSwitchToLogin={handleSwitchToLogin} />;
       case 'forgot-password':
         return (
-          <Card
-            style={{
-              background: colors.backgroundCards,
-              border: `1px solid rgba(255, 255, 255, 0.1)`,
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <Space direction='vertical' size='large' style={{ width: '100%' }}>
-              <div style={{ textAlign: 'center' }}>
-                <Title
-                  level={2}
-                  style={{
-                    color: colors.textPrimary,
-                    fontSize: typography.sizes.desktop.h2,
-                    fontWeight: typography.weights.semibold,
-                    marginBottom: '8px',
-                  }}
-                >
-                  Forgot Password?
-                </Title>
-                <Paragraph
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: typography.sizes.desktop.body,
-                    marginBottom: '32px',
-                  }}
-                >
-                  Enter your email address and we'll send you a link to reset your password.
-                </Paragraph>
-              </div>
-
-              <Button
-                type='link'
-                onClick={handleBackToLogin}
-                style={{
-                  color: colors.accentPrimary,
-                  fontSize: typography.sizes.desktop.body,
-                  fontWeight: typography.weights.semibold,
-                  padding: 0,
-                  height: 'auto',
-                }}
-                icon={<ArrowLeftOutlined />}
-              >
-                Back to Login
-              </Button>
-            </Space>
-          </Card>
+          <ForgotPasswordForm onSuccess={handleAuthSuccess} onBackToLogin={handleBackToLogin} />
         );
       case 'reset-password':
-        return (
-          <Card
-            style={{
-              background: colors.backgroundCards,
-              border: `1px solid rgba(255, 255, 255, 0.1)`,
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <Space direction='vertical' size='large' style={{ width: '100%' }}>
-              <div style={{ textAlign: 'center' }}>
-                <Title
-                  level={2}
-                  style={{
-                    color: colors.textPrimary,
-                    fontSize: typography.sizes.desktop.h2,
-                    fontWeight: typography.weights.semibold,
-                    marginBottom: '8px',
-                  }}
-                >
-                  Reset Password
-                </Title>
-                <Paragraph
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: typography.sizes.desktop.body,
-                    marginBottom: '32px',
-                  }}
-                >
-                  Enter your new password below.
-                </Paragraph>
-              </div>
-
-              <Button
-                type='link'
-                onClick={handleBackToLogin}
-                style={{
-                  color: colors.accentPrimary,
-                  fontSize: typography.sizes.desktop.body,
-                  fontWeight: typography.weights.semibold,
-                  padding: 0,
-                  height: 'auto',
-                }}
-                icon={<ArrowLeftOutlined />}
-              >
-                Back to Login
-              </Button>
-            </Space>
-          </Card>
-        );
+        return <ResetPasswordForm onSuccess={handleAuthSuccess} />;
       default:
         return null;
     }

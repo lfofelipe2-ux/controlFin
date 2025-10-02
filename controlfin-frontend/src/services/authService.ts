@@ -6,11 +6,11 @@
  */
 
 import type {
-  LoginRequest,
-  RegisterRequest,
-  PasswordResetConfirmation,
-  AuthResponse,
   ApiError,
+  AuthResponse,
+  LoginRequest,
+  PasswordResetConfirmation,
+  RegisterRequest,
 } from '../types/auth';
 
 // === API CONFIGURATION ===
@@ -181,6 +181,11 @@ export const requestPasswordReset = async (email: string): Promise<{ message: st
 };
 
 /**
+ * Forgot password - alias for requestPasswordReset
+ */
+export const forgotPassword = requestPasswordReset;
+
+/**
  * Reset password with token
  */
 export const resetPassword = async (
@@ -338,6 +343,7 @@ const authService = {
 
   // Password management
   requestPasswordReset,
+  forgotPassword,
   resetPassword,
   changePassword,
 
