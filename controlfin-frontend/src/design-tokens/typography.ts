@@ -5,10 +5,14 @@
  * Defines font families, sizes, weights, and line heights for consistent typography.
  */
 
+// Font family stacks for maintainability
+const FONT_FAMILY_PRIMARY = ['Inter', 'Poppins', 'Roboto'];
+const FONT_FAMILY_SYSTEM = ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'];
+
 export const typography = {
   // === FONT FAMILIES ===
   fontFamily: {
-    primary: 'Inter, Poppins, Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    primary: [...FONT_FAMILY_PRIMARY, ...FONT_FAMILY_SYSTEM].join(', '),
     mono: 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
   },
 
