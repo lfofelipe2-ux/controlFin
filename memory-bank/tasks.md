@@ -396,9 +396,44 @@ interface User {
 
 ## Creative Phases Required
 
-- [ ] Authentication UI/UX Design (login/register forms layout)
-- [ ] Error state design (loading, validation, API errors)
-- [ ] Responsive design patterns (mobile-first approach)
+- [x] Authentication UI/UX Design (login/register forms layout) - COMPLETE
+- [x] Error state design (loading, validation, API errors) - COMPLETE
+- [x] Responsive design patterns (mobile-first approach) - COMPLETE
+
+## Creative Phase Decisions
+
+### [CREATIVE-001]: Authentication UI/UX Design
+
+**Decision**: Dedicated Authentication Pages with Progressive Disclosure
+**Key Features**:
+
+- Mobile-first responsive design
+- Security-focused messaging and visual hierarchy
+- Progressive disclosure for complex flows
+- Accessibility compliance with ARIA patterns
+  **Documentation**: `memory-bank/creative/creative-authentication-ui-ux.md`
+
+### [CREATIVE-002]: Error State Design
+
+**Decision**: Layered Error System with Progressive Disclosure
+**Key Features**:
+
+- Field-level → Form-level → Global-level error hierarchy
+- Progressive disclosure prevents user overwhelm
+- Accessibility-first with ARIA live regions
+- Mobile-optimized with collapsible sections
+  **Documentation**: `memory-bank/creative/creative-error-state-design.md`
+
+### [CREATIVE-003]: Responsive Design Patterns
+
+**Decision**: Mobile-First Progressive Enhancement
+**Key Features**:
+
+- Mobile-first base design (320px+)
+- Progressive enhancement for tablet (768px+) and desktop (1024px+)
+- Touch optimization with 44px minimum targets
+- Performance optimization for mobile devices
+  **Documentation**: `memory-bank/creative/creative-responsive-design-patterns.md`
 
 **Subtasks**:
 
