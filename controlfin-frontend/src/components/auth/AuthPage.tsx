@@ -171,7 +171,7 @@ const AuthPage: React.FC<AuthPageProps> = ({
               fontSize: typography.sizes.desktop.body,
             }}
           >
-            {t('loading')}
+            {t('messages.loading')}
           </Text>
         </div>
       </div>

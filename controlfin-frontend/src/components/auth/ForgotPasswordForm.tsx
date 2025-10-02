@@ -256,7 +256,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading ? t('forgotPassword.submitting') : t('forgotPassword.submitButton')}
+              {isLoading ? t('forgotPassword.sending') : t('forgotPassword.sendButton')}
             </Button>
           </Form.Item>
         </Form>

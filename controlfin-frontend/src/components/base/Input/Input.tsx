@@ -68,13 +68,23 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   visibilityToggle = true,
   ...inputProps
 }) => {
+  const { t } = useTranslation();
+
+  // Translate label if needed
+  const displayLabel =
+    inputProps.translateLabel && inputProps.label ? t(inputProps.label) : inputProps.label;
+  const displayError =
+    inputProps.translateError && inputProps.error ? t(inputProps.error) : inputProps.error;
+  const displayHelperText =
+    inputProps.translateHelperText && inputProps.helperText
+      ? t(inputProps.helperText)
+      : inputProps.helperText;
+
   return (
     <div className={inputProps.fullWidth ? 'blockai-input--full-width' : ''}>
       {inputProps.label && (
         <label className='blockai-input__label'>
-          <span className='blockai-input__label-text'>
-            {inputProps.translateLabel && inputProps.label ? inputProps.label : inputProps.label}
-          </span>
+          <span className='blockai-input__label-text'>{displayLabel}</span>
           {inputProps.required && <span className='blockai-input__required'>*</span>}
         </label>
       )}
@@ -88,18 +98,10 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
         visibilityToggle={visibilityToggle}
       />
 
-      {inputProps.error && (
-        <span className='blockai-input__error'>
-          {inputProps.translateError && inputProps.error ? inputProps.error : inputProps.error}
-        </span>
-      )}
+      {inputProps.error && <span className='blockai-input__error'>{displayError}</span>}
 
       {inputProps.helperText && !inputProps.error && (
-        <span className='blockai-input__helper'>
-          {inputProps.translateHelperText && inputProps.helperText
-            ? inputProps.helperText
-            : inputProps.helperText}
-        </span>
+        <span className='blockai-input__helper'>{displayHelperText}</span>
       )}
     </div>
   );

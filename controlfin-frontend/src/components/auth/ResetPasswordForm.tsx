@@ -370,7 +370,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading ? t('resetPassword.submitting') : t('resetPassword.submitButton')}
+              {isLoading ? t('resetPassword.resetting') : t('resetPassword.resetButton')}
             </Button>
           </Form.Item>
         </Form>

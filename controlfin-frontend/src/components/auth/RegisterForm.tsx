@@ -353,7 +353,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               },
               {
                 pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message: t('register.validation.passwordsMustMatch'),
+                message: t('register.validation.passwordPattern'),
               },
             ]}
           >
@@ -515,7 +515,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 fontSize: typography.sizes.desktop.small,
               }}
             >
-              {t('register.agreePrefix')}{' '}
+              {t('register.termsLabel')}{' '}
               <Button
                 type='link'
                 style={{
@@ -538,7 +538,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   e.currentTarget.style.outline = 'none';
                 }}
               >
-                {t('register.termsLabel')}
+                {t('register.termsLink')}
               </Button>{' '}
               {t('register.and')}{' '}
               <Button
@@ -563,7 +563,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   e.currentTarget.style.outline = 'none';
                 }}
               >
-                {t('register.privacyLabel')}
+                {t('register.privacyLink')}
               </Button>
             </Checkbox>
           </Form.Item>
@@ -585,7 +585,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading || isSubmitting ? t('register.submitting') : t('register.submitButton')}
+              {isLoading || isSubmitting ? t('register.registering') : t('register.registerButton')}
             </Button>
           </Form.Item>
         </Form>
@@ -598,7 +598,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             margin: '24px 0',
           }}
         >
-          {t('register.divider')}
+          {t('register.orContinueWith')}
         </Divider>
 
         {/* Google OAuth Button */}
@@ -642,7 +642,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 height: 'auto',
               }}
             >
-              {t('register.signInLink')}
+              {t('register.signIn')}
             </Button>
           </div>
         )}
