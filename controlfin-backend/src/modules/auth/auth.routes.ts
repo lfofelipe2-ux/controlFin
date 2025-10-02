@@ -22,6 +22,13 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/register',
     {
+      // Applying rate limit: max 3 requests per minute per IP
+      config: {
+        rateLimit: {
+          max: 3,
+          timeWindow: '1 minute',
+        },
+      },
       schema: {
         body: registerSchema,
         response: {
