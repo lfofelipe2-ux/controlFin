@@ -334,7 +334,7 @@ ErrorSystem
 
 ## ERROR MESSAGE PATTERNS
 
-### Validation Messages
+### Validation Messages (BlockAI Conformity)
 
 ```typescript
 const validationMessages = {
@@ -354,6 +354,14 @@ const validationMessages = {
     minLength: 'Name must be at least 2 characters',
     maxLength: 'Name cannot exceed 50 characters',
   },
+};
+
+// BlockAI Error Colors
+const blockAIErrorColors = {
+  fieldError: '#ff3366', // Error/Danger do BlockAI
+  success: '#00ff88', // Success do BlockAI
+  warning: '#ffaa00', // Warning do BlockAI
+  textSecondary: '#a0a4b8', // Texto secundário do BlockAI
 };
 ```
 

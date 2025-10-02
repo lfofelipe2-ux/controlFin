@@ -160,16 +160,16 @@ After analyzing the options, **Option 4: Mobile-First Progressive Enhancement** 
 **Grid System**: Ant Design responsive grid with custom breakpoints
 **Touch Strategy**: 44px minimum touch targets, gesture-friendly navigation
 
-### Responsive Breakpoints
+### Responsive Breakpoints (BlockAI Conformity)
 
 ```typescript
 const breakpoints = {
-  xs: '320px', // Mobile portrait
+  xs: '320px', // Mobile portrait (BlockAI)
   sm: '576px', // Mobile landscape
-  md: '768px', // Tablet portrait
-  lg: '1024px', // Tablet landscape / Small desktop
-  xl: '1200px', // Desktop
-  xxl: '1600px', // Large desktop
+  md: '768px', // Tablet portrait (BlockAI)
+  lg: '1024px', // Desktop (BlockAI)
+  xl: '1200px', // Large desktop
+  xxl: '1920px', // Extra large (BlockAI)
 };
 ```
 

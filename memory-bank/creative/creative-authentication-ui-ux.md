@@ -165,6 +165,12 @@ After analyzing the options, **Option 3: Dedicated Authentication Pages with Pro
    - Contextual help and guidance
    - Smooth transitions between states
 
+5. **BlockAI Design System Conformity**
+   - Paleta de cores exata do BlockAI
+   - Tipografia Google Fonts (Inter, Poppins, Roboto)
+   - Componentes com estilos BlockAI
+   - Layout responsivo conforme breakpoints BlockAI
+
 ---
 
 ## IMPLEMENTATION PLAN
@@ -210,19 +216,24 @@ After analyzing the options, **Option 3: Dedicated Authentication Pages with Pro
 
 ### Phase 3: Visual Design System
 
-1. **Color Scheme**
-   - Primary: Professional blue (#1890ff)
-   - Success: Green (#52c41a)
-   - Error: Red (#ff4d4f)
-   - Warning: Orange (#faad14)
-   - Text: Dark gray (#262626)
-   - Background: Light gray (#f5f5f5)
+1. **Color Scheme (BlockAI Conformity)**
+   - Background Principal: #2d3561 (azul-roxo escuro profundo)
+   - Background Cards: #363d65 (azul médio escuro)
+   - Accent Primário: #00d9ff (ciano elétrico)
+   - Accent Secundário: #2196f3 (azul royal)
+   - Texto Principal: #ffffff (branco)
+   - Texto Secundário: #a0a4b8 (cinza azulado claro)
+   - Success: #00ff88 (verde neon)
+   - Error/Danger: #ff3366 (vermelho vibrante)
+   - Warning: #ffaa00 (laranja)
 
-2. **Typography**
-   - Headers: Inter, 24px, bold
-   - Form labels: Inter, 14px, medium
-   - Body text: Inter, 14px, regular
-   - Help text: Inter, 12px, regular
+2. **Typography (BlockAI Conformity)**
+   - Font Family: Inter, Poppins, Roboto (Google Fonts)
+   - Headers: Inter, 24px, semibold (600)
+   - Form labels: Inter, 14px, regular (400)
+   - Body text: Inter, 16px, regular (400)
+   - Help text: Inter, 12px, light (300)
+   - Secondary text: #a0a4b8 (cinza azulado claro)
 
 3. **Spacing System**
    - Base unit: 8px
