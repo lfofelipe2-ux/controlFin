@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import rateLimit from '@fastify/rate-limit';
 import {
   changePasswordSchema,
   loginSchema,
@@ -12,6 +13,11 @@ import {
 import { authService } from './auth.service';
 
 export async function authRoutes(fastify: FastifyInstance) {
+  // Register rate limit plugin if not already registered
+  // (if registered globally elsewhere, this will be a noop)
+  if (!fastify.hasDecorator('rateLimit')) {
+    await fastify.register(rateLimit);
+  }
   // Register user
   fastify.post(
     '/register',
@@ -89,6 +95,13 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/login',
     {
+      // Applying rate limit: max 5 requests per minute per IP
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute',
+        },
+      },
       schema: {
         body: loginSchema,
         response: {
