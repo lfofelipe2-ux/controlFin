@@ -5,7 +5,6 @@
  * components, ensuring type safety and validation consistency.
  */
 
-import React from 'react';
 import { z } from 'zod';
 
 // === ZOD VALIDATION SCHEMAS ===
@@ -210,20 +209,7 @@ export interface AuthActions {
   clearError: () => void;
 }
 
-/**
- * Password strength level
- */
-export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
-
-/**
- * Password strength result
- */
-export interface PasswordStrengthResult {
-  level: PasswordStrength;
-  score: number;
-  feedback: string[];
-  isValid: boolean;
-}
+// Password strength types are now exported from src/hooks/usePasswordStrength
 
 /**
  * Form validation error
@@ -248,7 +234,7 @@ export interface FormState {
 /**
  * Password strength checker
  */
-export const checkPasswordStrength = (password: string): PasswordStrengthResult => {
+export const checkPasswordStrength = (password: string) => {
   const feedback: string[] = [];
   let score = 0;
 
@@ -288,7 +274,7 @@ export const checkPasswordStrength = (password: string): PasswordStrengthResult 
   }
 
   // Determine strength level
-  let level: PasswordStrength;
+  let level: 'weak' | 'fair' | 'good' | 'strong';
   if (score < 3) {
     level = 'weak';
   } else if (score < 4) {
@@ -310,7 +296,7 @@ export const checkPasswordStrength = (password: string): PasswordStrengthResult 
 /**
  * Get password strength color based on level
  */
-export const getPasswordStrengthColor = (level: PasswordStrength): string => {
+export const getPasswordStrengthColor = (level: 'weak' | 'fair' | 'good' | 'strong'): string => {
   switch (level) {
     case 'weak':
       return '#ff3366'; // Error color
@@ -325,93 +311,12 @@ export const getPasswordStrengthColor = (level: PasswordStrength): string => {
   }
 };
 
-/**
- * Password strength hook
- */
-export const usePasswordStrength = (password: string) => {
-  const [strength, setStrength] = React.useState<{
-    level: 'weak' | 'fair' | 'good' | 'strong';
-    score: number;
-    feedback: string[];
-    isValid: boolean;
-  }>({
-    level: 'weak',
-    score: 0,
-    feedback: [],
-    isValid: false,
-  });
-
-  React.useEffect(() => {
-    if (!password) {
-      setStrength({
-        level: 'weak',
-        score: 0,
-        feedback: [],
-        isValid: false,
-      });
-      return;
-    }
-
-    const feedback: string[] = [];
-    let score = 0;
-
-    // Length check
-    if (password.length >= 8) {
-      score += 1;
-    } else {
-      feedback.push('At least 8 characters');
-    }
-
-    // Lowercase check
-    if (/[a-z]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push('At least one lowercase letter');
-    }
-
-    // Uppercase check
-    if (/[A-Z]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push('At least one uppercase letter');
-    }
-
-    // Number check
-    if (/\d/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push('At least one number');
-    }
-
-    // Special character check
-    if (/[@$!%*?&]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push('At least one special character (@$!%*?&)');
-    }
-
-    // Determine strength level
-    let level: 'weak' | 'fair' | 'good' | 'strong';
-    if (score < 3) {
-      level = 'weak';
-    } else if (score < 4) {
-      level = 'fair';
-    } else if (score < 5) {
-      level = 'good';
-    } else {
-      level = 'strong';
-    }
-
-    setStrength({
-      level,
-      score,
-      feedback,
-      isValid: score >= 4,
-    });
-  }, [password]);
-
-  return strength;
-};
+// Password strength hook is now exported from src/hooks/usePasswordStrength
+export {
+  usePasswordStrength,
+  type PasswordStrength,
+  type PasswordStrengthResult,
+} from '../hooks/usePasswordStrength';
 
 export default {
   loginSchema,
@@ -420,5 +325,4 @@ export default {
   resetPasswordSchema,
   checkPasswordStrength,
   getPasswordStrengthColor,
-  usePasswordStrength,
 };

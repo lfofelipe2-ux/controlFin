@@ -17,7 +17,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
-import { type ResetPasswordFormData, usePasswordStrength } from '../../types/auth';
+import { type ResetPasswordFormData } from '../../types/auth';
+import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -104,8 +105,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
         className={className}
         style={{
           background: colors.backgroundCards,
-          border: `1px solid rgba(255, 255, 255, 0.1)`,
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+          border: `1px solid ${colors.colorWhiteOpacity10}`,
+          boxShadow: `0 8px 24px ${colors.colorBlackOpacity30}`,
           ...style,
         }}
       >
@@ -171,8 +172,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
       className={className}
       style={{
         background: colors.backgroundCards,
-        border: `1px solid rgba(255, 255, 255, 0.1)`,
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+        border: `1px solid ${colors.colorWhiteOpacity10}`,
+        boxShadow: `0 8px 24px ${colors.colorBlackOpacity30}`,
         ...style,
       }}
     >

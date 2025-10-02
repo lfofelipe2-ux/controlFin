@@ -32,7 +32,8 @@ import {
 } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/Form';
 import { useNavigate } from 'react-router-dom';
-import { type RegisterFormData, usePasswordStrength } from '../../types/auth';
+import { type RegisterFormData } from '../../types/auth';
+import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
@@ -408,7 +409,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               />
               <Space direction='vertical' size='small'>
                 {passwordStrength.feedback.map((feedback: string, index: number) => (
-                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div key={feedback} style={{ display: 'flex', alignItems: 'center' }}>
                     {passwordStrength.score > index ? (
                       <CheckCircleOutlined
                         style={{

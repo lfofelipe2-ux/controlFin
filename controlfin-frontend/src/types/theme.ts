@@ -23,6 +23,15 @@ export interface BlockAIColors {
   success: string; // #00ff88
   error: string; // #ff3366
   warning: string; // #ffaa00
+
+  // Common Colors
+  colorWhite: string; // #ffffff
+  colorBlack: string; // #000000
+  colorTransparent: string; // transparent
+  colorWhiteOpacity10: string; // rgba(255, 255, 255, 0.1)
+  colorWhiteOpacity05: string; // rgba(255, 255, 255, 0.05)
+  colorBlackOpacity30: string; // rgba(0, 0, 0, 0.3)
+  colorBlackOpacity50: string; // rgba(0, 0, 0, 0.5)
 }
 
 export interface BlockAITypography {
@@ -144,6 +153,13 @@ export const blockAIDesignSystem: BlockAIDesignSystem = {
     success: '#00ff88',
     error: '#ff3366',
     warning: '#ffaa00',
+    colorWhite: '#ffffff',
+    colorBlack: '#000000',
+    colorTransparent: 'transparent',
+    colorWhiteOpacity10: 'rgba(255, 255, 255, 0.1)',
+    colorWhiteOpacity05: 'rgba(255, 255, 255, 0.05)',
+    colorBlackOpacity30: 'rgba(0, 0, 0, 0.3)',
+    colorBlackOpacity50: 'rgba(0, 0, 0, 0.5)',
   },
 
   typography: {
