@@ -244,7 +244,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
           </Form.Item>
 
           {/* Remember Me & Forgot Password */}
-          <Row justify='space-between' align='middle'>
+          <Row
+            justify='space-between'
+            align='middle'
+            style={{ marginTop: '16px', marginBottom: '24px' }}
+          >
             <Col>
               <Form.Item name='rememberMe' valuePropName='checked' noStyle>
                 <Checkbox
@@ -274,7 +278,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           </Row>
 
           {/* Submit Button */}
-          <Form.Item style={{ marginBottom: '24px' }}>
+          <Form.Item>
             <Button
               type='primary'
               htmlType='submit'

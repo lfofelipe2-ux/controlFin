@@ -494,6 +494,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Form.Item
             name='termsAccepted'
             valuePropName='checked'
+            style={{ marginTop: '16px', marginBottom: '24px' }}
             rules={[
               {
                 validator: (_, value) =>
@@ -537,7 +538,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </Form.Item>
 
           {/* Submit Button */}
-          <Form.Item style={{ marginBottom: '24px' }}>
+          <Form.Item>
             <Button
               type='primary'
               htmlType='submit'
