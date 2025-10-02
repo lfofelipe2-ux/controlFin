@@ -33,6 +33,20 @@ body {
   background-color: transparent;
 }
 
+/* Fix spacing between form inputs and error messages */
+.ant-form-item-explain-error {
+  margin-top: 8px !important;
+}
+
+/* Remove focus outlines from link buttons */
+.ant-btn-link:focus,
+.ant-btn-link:hover,
+.ant-btn-link:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

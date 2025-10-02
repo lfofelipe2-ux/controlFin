@@ -235,7 +235,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 ]}
               >
                 <Input
-                  prefix={<UserOutlined style={{ color: colors.textSecondary }} />}
+                  prefix={
+                    <UserOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />
+                  }
                   placeholder='First name'
                   style={{
                     background: colors.backgroundCards,
@@ -272,7 +274,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 ]}
               >
                 <Input
-                  prefix={<UserOutlined style={{ color: colors.textSecondary }} />}
+                  prefix={
+                    <UserOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />
+                  }
                   placeholder='Last name'
                   style={{
                     background: colors.backgroundCards,
@@ -311,7 +315,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             ]}
           >
             <Input
-              prefix={<MailOutlined style={{ color: colors.textSecondary }} />}
+              prefix={<MailOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
               placeholder='Enter your email'
               style={{
                 background: colors.backgroundCards,
@@ -353,7 +357,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             ]}
           >
             <Input.Password
-              prefix={<LockOutlined style={{ color: colors.textSecondary }} />}
+              prefix={<LockOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
               placeholder='Create a strong password'
               iconRender={(visible) =>
                 visible ? (
@@ -472,7 +476,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             ]}
           >
             <Input.Password
-              prefix={<LockOutlined style={{ color: colors.textSecondary }} />}
+              prefix={<LockOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
               placeholder='Confirm your password'
               iconRender={(visible) =>
                 visible ? (
@@ -518,6 +522,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   fontSize: typography.sizes.desktop.small,
                   padding: 0,
                   height: 'auto',
+                  border: 'none',
+                  boxShadow: 'none',
+                  outline: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.outline = 'none';
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.outline = 'none';
                 }}
               >
                 Terms of Service
@@ -530,6 +547,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   fontSize: typography.sizes.desktop.small,
                   padding: 0,
                   height: 'auto',
+                  border: 'none',
+                  boxShadow: 'none',
+                  outline: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.outline = 'none';
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.outline = 'none';
                 }}
               >
                 Privacy Policy
