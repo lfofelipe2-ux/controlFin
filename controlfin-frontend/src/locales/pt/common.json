@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "ControlFin",
+    "tagline": "Gestão Inteligente de Finanças Pessoais"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "finish": "Finalizar",
+    "retry": "Tentar Novamente",
+    "loading": "Carregando..."
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "minLength": "Mínimo de {{count}} caracteres necessários",
+    "maxLength": "Máximo de {{count}} caracteres permitidos",
+    "email": "Por favor, digite um endereço de email válido",
+    "url": "Por favor, digite uma URL válida",
+    "number": "Por favor, digite um número válido",
+    "positive": "Por favor, digite um número positivo",
+    "integer": "Por favor, digite um número inteiro"
+  },
+  "messages": {
+    "success": "Sucesso",
+    "error": "Erro",
+    "warning": "Aviso",
+    "info": "Informação",
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "deleting": "Excluindo...",
+    "noData": "Nenhum dado disponível",
+    "comingSoon": "Em breve",
+    "maintenance": "Em manutenção"
+  },
+  "navigation": {
+    "home": "Início",
+    "dashboard": "Painel",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "help": "Ajuda",
+    "logout": "Sair"
+  },
+  "time": {
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "tomorrow": "Amanhã",
+    "now": "Agora",
+    "ago": "atrás",
+    "in": "em",
+    "seconds": "segundos",
+    "minutes": "minutos",
+    "hours": "horas",
+    "days": "dias",
+    "weeks": "semanas",
+    "months": "meses",
+    "years": "anos"
+  },
+  "language": {
+    "label": "Idioma",
+    "english": "English",
+    "portuguese": "Português"
+  }
+}
