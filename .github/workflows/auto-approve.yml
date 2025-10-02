@@ -1,0 +1,48 @@
+name: Auto Approve
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-approve:
+    name: Auto Approve
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' || github.actor == 'renovate[bot]'
+    
+    steps:
+      - name: Auto approve PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Check if PR is from dependabot or renovate
+            const isBot = pr.user.login === 'dependabot[bot]' || pr.user.login === 'renovate[bot]';
+            
+            if (isBot) {
+              // Check if PR only updates dependencies
+              const files = await github.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number
+              });
+              
+              const onlyDependencyFiles = files.data.every(file => 
+                file.filename.includes('package.json') || 
+                file.filename.includes('package-lock.json') || 
+                file.filename.includes('yarn.lock') ||
+                file.filename.includes('pnpm-lock.yaml')
+              );
+              
+              if (onlyDependencyFiles) {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  event: 'APPROVE',
+                  body: '✅ Aprovado automaticamente - Atualização de dependências'
+                });
+              }
+            }
+

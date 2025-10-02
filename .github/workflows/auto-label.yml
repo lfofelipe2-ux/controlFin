@@ -1,0 +1,192 @@
+name: Auto Label
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-label:
+    name: Auto Label
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Auto label issues
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = [];
+            
+            // Auto-detect labels based on title and body
+            const title = issue.title.toLowerCase();
+            const body = issue.body?.toLowerCase() || '';
+            
+            if (title.includes('bug') || title.includes('error') || title.includes('fix')) {
+              labels.push('bug');
+            }
+            
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('new')) {
+              labels.push('enhancement');
+            }
+            
+            if (title.includes('docs') || title.includes('documentation')) {
+              labels.push('documentation');
+            }
+            
+            if (title.includes('test') || title.includes('testing')) {
+              labels.push('testing');
+            }
+            
+            if (title.includes('refactor') || title.includes('refactoring')) {
+              labels.push('refactor');
+            }
+            
+            if (title.includes('performance') || title.includes('optimization')) {
+              labels.push('performance');
+            }
+            
+            if (title.includes('security') || title.includes('vulnerability')) {
+              labels.push('security');
+            }
+            
+            if (title.includes('ui') || title.includes('ux') || title.includes('design')) {
+              labels.push('ui/ux');
+            }
+            
+            if (title.includes('api') || title.includes('backend')) {
+              labels.push('backend');
+            }
+            
+            if (title.includes('frontend') || title.includes('react') || title.includes('component')) {
+              labels.push('frontend');
+            }
+            
+            if (title.includes('database') || title.includes('db') || title.includes('mongodb')) {
+              labels.push('database');
+            }
+            
+            if (title.includes('ci') || title.includes('cd') || title.includes('deploy')) {
+              labels.push('ci/cd');
+            }
+            
+            if (title.includes('dependencies') || title.includes('deps') || title.includes('update')) {
+              labels.push('dependencies');
+            }
+            
+            if (title.includes('breaking') || title.includes('breaking change')) {
+              labels.push('breaking-change');
+            }
+            
+            if (title.includes('good first issue') || title.includes('beginner')) {
+              labels.push('good first issue');
+            }
+            
+            if (title.includes('help wanted') || title.includes('help')) {
+              labels.push('help wanted');
+            }
+            
+            if (title.includes('priority') || title.includes('urgent') || title.includes('critical')) {
+              labels.push('priority');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
+
+      - name: Auto label pull requests
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = [];
+            
+            // Auto-detect labels based on title and body
+            const title = pr.title.toLowerCase();
+            const body = pr.body?.toLowerCase() || '';
+            
+            if (title.includes('bug') || title.includes('error') || title.includes('fix')) {
+              labels.push('bug');
+            }
+            
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('new')) {
+              labels.push('enhancement');
+            }
+            
+            if (title.includes('docs') || title.includes('documentation')) {
+              labels.push('documentation');
+            }
+            
+            if (title.includes('test') || title.includes('testing')) {
+              labels.push('testing');
+            }
+            
+            if (title.includes('refactor') || title.includes('refactoring')) {
+              labels.push('refactor');
+            }
+            
+            if (title.includes('performance') || title.includes('optimization')) {
+              labels.push('performance');
+            }
+            
+            if (title.includes('security') || title.includes('vulnerability')) {
+              labels.push('security');
+            }
+            
+            if (title.includes('ui') || title.includes('ux') || title.includes('design')) {
+              labels.push('ui/ux');
+            }
+            
+            if (title.includes('api') || title.includes('backend')) {
+              labels.push('backend');
+            }
+            
+            if (title.includes('frontend') || title.includes('react') || title.includes('component')) {
+              labels.push('frontend');
+            }
+            
+            if (title.includes('database') || title.includes('db') || title.includes('mongodb')) {
+              labels.push('database');
+            }
+            
+            if (title.includes('ci') || title.includes('cd') || title.includes('deploy')) {
+              labels.push('ci/cd');
+            }
+            
+            if (title.includes('dependencies') || title.includes('deps') || title.includes('update')) {
+              labels.push('dependencies');
+            }
+            
+            if (title.includes('breaking') || title.includes('breaking change')) {
+              labels.push('breaking-change');
+            }
+            
+            if (title.includes('good first issue') || title.includes('beginner')) {
+              labels.push('good first issue');
+            }
+            
+            if (title.includes('help wanted') || title.includes('help')) {
+              labels.push('help wanted');
+            }
+            
+            if (title.includes('priority') || title.includes('urgent') || title.includes('critical')) {
+              labels.push('priority');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labels
+              });
+            }
+
