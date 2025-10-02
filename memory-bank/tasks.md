@@ -2,10 +2,11 @@
 
 ## Current Task Status
 
-- **Status:** TASK-007 COMPLETED & ARCHIVED ✅
+- **Status:** TASK-007 COMPLETED, ARCHIVED & PR CREATED ✅
 - **Mode:** READY FOR NEXT TASK (Level 3 Intermediate Feature)
 - **Date Completed:** 2025-10-02
 - **Archive Document:** `docs/archive/archive-task-007-i18n-ui-standards-20251002.md`
+- **Pull Request:** [#15](https://github.com/lfofelipe2-ux/controlFin/pull/15)
 
 ## 🚨 CRITICAL ISSUE IDENTIFIED
 
