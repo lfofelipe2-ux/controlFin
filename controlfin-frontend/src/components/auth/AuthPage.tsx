@@ -182,8 +182,13 @@ const AuthPage: React.FC<AuthPageProps> = ({
       style={{
         minHeight: '100vh',
         height: '100vh',
+        width: '100vw',
         background: `linear-gradient(135deg, ${colors.backgroundPrimary} 0%, ${colors.backgroundSidebar} 100%)`,
         padding: '16px',
+        margin: 0,
+        position: 'fixed',
+        top: 0,
+        left: 0,
         ...style,
       }}
     >
