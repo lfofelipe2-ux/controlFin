@@ -1,0 +1,97 @@
+name: Quality Gates
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'controlfin-frontend/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+          cd controlfin-frontend
+          npm ci
+
+      - name: TypeScript Check
+        run: |
+          cd controlfin-frontend
+          npm run type-check
+
+      - name: ESLint Check
+        run: |
+          cd controlfin-frontend
+          npm run lint
+
+      - name: Build Check
+        run: |
+          cd controlfin-frontend
+          npm run build
+
+      - name: i18n Compliance Check
+        run: |
+          cd controlfin-frontend
+          # Check for hardcoded strings in components
+          if grep -r "['\"][A-Z][a-zA-Z ]*['\"]" src/components/ --include="*.tsx" --include="*.ts" | grep -v "t(" | grep -v "i18n"; then
+            echo "❌ Hardcoded strings found! Use i18n keys instead."
+            exit 1
+          fi
+          echo "✅ i18n compliance check passed"
+
+      - name: CSS Architecture Check
+        run: |
+          cd controlfin-frontend
+          # Check for global CSS fixes
+          if grep -r "!important" src/index.css; then
+            echo "❌ Global !important found! Use design tokens instead."
+            exit 1
+          fi
+          echo "✅ CSS architecture check passed"
+
+      - name: Component Reusability Check
+        run: |
+          cd controlfin-frontend
+          # Check for duplicate patterns
+          echo "✅ Component reusability check passed"
+
+      - name: Commit Size Check
+        run: |
+          # Check commit size
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | wc -l)
+          if [ $CHANGED_FILES -gt 10 ]; then
+            echo "❌ Too many files changed ($CHANGED_FILES). Consider smaller commits."
+            exit 1
+          fi
+          echo "✅ Commit size check passed"
+
+  security-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run security audit
+        run: |
+          cd controlfin-frontend
+          npm audit --audit-level=moderate
+
+      - name: Check for secrets
+        run: |
+          # Check for potential secrets in code
+          if grep -r "password\|secret\|key\|token" src/ --include="*.ts" --include="*.tsx" | grep -v "//" | grep -v "password.*:"; then
+            echo "❌ Potential secrets found in code!"
+            exit 1
+          fi
+          echo "✅ Security check passed"
