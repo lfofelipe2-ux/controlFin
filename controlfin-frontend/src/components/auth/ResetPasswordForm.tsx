@@ -83,8 +83,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
       });
       setIsSuccess(true);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to reset password');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reset password';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -3,11 +3,16 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import rateLimit from '@fastify/rate-limit';
 import {
   changePasswordSchema,
+  ChangePasswordInput,
+  LoginInput,
   loginSchema,
   passwordResetRequestSchema,
   passwordResetSchema,
+  RefreshTokenInput,
   refreshTokenSchema,
+  RegisterInput,
   registerSchema,
+  UpdateProfileInput,
   updateProfileSchema,
 } from './auth.schemas';
 import { authService } from './auth.service';
@@ -71,7 +76,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const result = await authService.register(request.body as any);
+        const result = await authService.register(request.body as RegisterInput);
 
         return reply.status(201).send({
           message: 'User registered successfully',
@@ -95,7 +100,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Login user
@@ -152,7 +157,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const result = await authService.login(request.body as any);
+        const result = await authService.login(request.body as LoginInput);
 
         return reply.send({
           message: 'Login successful',
@@ -176,7 +181,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Refresh token
@@ -212,7 +217,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const tokens = await authService.refreshToken(request.body as any);
+        const tokens = await authService.refreshToken(request.body as RefreshTokenInput);
 
         return reply.send({
           message: 'Token refreshed successfully',
@@ -235,7 +240,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Logout user
@@ -270,7 +275,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Get current user profile
@@ -318,7 +323,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Update user profile
@@ -354,7 +359,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.updateProfile(request.user!._id, request.body as any);
+        const user = await authService.updateProfile(request.user!._id, request.body as UpdateProfileInput);
 
         return reply.send({
           message: 'Profile updated successfully',
@@ -377,7 +382,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Change password
@@ -407,7 +412,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.changePassword(request.user!._id, request.body as any);
+        await authService.changePassword(request.user!._id, request.body as ChangePasswordInput);
 
         return reply.send({
           message: 'Password changed successfully',
@@ -429,7 +434,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Request password reset (placeholder - requires email service)
@@ -453,7 +458,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       return reply.send({
         message: 'Password reset email sent (placeholder)',
       });
-    }
+    },
   );
 
   // Reset password (placeholder - requires email service)
@@ -477,6 +482,6 @@ export async function authRoutes(fastify: FastifyInstance) {
       return reply.send({
         message: 'Password reset successful (placeholder)',
       });
-    }
+    },
   );
 }

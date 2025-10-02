@@ -83,7 +83,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       } else {
         navigate('/dashboard');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
       // Error is handled by the auth hook
     } finally {
@@ -97,7 +97,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleGoogleLogin = () => {
     try {
       authService.initiateGoogleLogin();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google login error:', error);
     }
   };

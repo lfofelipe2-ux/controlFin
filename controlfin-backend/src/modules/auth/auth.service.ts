@@ -26,6 +26,15 @@ export interface AuthResponse {
   tokens: AuthTokens;
 }
 
+export interface JwtPayload {
+  userId: string;
+  type: 'access' | 'refresh';
+  iat?: number;
+  exp?: number;
+  iss?: string;
+  aud?: string;
+}
+
 export class AuthService {
   /**
    * Hash password using bcrypt
@@ -53,10 +62,10 @@ export class AuthService {
       },
       JWT_SECRET,
       {
-        expiresIn: JWT_EXPIRES_IN as any,
+        expiresIn: JWT_EXPIRES_IN,
         issuer: 'controlfin-api',
         audience: 'controlfin-client',
-      }
+      } as jwt.SignOptions,
     );
   }
 
@@ -71,10 +80,10 @@ export class AuthService {
       },
       JWT_REFRESH_SECRET,
       {
-        expiresIn: JWT_REFRESH_EXPIRES_IN as any,
+        expiresIn: JWT_REFRESH_EXPIRES_IN,
         issuer: 'controlfin-api',
         audience: 'controlfin-client',
-      }
+      } as jwt.SignOptions,
     );
   }
 
@@ -91,10 +100,10 @@ export class AuthService {
   /**
    * Verify JWT token
    */
-  private verifyToken(token: string, secret: string): any {
+  private verifyToken(token: string, secret: string): JwtPayload {
     try {
-      return jwt.verify(token, secret);
-    } catch (error) {
+      return jwt.verify(token, secret) as JwtPayload;
+    } catch {
       throw new Error('Invalid token');
     }
   }
@@ -228,8 +237,12 @@ export class AuthService {
     }
 
     // Update fields
-    if (data.firstName !== undefined) user.firstName = data.firstName;
-    if (data.lastName !== undefined) user.lastName = data.lastName;
+    if (data.firstName !== undefined) {
+      user.firstName = data.firstName;
+    }
+    if (data.lastName !== undefined) {
+      user.lastName = data.lastName;
+    }
     if (data.avatar !== undefined) {
       user.avatar = data.avatar || undefined;
     }
@@ -270,14 +283,14 @@ export class AuthService {
   /**
    * Verify JWT access token
    */
-  verifyAccessToken(token: string): any {
+  verifyAccessToken(token: string): JwtPayload {
     return this.verifyToken(token, JWT_SECRET);
   }
 
   /**
    * Verify JWT refresh token
    */
-  verifyRefreshToken(token: string): any {
+  verifyRefreshToken(token: string): JwtPayload {
     return this.verifyToken(token, JWT_REFRESH_SECRET);
   }
 }

@@ -55,12 +55,13 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Login failed';
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message || 'Login failed',
+            error: errorMessage,
             accessToken: null,
             refreshToken: null,
           });
@@ -85,12 +86,13 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed';
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message || 'Registration failed',
+            error: errorMessage,
             accessToken: null,
             refreshToken: null,
           });
@@ -129,10 +131,11 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await authService.requestPasswordReset(email);
           set({ isLoading: false, error: null });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Password reset request failed';
           set({
             isLoading: false,
-            error: error.message || 'Password reset request failed',
+            error: errorMessage,
           });
           throw error;
         }
@@ -147,10 +150,11 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await authService.resetPassword(data);
           set({ isLoading: false, error: null });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
           set({
             isLoading: false,
-            error: error.message || 'Password reset failed',
+            error: errorMessage,
           });
           throw error;
         }
@@ -173,7 +177,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: response.accessToken,
             error: null,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           // If refresh fails, logout user
           set({
             user: null,
@@ -228,7 +232,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
           });
-        } catch (error: any) {
+        } catch {
           // If getting user data fails, logout
           get().logout();
         }

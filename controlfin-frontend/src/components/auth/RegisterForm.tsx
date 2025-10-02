@@ -92,7 +92,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       } else {
         navigate('/dashboard');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration error:', error);
       // Error is handled by the auth hook
     } finally {
@@ -106,7 +106,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const handleGoogleRegister = () => {
     try {
       authService.initiateGoogleLogin();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google registration error:', error);
     }
   };

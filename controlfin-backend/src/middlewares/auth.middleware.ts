@@ -65,7 +65,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
       avatar: user.avatar || undefined,
       isEmailVerified: user.isEmailVerified,
     };
-  } catch (error) {
+  } catch {
     return reply.status(401).send({
       error: 'Unauthorized',
       message: 'Invalid or expired token',
@@ -80,7 +80,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
  */
 export async function optionalAuthMiddleware(
   request: FastifyRequest,
-  _reply: FastifyReply
+  _reply: FastifyReply,
 ): Promise<void> {
   try {
     const authHeader = request.headers.authorization;
@@ -107,7 +107,7 @@ export async function optionalAuthMiddleware(
         isEmailVerified: user.isEmailVerified,
       };
     }
-  } catch (error) {
+  } catch {
     // Silently continue without user on any error
     return;
   }
@@ -119,7 +119,7 @@ export async function optionalAuthMiddleware(
  */
 export async function emailVerificationRequiredMiddleware(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   // First run auth middleware
   await authMiddleware(request, reply);
