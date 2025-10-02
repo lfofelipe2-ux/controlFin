@@ -6,15 +6,15 @@
  */
 
 import { Button as AntButton } from 'antd';
+import type { ButtonType } from 'antd/es/button';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import './Button.scss';
 import type { ButtonProps, ButtonVariant } from './Button.types';
 
 /**
  * Map variant to Ant Design button type
  */
-const getAntButtonType = (variant: ButtonVariant = 'primary'): any => {
+const getAntButtonType = (variant: ButtonVariant = 'primary'): ButtonType => {
   switch (variant) {
     case 'primary':
       return 'primary';
