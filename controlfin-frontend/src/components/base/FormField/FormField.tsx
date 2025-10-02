@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { Input } from '../Input/Input';
-import type { FormFieldProps } from './FormField.types';
 import './FormField.scss';
+import type { FormFieldProps } from './FormField.types';
 
 /**
  * FormField Component

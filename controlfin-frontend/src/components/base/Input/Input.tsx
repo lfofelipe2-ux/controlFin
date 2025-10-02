@@ -8,8 +8,8 @@
 import { Input as AntInput } from 'antd';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { InputProps, PasswordInputProps } from './Input.types';
 import './Input.scss';
+import type { InputProps, PasswordInputProps } from './Input.types';
 
 /**
  * Base Input Component

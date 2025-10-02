@@ -5,39 +5,39 @@
  * and Google OAuth integration, following the BlockAI design system.
  */
 
-import React, { useState } from 'react';
 import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Typography,
-  Space,
-  Divider,
-  Alert,
-  Card,
-  Row,
-  Col,
-  Progress,
-} from 'antd';
-import {
-  UserOutlined,
-  LockOutlined,
-  MailOutlined,
-  GoogleOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  GoogleOutlined,
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Progress,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type RegisterFormData } from '../../types/auth';
-import { usePasswordStrength } from '../../hooks/usePasswordStrength';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
+import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import authService from '../../services/authService';
+import { type RegisterFormData } from '../../types/auth';
 
 const { Title, Text, Paragraph } = Typography;
 

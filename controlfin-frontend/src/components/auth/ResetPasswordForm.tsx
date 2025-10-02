@@ -17,9 +17,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
+import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import authService from '../../services/authService';
 import { type ResetPasswordFormData } from '../../types/auth';
-import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 
 const { Title, Text, Paragraph } = Typography;
 
