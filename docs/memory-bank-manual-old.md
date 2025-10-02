@@ -12,13 +12,13 @@ O Memory Bank é um framework modular e orientado por documentação que usa mod
 - **Custom Modes**: Funcionalidade deve estar habilitada (Settings → Features → Chat → Custom modes)
 - **AI Model**: Claude 4 Sonnet ou Claude 4 Opus recomendado para melhores resultados
 
-## 🗂️ Estrutura de Arquivos (Memory Bank Padrão)
+## 🗂️ Estrutura de Arquivos
 
 ```
 memory-bank/
-├── tasks.md                    # Fonte única de verdade para tarefas
+├── tasks.md                    # Tarefas ativas e histórico
 ├── activeContext.md            # Contexto atual do projeto
-├── progress.md                 # Status de implementação
+├── progress.md                 # Progresso geral do projeto
 ├── projectBrief.md             # Brief completo do projeto
 ├── systemPatterns.md           # Padrões arquiteturais
 ├── techContext.md              # Contexto técnico
@@ -44,7 +44,6 @@ memory-bank/
 - Detecta complexidade da tarefa
 - Inicializa arquivos necessários
 - Determina próximo modo
-  **Ferramentas**: Codebase Search, Read File, Terminal, List Directory, Fetch Rules
 
 ### **PLAN Mode** - Planejamento
 
@@ -55,7 +54,6 @@ memory-bank/
 - Cria plano detalhado de implementação
 - Valida tecnologia necessária
 - Identifica fases criativas necessárias
-  **Ferramentas**: Codebase Search, Read File, Terminal, List Directory
 
 ### **CREATIVE Mode** - Design
 
@@ -66,7 +64,6 @@ memory-bank/
 - Analisa múltiplas opções
 - Toma decisões arquiteturais
 - Documenta escolhas e rationale
-  **Ferramentas**: Codebase Search, Read File, Terminal, List Directory, Edit File, Fetch Rules
 
 ### **IMPLEMENT Mode** - Implementação
 
@@ -77,30 +74,26 @@ memory-bank/
 - Executa plano de implementação
 - Cria código e componentes
 - Testa funcionalidade
-  **Ferramentas**: Todas as ferramentas habilitadas
 
-### **REFLECT/ARCHIVE Mode** - Revisão e Arquivamento
+### **REFLECT Mode** - Reflexão
 
 **Quando usar**: Após implementação completa
-**Comando**: `reflect` ou `archive`
+**Comando**: `reflect`
 **Função**:
 
 - Revisa implementação
 - Documenta lições aprendidas
-- Cria documentação completa
-- Move para arquivo permanente
-  **Ferramentas**: Codebase Search, Read File, Terminal, List Directory
+- Identifica melhorias
 
-### **QA Mode** - Validação Técnica
+### **ARCHIVE Mode** - Arquivamento
 
-**Quando usar**: A qualquer momento durante o desenvolvimento
-**Comando**: `qa`
+**Quando usar**: Após reflexão completa
+**Comando**: `archive`
 **Função**:
 
-- Valida implementação técnica
-- Executa testes automatizados
-- Verifica qualidade do código
-  **Nota**: Não é um modo separado, mas funcionalidade integrada em todos os modos
+- Documenta tarefa completa
+- Move para arquivo permanente
+- Limpa arquivos temporários
 
 ## 📊 Níveis de Complexidade
 
@@ -231,29 +224,11 @@ archive
 
 ## 📚 Referências
 
-- **Memory Bank Official**: [vanzan01/cursor-memory-bank](https://github.com/vanzan01/cursor-memory-bank)
 - **Development Standards**: `memory-bank/custom_modes/development_standards.md`
 - **UI/UX Validation**: `memory-bank/custom_modes/ui_ux_validation_workflow.md`
 - **Critical Analysis**: `memory-bank/custom_modes/critical_analysis_report.md`
 
-## 🔄 Diferenças do Sistema Oficial
-
-### **Adaptações para ControlFin**
-
-- Estrutura de arquivos customizada para o projeto
-- Padrões de desenvolvimento específicos (i18n obrigatório)
-- Workflows de validação com Playwright
-- Regras de commit e qualidade específicas
-
-### **Funcionalidades Adicionais**
-
-- Quality Gates automatizados via GitHub Actions
-- Validação de i18n compliance
-- Prevenção de violações arquiteturais
-- Documentação de padrões específicos do projeto
-
 ---
 
 **Última Atualização**: 2025-01-27  
-**Versão**: 2.0 (Baseada no Memory Bank System v0.7-beta)  
-**Compatibilidade**: Cursor 0.48+
+**Versão**: 1.0
