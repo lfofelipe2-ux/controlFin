@@ -336,3 +336,177 @@
 - 2025-01-27: Archive document: archive-task-004-backend-auth-20250127.md
 - 2025-01-27: Memory Bank updated: tasks.md, progress.md, activeContext.md
 - 2025-01-27: **READY FOR NEXT PHASE**: Google OAuth (TASK-005) or Frontend UI (TASK-006)
+
+---
+
+# PR REVIEW RECOMMENDATIONS
+
+## [REC-001]: Production Security Hardening
+
+### Overview
+
+- **Source**: PR #13 Review Comments
+- **Priority**: High
+- **Status**: Pending
+- **Dependencies**: TASK-004 (Backend Authentication API)
+
+### Recommendations
+
+#### [REC-001.1]: JWT Secrets Configuration
+
+- **Description**: Remove fallback values for JWT secrets in production
+- **Current Issue**: Using predictable default values in production
+- **Solution**: Fail application startup if environment variables not provided
+- **Implementation**: Add validation in `auth.service.ts`
+- **Estimated Effort**: 1 hour
+- **Risk Level**: High (Security vulnerability)
+
+**Code Changes Required**:
+
+```typescript
+const JWT_SECRET = process.env['JWT_SECRET'];
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+const JWT_REFRESH_SECRET = process.env['JWT_REFRESH_SECRET'];
+if (!JWT_REFRESH_SECRET) {
+  throw new Error('JWT_REFRESH_SECRET environment variable is required');
+}
+```
+
+#### [REC-001.2]: Rate Limiting Global Configuration
+
+- **Description**: Configure rate limiting globally in application
+- **Current Issue**: Conditional registration creates unclear dependency management
+- **Solution**: Register rate limiting at application level in `server.ts`
+- **Estimated Effort**: 2 hours
+- **Risk Level**: Medium (Performance optimization)
+
+#### [REC-001.3]: Password Reset Implementation
+
+- **Description**: Implement actual password reset functionality
+- **Current Issue**: Placeholder endpoints return success without action
+- **Solution**: Integrate email service (SendGrid, AWS SES, etc.)
+- **Estimated Effort**: 8 hours
+- **Risk Level**: Medium (User experience)
+
+**Implementation Steps**:
+
+1. Choose email service provider
+2. Configure SMTP/API credentials
+3. Create email templates
+4. Implement token generation and validation
+5. Update endpoints to send actual emails
+
+### Environment Variables Required
+
+```bash
+# Production Environment Variables
+JWT_SECRET=your-super-secret-jwt-key-256-bits
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-256-bits
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+MONGODB_URI=mongodb://localhost:27017/controlfin-prod
+
+# Email Service (for password reset)
+EMAIL_SERVICE=sendgrid
+EMAIL_API_KEY=your-sendgrid-api-key
+EMAIL_FROM=noreply@controlfin.com
+```
+
+## [REC-002]: Code Quality Improvements
+
+### Overview
+
+- **Source**: PR #13 Review Comments
+- **Priority**: Low
+- **Status**: Pending
+- **Dependencies**: None
+
+### Recommendations
+
+#### [REC-002.1]: Remove Unnecessary Type Assertions
+
+- **Description**: Remove `as any` type assertions in JWT sign calls
+- **Current Issue**: Type assertions mask potential runtime errors
+- **Solution**: Use proper typing for `expiresIn` parameter
+- **Estimated Effort**: 30 minutes
+- **Risk Level**: Low (Code quality)
+
+#### [REC-002.2]: Simplify Avatar Property Assignment
+
+- **Description**: Remove redundant `|| undefined` expressions
+- **Current Issue**: `user.avatar || undefined` is redundant
+- **Solution**: Use `user.avatar` directly
+- **Estimated Effort**: 15 minutes
+- **Risk Level**: Low (Code quality)
+
+#### [REC-002.3]: Extract Password Validation Pattern
+
+- **Description**: Create constant for password validation regex
+- **Current Issue**: Pattern duplicated in multiple schemas
+- **Solution**: Extract to shared constant
+- **Estimated Effort**: 30 minutes
+- **Risk Level**: Low (Code maintainability)
+
+**Implementation**:
+
+```typescript
+const PASSWORD_PATTERN = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$';
+```
+
+## [REC-003]: Production Deployment Checklist
+
+### Overview
+
+- **Source**: PR #13 Review Comments + Production Readiness
+- **Priority**: High
+- **Status**: Pending
+- **Dependencies**: TASK-004 (Backend Authentication API)
+
+### Checklist
+
+#### [REC-003.1]: Security Configuration
+
+- [ ] Configure strong JWT secrets (256-bit minimum)
+- [ ] Set up environment variable validation
+- [ ] Configure HTTPS in production
+- [ ] Set up rate limiting globally
+- [ ] Configure CORS properly for production domains
+
+#### [REC-003.2]: Database Configuration
+
+- [ ] Configure MongoDB Atlas for production
+- [ ] Set up database backups
+- [ ] Configure connection pooling
+- [ ] Set up monitoring and alerts
+
+#### [REC-003.3]: Monitoring and Logging
+
+- [ ] Set up application monitoring (DataDog, New Relic, etc.)
+- [ ] Configure error tracking (Sentry, Bugsnag, etc.)
+- [ ] Set up log aggregation
+- [ ] Configure health check endpoints
+
+#### [REC-003.4]: Performance Optimization
+
+- [ ] Configure CDN for static assets
+- [ ] Set up caching strategies
+- [ ] Optimize database queries
+- [ ] Configure compression
+
+### Implementation Timeline
+
+- **Week 1**: Security hardening (REC-001)
+- **Week 2**: Code quality improvements (REC-002)
+- **Week 3**: Production deployment preparation (REC-003)
+- **Week 4**: Monitoring and optimization
+
+### Success Criteria
+
+- [ ] All security recommendations implemented
+- [ ] Application fails gracefully with missing environment variables
+- [ ] Rate limiting configured globally
+- [ ] Password reset functionality working
+- [ ] Production deployment successful
+- [ ] Monitoring and alerting configured
