@@ -59,7 +59,18 @@ function validateTranslations() {
       const keyCount = countKeys(parsed);
       console.log(`✅ ${file.name} - ${keyCount} keys, valid JSON`);
     } catch (error) {
-      console.log(`❌ ${file.name} - INVALID JSON: ${error.message}`);
+      let extraInfo = '';
+      // Try to extract position from error message
+      const match = error.message.match(/at position (\d+)/);
+      if (match) {
+        const pos = parseInt(match[1], 10);
+        const lines = content.slice(0, pos).split('\n');
+        const lineNum = lines.length;
+        const colNum = lines[lines.length - 1].length + 1;
+        extraInfo = ` (Error at line ${lineNum}, column ${colNum})`;
+      }
+      console.log(`❌ ${file.name} - INVALID JSON: ${error.message}${extraInfo}`);
+      console.log(`   Tip: Validate your JSON syntax (e.g., https://jsonlint.com) and check for missing commas, quotes, or brackets.`);
       allValid = false;
     }
   }
