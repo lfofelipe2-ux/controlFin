@@ -1,0 +1,81 @@
+# Security policy for ControlFin
+# https://docs.github.com/en/code-security/getting-started/adding-a-security-policy-to-your-repository
+
+# Supported versions
+# Only versions with active support will receive security updates
+supported_versions:
+  - version: ">= 1.0.0"
+    support: "active"
+    until: "2025-12-31"
+
+# Security contact information
+contact:
+  email: security@controlfin.com
+  # Replace with your actual security contact email
+
+# Reporting process
+reporting_process: |
+  ## Como Reportar Vulnerabilidades de Segurança
+
+  Se você encontrou uma vulnerabilidade de segurança no ControlFin, por favor:
+
+  1. **NÃO** abra um issue público
+  2. Envie um email para security@controlfin.com com:
+     - Descrição detalhada da vulnerabilidade
+     - Passos para reproduzir
+     - Impacto potencial
+     - Suas informações de contato
+
+  ### O que esperar:
+
+  - **Resposta inicial**: Dentro de 48 horas
+  - **Avaliação**: Dentro de 7 dias
+  - **Correção**: Dentro de 30 dias (para vulnerabilidades críticas)
+  - **Divulgação**: Após correção e teste
+
+  ### Agradecimentos:
+
+  Agradecemos sua contribuição para manter o ControlFin seguro. Créditos serão dados aos pesquisadores de segurança que reportarem vulnerabilidades de forma responsável.
+
+# Security measures
+security_measures:
+  - "Criptografia em trânsito (HTTPS/TLS)"
+  - "Criptografia em repouso (dados sensíveis)"
+  - "Autenticação robusta (JWT + OAuth)"
+  - "Validação rigorosa de inputs (Zod)"
+  - "Rate limiting e proteção contra DDoS"
+  - "Headers de segurança (Helmet.js)"
+  - "Auditoria de dependências (Dependabot)"
+  - "Análise de código (CodeQL)"
+
+# Disclosure policy
+disclosure_policy: |
+  ## Política de Divulgação
+
+  Seguimos o princípio de divulgação responsável:
+
+  1. **Confidencialidade**: Vulnerabilidades são mantidas em sigilo até correção
+  2. **Coordenação**: Trabalhamos com pesquisadores para corrigir problemas
+  3. **Divulgação**: Após correção, divulgamos publicamente com créditos
+  4. **Timeline**: Divulgação ocorre após 30 dias da correção (ou acordo mútuo)
+
+# Bounty program
+bounty_program: |
+  ## Programa de Recompensas
+
+  Atualmente não temos um programa de recompensas monetárias, mas:
+
+  - Créditos públicos em releases de segurança
+  - Menção especial no README
+  - Badge de "Security Researcher" no perfil
+  - Acesso antecipado a novas funcionalidades
+
+# Security updates
+security_updates: |
+  ## Atualizações de Segurança
+
+  - **Críticas**: Correções imediatas (0-7 dias)
+  - **Altas**: Correções rápidas (7-30 dias)
+  - **Médias**: Correções em ciclo regular (30-90 dias)
+  - **Baixas**: Correções em próximas releases (90+ dias)
+

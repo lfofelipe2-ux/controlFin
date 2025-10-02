@@ -1,0 +1,29 @@
+name: Auto Merge Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  auto-merge-bot:
+    name: Auto Merge Bot
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' || github.actor == 'renovate[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Enable auto-merge
+        run: |
+          # Check if PR is approved and all checks pass
+          gh pr view "${{ github.event.pull_request.number }}" --json state,isDraft,mergeable,statusCheckRollup
+          
+          # Enable auto-merge if conditions are met
+          gh pr merge --auto --squash "${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
