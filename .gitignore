@@ -19,6 +19,8 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 .idea
+# Allow .cursorrules files
+!.cursor/*.cursorrules
 .DS_Store
 *.suo
 *.ntvs*

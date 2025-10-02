@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussões
+    url: https://github.com/luisfelipedeoliveira/controlFin/discussions
+    about: Use discussões para perguntas gerais e ideias
+  - name: 📚 Documentação
+    url: https://github.com/luisfelipedeoliveira/controlFin/wiki
+    about: Consulte a documentação do projeto
+  - name: 🐛 Bug Report
+    url: https://github.com/luisfelipedeoliveira/controlFin/issues/new?template=bug_report.md
+    about: Reporte um bug encontrado
+  - name: ✨ Feature Request
+    url: https://github.com/luisfelipedeoliveira/controlFin/issues/new?template=feature_request.md
+    about: Sugira uma nova funcionalidade

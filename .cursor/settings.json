@@ -1,0 +1,50 @@
+{
+  "cursor.general.enableShadowWorkspace": true,
+  "cursor.chat.showSuggestedFiles": true,
+  "cursor.cpp.disabledLanguages": [],
+  "cursor.aiPreferences.model": "claude-sonnet-4",
+  "cursor.chat.contextLength": "long",
+  "cursor.general.gitRememberChoice": true,
+
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggest.preview": true,
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true,
+    "typescript": true,
+    "typescriptreact": true
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html"
+  },
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/coverage": true
+  },
+
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true
+  }
+}

@@ -1,0 +1,33 @@
+# Configuration for GitHub Discussions
+# https://docs.github.com/en/discussions/managing-discussions-for-your-community
+
+# Categories for discussions
+categories:
+  - name: 💬 Geral
+    description: Discussões gerais sobre o projeto
+    emoji: 💬
+    color: 0D8ABC
+  - name: 💡 Ideias
+    description: Sugestões e ideias para melhorar o projeto
+    emoji: 💡
+    color: FFC13B
+  - name: ❓ Perguntas
+    description: Perguntas sobre como usar o projeto
+    emoji: ❓
+    color: 28A745
+  - name: 🐛 Bugs
+    description: Discussões sobre bugs encontrados
+    emoji: 🐛
+    color: DC3545
+  - name: ✨ Features
+    description: Discussões sobre novas funcionalidades
+    emoji: ✨
+    color: 6F42C1
+  - name: 📚 Documentação
+    description: Discussões sobre documentação
+    emoji: 📚
+    color: 17A2B8
+  - name: 🎉 Showcase
+    description: Mostre como você está usando o projeto
+    emoji: 🎉
+    color: FF6B6B

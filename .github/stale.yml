@@ -1,0 +1,47 @@
+# Configuration for probot/stale
+# https://github.com/probot/stale
+
+# Number of days of inactivity before an issue becomes stale
+daysUntilStale: 30
+
+# Number of days of inactivity before a stale issue is closed
+daysUntilClose: 7
+
+# Issues with these labels will never be marked as stale
+exemptLabels:
+  - pinned
+  - security
+  - bug
+  - enhancement
+  - documentation
+
+# Set to true to ignore issues in a project (default: false)
+exemptProjects: false
+
+# Set to true to ignore issues in a milestone (default: false)
+exemptMilestones: false
+
+# Set to true to ignore issues with an assignee (default: false)
+exemptAssignees: false
+
+# Label to use when marking an issue as stale
+staleLabel: stale
+
+# Comment to post when marking an issue as stale
+markComment: >
+  This issue has been automatically marked as stale because it has not had
+  recent activity. It will be closed if no further activity occurs. Thank you
+  for your contributions.
+
+# Comment to post when closing a stale issue
+closeComment: >
+  This issue has been automatically closed due to inactivity. If you think
+  this is still relevant, please open a new issue.
+
+# Limit the number of actions per run, useful for large repos (default: 30)
+operationsPerRun: 30
+
+# Set to true to enable debug logging (default: false)
+debug: false
+# Repository to extend settings from (default: not set)
+# extends: .github/stale.yml
