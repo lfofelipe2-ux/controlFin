@@ -1,10 +1,17 @@
-import { ButtonProps as AntButtonProps } from 'antd';
+import type { ButtonProps as AntButtonProps } from 'antd';
 import React from 'react';
 
 /**
- * Button variant types
+ * Button Variant Types
  */
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link' | 'text' | 'danger';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'link'
+  | 'text'
+  | 'danger'
+  | 'dashed';
 
 /**
  * Button size types
@@ -14,7 +21,7 @@ export type ButtonSize = 'small' | 'medium' | 'large';
 /**
  * Button component props extending Ant Design's Button props
  */
-export interface ButtonProps extends Omit<AntButtonProps, 'size' | 'type'> {
+export interface ButtonProps extends Omit<AntButtonProps, 'size' | 'type' | 'variant'> {
   /** Button text content (can be a translation key) */
   children?: React.ReactNode;
   /** Whether the content should be translated */

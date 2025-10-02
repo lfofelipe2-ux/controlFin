@@ -5,34 +5,34 @@
  * and Google OAuth integration, following the BlockAI design system.
  */
 
-import React, { useState } from 'react';
 import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Typography,
-  Space,
-  Divider,
-  Alert,
-  Card,
-  Row,
-  Col,
-} from 'antd';
-import {
-  UserOutlined,
-  LockOutlined,
-  GoogleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
+  GoogleOutlined,
+  LockOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type LoginFormData } from '../../types/auth';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
+import { type LoginFormData } from '../../types/auth';
 
 const { Title, Text, Paragraph } = Typography;
 

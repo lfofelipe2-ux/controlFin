@@ -9,7 +9,7 @@ import { Button as AntButton } from 'antd';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import './Button.scss';
-import { ButtonProps, ButtonVariant } from './Button.types';
+import type { ButtonProps, ButtonVariant } from './Button.types';
 
 /**
  * Map variant to Ant Design button type

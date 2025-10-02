@@ -1,4 +1,4 @@
-import { InputProps } from '../Input/Input.types';
+import type { InputProps } from '../Input/Input.types';
 
 /**
  * FormField component props

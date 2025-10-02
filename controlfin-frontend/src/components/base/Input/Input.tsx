@@ -5,39 +5,34 @@
  * Built on top of Ant Design's Input component with BlockAI theme customization.
  */
 
-import { Input as AntInput, Typography } from 'antd';
+import { Input as AntInput } from 'antd';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBlockAITheme } from '../../../hooks/useBlockAITheme';
+import type { InputProps, PasswordInputProps } from './Input.types';
 import './Input.scss';
-import { InputProps, PasswordInputProps } from './Input.types';
-
-const { Text } = Typography;
 
 /**
  * Base Input Component
  */
 export const Input: React.FC<InputProps> = ({
   label,
-  translateLabel = false,
   error,
-  translateError = true,
   helperText,
+  translateLabel = false,
+  translateError = false,
   translateHelperText = false,
   size = 'medium',
   fullWidth = false,
-  startIcon,
-  endIcon,
-  className = '',
-  style,
-  disabled,
-  ...antInputProps
+  ...props
 }) => {
   const { t } = useTranslation();
-  const { colors } = useBlockAITheme();
 
   // Map size to Ant Design size
-  const antSize = size === 'small' ? 'small' : size === 'large' ? 'large' : 'middle';
+  const sizeMap = {
+    small: 'small' as const,
+    medium: 'middle' as const,
+    large: 'large' as const,
+  };
 
   // Translate label if needed
   const displayLabel = translateLabel && label ? t(label) : label;
@@ -46,39 +41,22 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div
-      className={`base-input ${fullWidth ? 'base-input--full-width' : ''} ${
-        error ? 'base-input--error' : ''
-      } ${disabled ? 'base-input--disabled' : ''} ${className}`}
-      style={style}
+      className={`blockai-input ${fullWidth ? 'blockai-input--full-width' : ''} ${
+        error ? 'blockai-input--error' : ''
+      } ${props.disabled ? 'blockai-input--disabled' : ''}`}
     >
       {label && (
-        <label className='base-input__label'>
-          <Text strong>{displayLabel}</Text>
-          {antInputProps.required && <span className='base-input__required'>*</span>}
+        <label className='blockai-input__label'>
+          <span className='blockai-input__label-text'>{displayLabel}</span>
+          {props.required && <span className='blockai-input__required'>*</span>}
         </label>
       )}
 
-      <AntInput
-        size={antSize}
-        prefix={startIcon}
-        suffix={endIcon}
-        disabled={disabled}
-        status={error ? 'error' : undefined}
-        {...antInputProps}
-        className={`base-input__field ${antInputProps.className || ''}`}
-      />
+      <AntInput {...props} status={error ? 'error' : undefined} size={sizeMap[size]} />
 
-      {error && (
-        <Text type='danger' className='base-input__error'>
-          {displayError}
-        </Text>
-      )}
+      {error && <span className='blockai-input__error'>{displayError}</span>}
 
-      {helperText && !error && (
-        <Text type='secondary' className='base-input__helper'>
-          {displayHelperText}
-        </Text>
-      )}
+      {helperText && !error && <span className='blockai-input__helper'>{displayHelperText}</span>}
     </div>
   );
 };
@@ -91,18 +69,39 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   ...inputProps
 }) => {
   return (
-    <Input
-      {...inputProps}
-      type='password'
-      endIcon={
-        visibilityToggle ? (
-          <AntInput.Password
-            visibilityToggle={visibilityToggle}
-            style={{ border: 'none', padding: 0 }}
-          />
-        ) : undefined
-      }
-    />
+    <div className={inputProps.fullWidth ? 'blockai-input--full-width' : ''}>
+      {inputProps.label && (
+        <label className='blockai-input__label'>
+          <span className='blockai-input__label-text'>
+            {inputProps.translateLabel && inputProps.label ? inputProps.label : inputProps.label}
+          </span>
+          {inputProps.required && <span className='blockai-input__required'>*</span>}
+        </label>
+      )}
+
+      <AntInput.Password
+        {...inputProps}
+        status={inputProps.error ? 'error' : undefined}
+        size={
+          inputProps.size === 'small' ? 'small' : inputProps.size === 'large' ? 'large' : 'middle'
+        }
+        visibilityToggle={visibilityToggle}
+      />
+
+      {inputProps.error && (
+        <span className='blockai-input__error'>
+          {inputProps.translateError && inputProps.error ? inputProps.error : inputProps.error}
+        </span>
+      )}
+
+      {inputProps.helperText && !inputProps.error && (
+        <span className='blockai-input__helper'>
+          {inputProps.translateHelperText && inputProps.helperText
+            ? inputProps.helperText
+            : inputProps.helperText}
+        </span>
+      )}
+    </div>
   );
 };
 

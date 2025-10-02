@@ -14,6 +14,7 @@ import {
 import { Alert, Button, Card, Form, Input, Progress, Space, Typography } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
@@ -35,6 +36,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
   // === HOOKS ===
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation('auth');
   const { colors, typography } = useBlockAITheme();
   const [form] = useForm<ResetPasswordFormData>();
 
@@ -58,9 +60,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
     if (tokenParam) {
       setToken(tokenParam);
     } else {
-      setError('Invalid or missing reset token');
+      setError(t('resetPassword.invalidToken'));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   // === HANDLERS ===
 
@@ -69,7 +71,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
    */
   const handleSubmit = async (values: ResetPasswordFormData) => {
     if (!token) {
-      setError('Invalid or missing reset token');
+      setError(t('resetPassword.invalidToken'));
       return;
     }
 
@@ -84,7 +86,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
       setIsSuccess(true);
       onSuccess?.();
     } catch (err: any) {
-      setError(err.message || 'Failed to reset password');
+      setError(err.message || t('resetPassword.errorMessage'));
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +135,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                 marginBottom: '8px',
               }}
             >
-              Password Reset Successfully
+              {t('resetPassword.successTitle')}
             </Title>
             <Paragraph
               style={{
@@ -142,7 +144,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                 marginBottom: '24px',
               }}
             >
-              Your password has been reset successfully. You can now log in with your new password.
+              {t('resetPassword.successMessage')}
             </Paragraph>
           </div>
 
@@ -160,7 +162,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
               fontWeight: typography.weights.semibold,
             }}
           >
-            Back to Login
+            {t('resetPassword.backToLogin')}
           </Button>
         </Space>
       </Card>
@@ -189,7 +191,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
               marginBottom: '8px',
             }}
           >
-            Reset Your Password
+            {t('resetPassword.title')}
           </Title>
           <Paragraph
             style={{
@@ -197,14 +199,14 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
               fontSize: typography.sizes.desktop.body,
             }}
           >
-            Enter your new password below. Make sure it's strong and secure.
+            {t('resetPassword.subtitle')}
           </Paragraph>
         </div>
 
         {/* Error Alert */}
         {error && (
           <Alert
-            message='Error'
+            message={t('resetPassword.errorTitle')}
             description={error}
             type='error'
             showIcon
@@ -234,22 +236,21 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                New Password
+                {t('resetPassword.passwordLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter your new password',
+                message: t('resetPassword.validation.passwordRequired'),
               },
               {
                 min: 8,
-                message: 'Password must be at least 8 characters',
+                message: t('resetPassword.validation.passwordMin'),
               },
               {
                 pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message:
-                  'Password must contain uppercase, lowercase, number, and special character',
+                message: t('resetPassword.validation.passwordStrong'),
               },
             ]}
           >
@@ -261,7 +262,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                   }}
                 />
               }
-              placeholder='Enter your new password'
+              placeholder={t('resetPassword.passwordPlaceholder')}
               onChange={(e) => setPassword(e.target.value)}
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               style={{
@@ -282,7 +283,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                   fontSize: typography.sizes.desktop.small,
                 }}
               >
-                Password Strength: {passwordStrength.level}
+                {t('resetPassword.passwordStrength.label')}:{' '}
+                {t(`resetPassword.passwordStrength.${passwordStrength.level}`)}
               </Text>
               <Progress
                 percent={passwordStrength.score * 25}
@@ -313,21 +315,23 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Confirm New Password
+                {t('resetPassword.confirmPasswordLabel')}
               </Text>
             }
             dependencies={['password']}
             rules={[
               {
                 required: true,
-                message: 'Please confirm your new password',
+                message: t('resetPassword.validation.confirmPasswordRequired'),
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(
+                    new Error(t('resetPassword.validation.passwordsMustMatch'))
+                  );
                 },
               }),
             ]}
@@ -340,7 +344,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                   }}
                 />
               }
-              placeholder='Confirm your new password'
+              placeholder={t('resetPassword.confirmPasswordPlaceholder')}
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               style={{
                 background: colors.backgroundSidebar,
@@ -366,7 +370,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSuccess, classN
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
+              {isLoading ? t('resetPassword.submitting') : t('resetPassword.submitButton')}
             </Button>
           </Form.Item>
         </Form>
