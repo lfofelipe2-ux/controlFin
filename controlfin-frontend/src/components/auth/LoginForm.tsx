@@ -5,33 +5,34 @@
  * and Google OAuth integration, following the BlockAI design system.
  */
 
-import React, { useState } from 'react';
 import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Typography,
-  Space,
-  Divider,
-  Alert,
-  Card,
-  Row,
-  Col,
-} from 'antd';
-import {
-  UserOutlined,
-  LockOutlined,
-  GoogleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
+  GoogleOutlined,
+  LockOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { type LoginFormData } from '../../types/auth';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
+import { type LoginFormData } from '../../types/auth';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -56,6 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   // === HOOKS ===
   const [form] = useForm<LoginFormData>();
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
   const { login, isLoading, error, clearError } = useAuth();
   const { colors, typography } = useBlockAITheme();
 
@@ -83,8 +85,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
       } else {
         navigate('/dashboard');
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
+    } catch (error: unknown) {
+      console.error('Login error:', error as Error);
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);
@@ -97,8 +99,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleGoogleLogin = () => {
     try {
       authService.initiateGoogleLogin();
-    } catch (error: any) {
-      console.error('Google login error:', error);
+    } catch (error: unknown) {
+      console.error('Google login error:', error as Error);
     }
   };
 
@@ -127,7 +129,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               marginBottom: '8px',
             }}
           >
-            Welcome Back
+            {t('login.title')}
           </Title>
           <Paragraph
             style={{
@@ -136,14 +138,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
               marginBottom: '32px',
             }}
           >
-            Sign in to your ControlFin account
+            {t('login.subtitle')}
           </Paragraph>
         </div>
 
         {/* Error Alert */}
         {error && (
           <Alert
-            message='Login Failed'
+            message={t('login.errorTitle')}
             description={error}
             type='error'
             showIcon
@@ -177,23 +179,23 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Email Address
+                {t('login.emailLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter your email address',
+                message: t('login.validation.emailRequired'),
               },
               {
                 type: 'email',
-                message: 'Please enter a valid email address',
+                message: t('login.validation.emailInvalid'),
               },
             ]}
           >
             <Input
               prefix={<UserOutlined style={{ color: colors.textSecondary }} />}
-              placeholder='Enter your email'
+              placeholder={t('login.emailPlaceholder')}
               style={{
                 background: colors.backgroundCards,
                 border: `1px solid rgba(255, 255, 255, 0.1)`,
@@ -214,19 +216,19 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Password
+                {t('login.passwordLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter your password',
+                message: t('login.validation.passwordRequired'),
               },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined style={{ color: colors.textSecondary }} />}
-              placeholder='Enter your password'
+              placeholder={t('login.passwordPlaceholder')}
               iconRender={(visible) =>
                 visible ? (
                   <EyeTwoTone style={{ color: colors.textSecondary }} />
@@ -257,7 +259,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     fontSize: typography.sizes.desktop.small,
                   }}
                 >
-                  Remember me
+                  {t('login.rememberMe')}
                 </Checkbox>
               </Form.Item>
             </Col>
@@ -272,7 +274,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   height: 'auto',
                 }}
               >
-                Forgot password?
+                {t('login.forgotPassword')}
               </Button>
             </Col>
           </Row>
@@ -294,7 +296,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading || isSubmitting ? 'Signing In...' : 'Sign In'}
+              {isLoading || isSubmitting ? t('login.loggingIn') : t('login.loginButton')}
             </Button>
           </Form.Item>
         </Form>
@@ -307,7 +309,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             margin: '24px 0',
           }}
         >
-          Or continue with
+          {t('login.orContinueWith')}
         </Divider>
 
         {/* Google OAuth Button */}
@@ -326,7 +328,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           }}
           icon={<GoogleOutlined />}
         >
-          Continue with Google
+          {t('login.googleButton')}
         </Button>
 
         {/* Switch to Register */}
@@ -338,7 +340,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 fontSize: typography.sizes.desktop.body,
               }}
             >
-              Don't have an account?{' '}
+              {t('login.noAccount')}{' '}
             </Text>
             <Button
               type='link'
@@ -351,7 +353,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 height: 'auto',
               }}
             >
-              Sign up here
+              {t('login.signUp')}
             </Button>
           </div>
         )}

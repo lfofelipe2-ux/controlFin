@@ -1,0 +1,118 @@
+.base-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+
+  &__start-icon,
+  &__end-icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.125rem;
+  }
+
+  // Variant styles
+  &--primary {
+    background: linear-gradient(135deg, #0066cc 0%, #4da6ff 100%);
+    border: none;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #0052a3 0%, #3d8cd9 100%);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      background: linear-gradient(135deg, #004080 0%, #2d73b3 100%);
+    }
+  }
+
+  &--secondary {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+
+    &:hover:not(:disabled) {
+      background: #e9ecef;
+      border-color: #adb5bd;
+    }
+
+    &:active:not(:disabled) {
+      background: #dee2e6;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    border: 1px solid #0066cc;
+    color: #0066cc;
+
+    &:hover:not(:disabled) {
+      background: rgba(0, 102, 204, 0.05);
+      border-color: #4da6ff;
+      color: #4da6ff;
+    }
+  }
+
+  &--link,
+  &--text {
+    color: #0066cc;
+
+    &:hover:not(:disabled) {
+      color: #4da6ff;
+    }
+  }
+
+  &--danger {
+    background: #ff4d4f;
+    border: none;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: #ff7875;
+      box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      background: #d9363e;
+    }
+  }
+
+  // Size styles
+  &--small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    height: auto;
+  }
+
+  &--medium {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    height: auto;
+  }
+
+  &--large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    height: auto;
+  }
+
+  // Full width
+  &--full-width {
+    width: 100%;
+  }
+
+  // Disabled state
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // Loading state
+  &.ant-btn-loading {
+    opacity: 0.8;
+  }
+}

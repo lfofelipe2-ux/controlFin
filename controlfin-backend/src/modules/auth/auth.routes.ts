@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import rateLimit from '@fastify/rate-limit';
 import {
   changePasswordSchema,
   loginSchema,
@@ -13,16 +12,11 @@ import {
 import { authService } from './auth.service';
 
 export async function authRoutes(fastify: FastifyInstance) {
-  // Register rate limit plugin if not already registered
-  // (if registered globally elsewhere, this will be a noop)
-  if (!fastify.hasDecorator('rateLimit')) {
-    await fastify.register(rateLimit);
-  }
   // Register user
   fastify.post(
     '/register',
     {
-      // Applying rate limit: max 3 requests per minute per IP
+      // Applying route-level rate limit as an extra guard (global is also enabled)
       config: {
         rateLimit: {
           max: 3,
@@ -69,9 +63,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Body: import('./auth.schemas').RegisterInput }>,
+      reply: FastifyReply
+    ) => {
       try {
-        const result = await authService.register(request.body as any);
+        const result = await authService.register(request.body);
 
         return reply.status(201).send({
           message: 'User registered successfully',
@@ -102,7 +99,6 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/login',
     {
-      // Applying rate limit: max 5 requests per minute per IP
       config: {
         rateLimit: {
           max: 5,
@@ -150,9 +146,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Body: import('./auth.schemas').LoginInput }>,
+      reply: FastifyReply
+    ) => {
       try {
-        const result = await authService.login(request.body as any);
+        const result = await authService.login(request.body);
 
         return reply.send({
           message: 'Login successful',
@@ -210,9 +209,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Body: import('./auth.schemas').RefreshTokenInput }>,
+      reply: FastifyReply
+    ) => {
       try {
-        const tokens = await authService.refreshToken(request.body as any);
+        const tokens = await authService.refreshToken(request.body);
 
         return reply.send({
           message: 'Token refreshed successfully',
@@ -448,7 +450,10 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (
+      _request: FastifyRequest<{ Body: import('./auth.schemas').PasswordResetRequestInput }>,
+      reply: FastifyReply
+    ) => {
       // TODO: Implement email service for password reset
       return reply.send({
         message: 'Password reset email sent (placeholder)',
@@ -472,7 +477,10 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (
+      _request: FastifyRequest<{ Body: import('./auth.schemas').PasswordResetInput }>,
+      reply: FastifyReply
+    ) => {
       // TODO: Implement password reset with token validation
       return reply.send({
         message: 'Password reset successful (placeholder)',

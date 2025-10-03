@@ -7,6 +7,7 @@
 
 import { Col, Layout, Row, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
@@ -38,6 +39,7 @@ const AuthPage: React.FC<AuthPageProps> = ({
 }) => {
   // === HOOKS ===
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const { isAuthenticated, isLoading } = useAuth();
   const { colors, typography } = useBlockAITheme();
 
@@ -169,7 +171,7 @@ const AuthPage: React.FC<AuthPageProps> = ({
               fontSize: typography.sizes.desktop.body,
             }}
           >
-            Loading...
+            {t('messages.loading')}
           </Text>
         </div>
       </div>

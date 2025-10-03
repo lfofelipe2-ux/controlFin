@@ -9,6 +9,7 @@ import { ArrowLeftOutlined, CheckCircleOutlined, MailOutlined } from '@ant-desig
 import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import authService from '../../services/authService';
@@ -34,6 +35,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 }) => {
   // === HOOKS ===
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
   const { colors, typography } = useBlockAITheme();
   const [form] = useForm<ForgotPasswordFormData>();
 
@@ -55,8 +57,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       await authService.forgotPassword(values.email);
       setIsSuccess(true);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to send password reset email');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || t('forgotPassword.errorMessage'));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +109,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 marginBottom: '8px',
               }}
             >
-              Check Your Email
+              {t('forgotPassword.successTitle')}
             </Title>
             <Paragraph
               style={{
@@ -115,8 +118,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 marginBottom: '24px',
               }}
             >
-              We've sent a password reset link to your email address. Please check your inbox and
-              follow the instructions to reset your password.
+              {t('forgotPassword.successMessage')}
             </Paragraph>
           </div>
 
@@ -134,7 +136,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               fontWeight: typography.weights.semibold,
             }}
           >
-            Back to Login
+            {t('forgotPassword.backToLogin')}
           </Button>
         </Space>
       </Card>
@@ -163,7 +165,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               marginBottom: '8px',
             }}
           >
-            Forgot Password?
+            {t('forgotPassword.title')}
           </Title>
           <Paragraph
             style={{
@@ -171,14 +173,14 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               fontSize: typography.sizes.desktop.body,
             }}
           >
-            Enter your email address and we'll send you a link to reset your password.
+            {t('forgotPassword.subtitle')}
           </Paragraph>
         </div>
 
         {/* Error Alert */}
         {error && (
           <Alert
-            message='Error'
+            message={t('forgotPassword.errorTitle')}
             description={error}
             type='error'
             showIcon
@@ -208,17 +210,17 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Email Address
+                {t('forgotPassword.emailLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter your email address',
+                message: t('forgotPassword.validation.emailRequired'),
               },
               {
                 type: 'email',
-                message: 'Please enter a valid email address',
+                message: t('forgotPassword.validation.emailInvalid'),
               },
             ]}
           >
@@ -230,7 +232,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                   }}
                 />
               }
-              placeholder='Enter your email address'
+              placeholder={t('forgotPassword.emailPlaceholder')}
               style={{
                 background: colors.backgroundSidebar,
                 borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -255,7 +257,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+              {isLoading ? t('forgotPassword.sending') : t('forgotPassword.sendButton')}
             </Button>
           </Form.Item>
         </Form>
@@ -272,7 +274,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
             }}
           >
             <ArrowLeftOutlined style={{ marginRight: '8px' }} />
-            Back to Login
+            {t('forgotPassword.backToLogin')}
           </Button>
         </div>
       </Space>
