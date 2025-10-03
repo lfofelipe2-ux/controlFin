@@ -64,7 +64,9 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
     toJSON: {
       transform: function (_doc, ret) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (ret as any).password;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (ret as any).__v;
         return ret;
       },

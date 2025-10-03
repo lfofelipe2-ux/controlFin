@@ -128,8 +128,10 @@ export interface User {
 export interface AuthResponse {
   message: string;
   user: User;
-  accessToken: string;
-  refreshToken: string;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 /**
@@ -168,11 +170,15 @@ export interface PasswordResetConfirmation {
 /**
  * API error response interface
  */
+export interface ApiErrorDetails {
+  [key: string]: unknown;
+}
+
 export interface ApiError {
   message: string;
   status: number;
   code?: string;
-  details?: Record<string, any>;
+  details?: ApiErrorDetails;
 }
 
 /**

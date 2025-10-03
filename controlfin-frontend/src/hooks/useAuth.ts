@@ -16,6 +16,7 @@ import type {
   PasswordResetConfirmation,
 } from '../types/auth';
 import authService from '../services/authService';
+import { extractTokens } from '../utils/authTokens';
 
 // === AUTHENTICATION STORE INTERFACE ===
 
@@ -47,24 +48,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.loginUser(credentials);
 
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken,
+            refreshToken,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const err = error as Error;
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message || 'Login failed',
+            error: err.message || 'Login failed',
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -77,24 +80,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.registerUser(userData);
 
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken,
+            refreshToken,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const err = error as Error;
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message || 'Registration failed',
+            error: err.message || 'Registration failed',
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -129,12 +134,13 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await authService.requestPasswordReset(email);
           set({ isLoading: false, error: null });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const err = error as Error;
           set({
             isLoading: false,
-            error: error.message || 'Password reset request failed',
+            error: err.message || 'Password reset request failed',
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -147,12 +153,13 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await authService.resetPassword(data);
           set({ isLoading: false, error: null });
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const err = error as Error;
           set({
             isLoading: false,
-            error: error.message || 'Password reset failed',
+            error: err.message || 'Password reset failed',
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -173,7 +180,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: response.accessToken,
             error: null,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           // If refresh fails, logout user
           set({
             user: null,
@@ -183,7 +190,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw (error as Error);
         }
       },
 
@@ -220,15 +227,18 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
 
+          const { accessToken: accessTokenInit, refreshToken: refreshTokenInit } = extractTokens(
+            response
+          );
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken: accessTokenInit,
+            refreshToken: refreshTokenInit,
           });
-        } catch (error: any) {
+        } catch {
           // If getting user data fails, logout
           get().logout();
         }

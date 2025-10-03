@@ -65,7 +65,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
       avatar: user.avatar || undefined,
       isEmailVerified: user.isEmailVerified,
     };
-  } catch (error) {
+  } catch {
     return reply.status(401).send({
       error: 'Unauthorized',
       message: 'Invalid or expired token',
@@ -107,7 +107,7 @@ export async function optionalAuthMiddleware(
         isEmailVerified: user.isEmailVerified,
       };
     }
-  } catch (error) {
+  } catch {
     // Silently continue without user on any error
     return;
   }

@@ -28,6 +28,8 @@ const getAntButtonType = (variant: ButtonVariant = 'primary'): ButtonType => {
       return 'text';
     case 'danger':
       return 'primary'; // We'll handle danger styling separately
+    case 'dashed':
+      return 'dashed';
     default:
       return 'default';
   }
