@@ -58,7 +58,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       setIsSuccess(true);
       onSuccess?.();
     } catch (err: unknown) {
-      setError((err as Error).message || t('forgotPassword.errorMessage'));
+      const error = err as Error;
+      setError(error.message || t('forgotPassword.errorMessage'));
     } finally {
       setIsLoading(false);
     }

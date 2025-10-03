@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { env } from '../../config/env';
 import { IUser, User } from '../users/user.model';
 import {
   ChangePasswordInput,
@@ -10,11 +11,10 @@ import {
 } from './auth.schemas';
 
 // JWT configuration
-const JWT_SECRET = process.env['JWT_SECRET'] || 'your-super-secret-jwt-key-change-in-production';
-const JWT_REFRESH_SECRET =
-  process.env['JWT_REFRESH_SECRET'] || 'your-super-secret-refresh-key-change-in-production';
-const JWT_EXPIRES_IN = process.env['JWT_EXPIRES_IN'] || '15m';
-const JWT_REFRESH_EXPIRES_IN = process.env['JWT_REFRESH_EXPIRES_IN'] || '7d';
+const JWT_SECRET = env.jwtSecret;
+const JWT_REFRESH_SECRET = env.jwtRefreshSecret;
+const JWT_EXPIRES_IN = env.jwtExpiresIn;
+const JWT_REFRESH_EXPIRES_IN = env.jwtRefreshExpiresIn;
 
 export interface AuthTokens {
   accessToken: string;
@@ -53,7 +53,7 @@ export class AuthService {
       },
       JWT_SECRET,
       {
-        expiresIn: JWT_EXPIRES_IN as any,
+        expiresIn: JWT_EXPIRES_IN,
         issuer: 'controlfin-api',
         audience: 'controlfin-client',
       }
@@ -71,7 +71,7 @@ export class AuthService {
       },
       JWT_REFRESH_SECRET,
       {
-        expiresIn: JWT_REFRESH_EXPIRES_IN as any,
+        expiresIn: JWT_REFRESH_EXPIRES_IN,
         issuer: 'controlfin-api',
         audience: 'controlfin-client',
       }
@@ -91,9 +91,14 @@ export class AuthService {
   /**
    * Verify JWT token
    */
-  private verifyToken(token: string, secret: string): any {
+  private verifyToken(token: string, secret: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
     try {
-      return jwt.verify(token, secret);
+      return jwt.verify(token, secret) as {
+        userId: string;
+        type: 'access' | 'refresh';
+        iat: number;
+        exp: number;
+      };
     } catch (error) {
       throw new Error('Invalid token');
     }
@@ -231,7 +236,7 @@ export class AuthService {
     if (data.firstName !== undefined) user.firstName = data.firstName;
     if (data.lastName !== undefined) user.lastName = data.lastName;
     if (data.avatar !== undefined) {
-      user.avatar = data.avatar || undefined;
+      user.avatar = data.avatar ? data.avatar : undefined;
     }
 
     await user.save();
@@ -270,14 +275,14 @@ export class AuthService {
   /**
    * Verify JWT access token
    */
-  verifyAccessToken(token: string): any {
+  verifyAccessToken(token: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
     return this.verifyToken(token, JWT_SECRET);
   }
 
   /**
    * Verify JWT refresh token
    */
-  verifyRefreshToken(token: string): any {
+  verifyRefreshToken(token: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
     return this.verifyToken(token, JWT_REFRESH_SECRET);
   }
 }

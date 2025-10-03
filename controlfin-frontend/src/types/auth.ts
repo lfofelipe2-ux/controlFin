@@ -128,8 +128,10 @@ export interface User {
 export interface AuthResponse {
   message: string;
   user: User;
-  accessToken: string;
-  refreshToken: string;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 /**

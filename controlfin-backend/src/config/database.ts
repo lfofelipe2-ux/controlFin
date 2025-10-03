@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import { env } from './env';
 
-const MONGODB_URI = process.env['MONGODB_URI'] || 'mongodb://localhost:27017/controlfin-dev';
+const MONGODB_URI = env.mongodbUri;
 
 export async function connectDatabase(): Promise<void> {
   try {

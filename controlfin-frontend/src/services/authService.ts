@@ -96,9 +96,13 @@ export const loginUser = async (credentials: LoginRequest): Promise<AuthResponse
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+  if ((response as any).accessToken && (response as any).refreshToken) {
+    localStorage.setItem('accessToken', (response as any).accessToken);
+    localStorage.setItem('refreshToken', (response as any).refreshToken);
+  } else if ((response as any).tokens) {
+    const tokens = (response as any).tokens as { accessToken: string; refreshToken: string };
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
   return response;
@@ -114,9 +118,13 @@ export const registerUser = async (userData: RegisterRequest): Promise<AuthRespo
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+  if ((response as any).accessToken && (response as any).refreshToken) {
+    localStorage.setItem('accessToken', (response as any).accessToken);
+    localStorage.setItem('refreshToken', (response as any).refreshToken);
+  } else if ((response as any).tokens) {
+    const tokens = (response as any).tokens as { accessToken: string; refreshToken: string };
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
   return response;
@@ -150,17 +158,21 @@ export const refreshAccessToken = async (): Promise<{ accessToken: string }> => 
     throw new Error('No refresh token available');
   }
 
-  const response = await makeRequest<{ accessToken: string }>('/auth/refresh', {
+  const response = await makeRequest<
+    { accessToken?: string; tokens?: { accessToken: string; refreshToken: string } }
+  >('/auth/refresh', {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
 
   // Update stored access token
-  if (response.accessToken) {
+  if (response.tokens?.accessToken) {
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+  } else if (response.accessToken) {
     localStorage.setItem('accessToken', response.accessToken);
   }
 
-  return response;
+  return { accessToken: response.tokens?.accessToken || (response.accessToken as string) };
 };
 
 /**
