@@ -16,6 +16,7 @@ import type {
   PasswordResetConfirmation,
 } from '../types/auth';
 import authService from '../services/authService';
+import { extractTokens } from '../utils/authTokens';
 
 // === AUTHENTICATION STORE INTERFACE ===
 
@@ -47,14 +48,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.loginUser(credentials);
 
-          const accessToken =
-            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
-            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
-            null;
-          const refreshToken =
-            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
-            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
-            null;
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
@@ -86,14 +80,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.registerUser(userData);
 
-          const accessToken =
-            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
-            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
-            null;
-          const refreshToken =
-            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
-            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
-            null;
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
@@ -240,14 +227,9 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
 
-          const accessTokenInit =
-            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
-            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
-            null;
-          const refreshTokenInit =
-            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
-            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
-            null;
+          const { accessToken: accessTokenInit, refreshToken: refreshTokenInit } = extractTokens(
+            response
+          );
           set({
             user: response.user,
             isAuthenticated: true,

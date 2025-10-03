@@ -89,7 +89,10 @@ const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Prom
 /**
  * Login user with email and password
  */
-type TokensResponseShape = { accessToken: string; refreshToken: string };
+type TokensResponseShape = NonNullable<AuthResponse['tokens']> & {
+  accessToken: string;
+  refreshToken: string;
+};
 type LoginRegisterResponse = AuthResponse | (AuthResponse & TokensResponseShape);
 
 export const loginUser = async (credentials: LoginRequest): Promise<AuthResponse> => {
@@ -102,7 +105,7 @@ export const loginUser = async (credentials: LoginRequest): Promise<AuthResponse
   if ('accessToken' in response && 'refreshToken' in response) {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
-  } else if ('tokens' in response) {
+  } else if ('tokens' in response && response.tokens) {
     const tokens = response.tokens as TokensResponseShape;
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
@@ -124,7 +127,7 @@ export const registerUser = async (userData: RegisterRequest): Promise<AuthRespo
   if ('accessToken' in response && 'refreshToken' in response) {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
-  } else if ('tokens' in response) {
+  } else if ('tokens' in response && response.tokens) {
     const tokens = response.tokens as TokensResponseShape;
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
