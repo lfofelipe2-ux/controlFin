@@ -47,15 +47,21 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.loginUser(credentials);
 
-          const accessToken = (response as any).accessToken ?? (response as any).tokens?.accessToken;
-          const refreshToken = (response as any).refreshToken ?? (response as any).tokens?.refreshToken;
+          const accessToken =
+            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
+            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
+            null;
+          const refreshToken =
+            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
+            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
+            null;
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: accessToken ?? null,
-            refreshToken: refreshToken ?? null,
+            accessToken,
+            refreshToken,
           });
         } catch (error: unknown) {
           const err = error as Error;
@@ -80,15 +86,21 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.registerUser(userData);
 
-          const accessToken = (response as any).accessToken ?? (response as any).tokens?.accessToken;
-          const refreshToken = (response as any).refreshToken ?? (response as any).tokens?.refreshToken;
+          const accessToken =
+            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
+            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
+            null;
+          const refreshToken =
+            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
+            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
+            null;
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: accessToken ?? null,
-            refreshToken: refreshToken ?? null,
+            accessToken,
+            refreshToken,
           });
         } catch (error: unknown) {
           const err = error as Error;
@@ -228,17 +240,23 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
 
-          const accessTokenInit = (response as any).accessToken ?? (response as any).tokens?.accessToken;
-          const refreshTokenInit = (response as any).refreshToken ?? (response as any).tokens?.refreshToken;
+          const accessTokenInit =
+            (response as { accessToken?: string; tokens?: { accessToken?: string } }).accessToken ??
+            (response as { tokens?: { accessToken?: string } }).tokens?.accessToken ??
+            null;
+          const refreshTokenInit =
+            (response as { refreshToken?: string; tokens?: { refreshToken?: string } }).refreshToken ??
+            (response as { tokens?: { refreshToken?: string } }).tokens?.refreshToken ??
+            null;
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: accessTokenInit ?? null,
-            refreshToken: refreshTokenInit ?? null,
+            accessToken: accessTokenInit,
+            refreshToken: refreshTokenInit,
           });
-        } catch (_error: unknown) {
+        } catch {
           // If getting user data fails, logout
           get().logout();
         }

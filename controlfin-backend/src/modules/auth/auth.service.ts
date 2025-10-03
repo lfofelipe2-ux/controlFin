@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '../../config/env';
 import { IUser, User } from '../users/user.model';
 import {
@@ -13,8 +13,8 @@ import {
 // JWT configuration
 const JWT_SECRET = env.jwtSecret;
 const JWT_REFRESH_SECRET = env.jwtRefreshSecret;
-const JWT_EXPIRES_IN = env.jwtExpiresIn;
-const JWT_REFRESH_EXPIRES_IN = env.jwtRefreshExpiresIn;
+const JWT_EXPIRES_IN: SignOptions['expiresIn'] = env.jwtExpiresIn as unknown as SignOptions['expiresIn'];
+const JWT_REFRESH_EXPIRES_IN: SignOptions['expiresIn'] = env.jwtRefreshExpiresIn as unknown as SignOptions['expiresIn'];
 
 export interface AuthTokens {
   accessToken: string;
@@ -46,17 +46,18 @@ export class AuthService {
    * Generate JWT access token
    */
   private generateAccessToken(userId: string): string {
+    const options: SignOptions = {
+      expiresIn: JWT_EXPIRES_IN as unknown as Exclude<SignOptions['expiresIn'], undefined>,
+      issuer: 'controlfin-api',
+      audience: 'controlfin-client',
+    };
     return jwt.sign(
       {
         userId,
         type: 'access',
       },
       JWT_SECRET,
-      {
-        expiresIn: JWT_EXPIRES_IN,
-        issuer: 'controlfin-api',
-        audience: 'controlfin-client',
-      }
+      options
     );
   }
 
@@ -64,17 +65,18 @@ export class AuthService {
    * Generate JWT refresh token
    */
   private generateRefreshToken(userId: string): string {
+    const options: SignOptions = {
+      expiresIn: JWT_REFRESH_EXPIRES_IN as unknown as Exclude<SignOptions['expiresIn'], undefined>,
+      issuer: 'controlfin-api',
+      audience: 'controlfin-client',
+    };
     return jwt.sign(
       {
         userId,
         type: 'refresh',
       },
       JWT_REFRESH_SECRET,
-      {
-        expiresIn: JWT_REFRESH_EXPIRES_IN,
-        issuer: 'controlfin-api',
-        audience: 'controlfin-client',
-      }
+      options
     );
   }
 

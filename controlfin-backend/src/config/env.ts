@@ -28,7 +28,19 @@ function withDevFallback(value: string | undefined, fallback: string): string {
   return value && value.trim() !== '' ? value : fallback;
 }
 
-export const env = {
+export const env: {
+  nodeEnv: 'development' | 'test' | 'production';
+  isProduction: boolean;
+  port: number;
+  mongodbUri: string;
+  jwtSecret: string;
+  jwtRefreshSecret: string;
+  jwtExpiresIn: string;
+  jwtRefreshExpiresIn: string;
+  frontendUrl: string;
+  rateLimitMax: number;
+  rateLimitWindowMs: number;
+} = {
   nodeEnv: parsed.NODE_ENV,
   isProduction: parsed.NODE_ENV === 'production',
   port: parsed.PORT ? Number(parsed.PORT) : 3000,

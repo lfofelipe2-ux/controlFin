@@ -170,11 +170,15 @@ export interface PasswordResetConfirmation {
 /**
  * API error response interface
  */
+export interface ApiErrorDetails {
+  [key: string]: unknown;
+}
+
 export interface ApiError {
   message: string;
   status: number;
   code?: string;
-  details?: Record<string, any>;
+  details?: ApiErrorDetails;
 }
 
 /**

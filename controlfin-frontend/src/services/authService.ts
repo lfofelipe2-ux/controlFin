@@ -89,45 +89,48 @@ const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Prom
 /**
  * Login user with email and password
  */
+type TokensResponseShape = { accessToken: string; refreshToken: string };
+type LoginRegisterResponse = AuthResponse | (AuthResponse & TokensResponseShape);
+
 export const loginUser = async (credentials: LoginRequest): Promise<AuthResponse> => {
-  const response = await makeRequest<AuthResponse>('/auth/login', {
+  const response = await makeRequest<LoginRegisterResponse>('/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   });
 
   // Store tokens in localStorage
-  if ((response as any).accessToken && (response as any).refreshToken) {
-    localStorage.setItem('accessToken', (response as any).accessToken);
-    localStorage.setItem('refreshToken', (response as any).refreshToken);
-  } else if ((response as any).tokens) {
-    const tokens = (response as any).tokens as { accessToken: string; refreshToken: string };
+  if ('accessToken' in response && 'refreshToken' in response) {
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+  } else if ('tokens' in response) {
+    const tokens = response.tokens as TokensResponseShape;
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
-  return response;
+  return response as AuthResponse;
 };
 
 /**
  * Register new user
  */
 export const registerUser = async (userData: RegisterRequest): Promise<AuthResponse> => {
-  const response = await makeRequest<AuthResponse>('/auth/register', {
+  const response = await makeRequest<LoginRegisterResponse>('/auth/register', {
     method: 'POST',
     body: JSON.stringify(userData),
   });
 
   // Store tokens in localStorage
-  if ((response as any).accessToken && (response as any).refreshToken) {
-    localStorage.setItem('accessToken', (response as any).accessToken);
-    localStorage.setItem('refreshToken', (response as any).refreshToken);
-  } else if ((response as any).tokens) {
-    const tokens = (response as any).tokens as { accessToken: string; refreshToken: string };
+  if ('accessToken' in response && 'refreshToken' in response) {
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+  } else if ('tokens' in response) {
+    const tokens = response.tokens as TokensResponseShape;
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
-  return response;
+  return response as AuthResponse;
 };
 
 /**
