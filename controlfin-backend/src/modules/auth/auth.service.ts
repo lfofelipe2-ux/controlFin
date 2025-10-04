@@ -237,15 +237,9 @@ export class AuthService {
     }
 
     // Update fields
-    if (data.firstName !== undefined) {
-      user.firstName = data.firstName;
-    }
-    if (data.lastName !== undefined) {
-      user.lastName = data.lastName;
-    }
-    if (data.avatar !== undefined) {
-      user.avatar = data.avatar || undefined;
-    }
+    if (data.firstName !== undefined) user.firstName = data.firstName;
+    if (data.lastName !== undefined) user.lastName = data.lastName;
+    if (data.avatar !== undefined) user.avatar = data.avatar || undefined;
 
     await user.save();
 
