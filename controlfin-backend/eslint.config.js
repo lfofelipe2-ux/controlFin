@@ -36,7 +36,6 @@ module.exports = [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/no-var-requires': 'error',
-      
       // General rules
       'no-console': 'warn',
       'no-debugger': 'error',
