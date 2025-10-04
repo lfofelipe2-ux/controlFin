@@ -75,7 +75,7 @@ describe('OAuth Service', () => {
     });
 
     it('should reject null profile', () => {
-      const isValid = validateGoogleProfile(null as any);
+      const isValid = validateGoogleProfile(null as unknown as GoogleProfile);
       expect(isValid).toBeFalsy();
     });
   });
@@ -129,7 +129,7 @@ describe('OAuth Service', () => {
       };
 
       const { authService } = await import('../auth.service');
-      const result = await generateOAuthTokens(mockUser as any);
+      const result = await generateOAuthTokens(mockUser as unknown as User);
 
       expect(authService.generateTokensForOAuth).toHaveBeenCalledWith('user123');
       expect(result).toEqual({
@@ -140,13 +140,15 @@ describe('OAuth Service', () => {
 
     it('should throw error when token generation fails', async () => {
       const { authService } = await import('../auth.service');
-      (authService.generateTokensForOAuth as any).mockRejectedValue(
+      (authService.generateTokensForOAuth as jest.Mock).mockRejectedValue(
         new Error('Token generation failed')
       );
 
       const mockUser = { _id: 'user123' };
 
-      await expect(generateOAuthTokens(mockUser as any)).rejects.toThrow('Token generation failed');
+      await expect(generateOAuthTokens(mockUser as unknown as User)).rejects.toThrow(
+        'Token generation failed'
+      );
     });
   });
 
@@ -160,7 +162,7 @@ describe('OAuth Service', () => {
     it('should throw error for invalid profile', async () => {
       const invalidProfile = { ...mockGoogleProfile, id: undefined };
 
-      await expect(handleOAuthCallback(invalidProfile as any)).rejects.toThrow(
+      await expect(handleOAuthCallback(invalidProfile as unknown as GoogleProfile)).rejects.toThrow(
         'OAuth authentication failed'
       );
     });
@@ -168,7 +170,7 @@ describe('OAuth Service', () => {
 
   describe('canUserUseOAuth', () => {
     it('should return true when user does not exist', async () => {
-      (User.findOne as any).mockResolvedValue(null);
+      (User.findOne as jest.Mock).mockResolvedValue(null);
 
       const result = await canUserUseOAuth('test@example.com');
 
@@ -181,7 +183,7 @@ describe('OAuth Service', () => {
         password: 'hashed-password',
       };
 
-      (User.findOne as any).mockResolvedValue(existingUser);
+      (User.findOne as jest.Mock).mockResolvedValue(existingUser);
 
       const result = await canUserUseOAuth('test@example.com');
 
@@ -194,7 +196,7 @@ describe('OAuth Service', () => {
         password: undefined,
       };
 
-      (User.findOne as any).mockResolvedValue(existingUser);
+      (User.findOne as jest.Mock).mockResolvedValue(existingUser);
 
       const result = await canUserUseOAuth('test@example.com');
 
@@ -202,7 +204,7 @@ describe('OAuth Service', () => {
     });
 
     it('should return false when database error occurs', async () => {
-      (User.findOne as any).mockRejectedValue(new Error('Database error'));
+      (User.findOne as jest.Mock).mockRejectedValue(new Error('Database error'));
 
       const result = await canUserUseOAuth('test@example.com');
 

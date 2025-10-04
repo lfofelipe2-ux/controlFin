@@ -13,12 +13,13 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { z } from 'zod';
 import { GoogleProfile, handleOAuthCallback, validateGoogleProfile } from './auth.oauth.service';
+import rateLimit from '@fastify/rate-limit';
 
 // Rate limiting configuration
 const rateLimitConfig = {
   max: 10, // Maximum 10 requests
   timeWindow: '15 minutes', // Per 15 minutes
-  errorResponseBuilder: (request: FastifyRequest, context: any) => {
+  errorResponseBuilder: (_request: FastifyRequest, context: { after: number }) => {
     return {
       statusCode: 429,
       error: 'Too Many Requests',
@@ -106,9 +107,9 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
    * Initiate Google OAuth flow
    */
   fastify.register(async function (fastify) {
-    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
+    await fastify.register(rateLimit, rateLimitConfig);
 
-    fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
+    fastify.get('/auth/google', async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
         const redirectUri = `${frontendUrl}/auth/callback`;
@@ -159,7 +160,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
    * Handle Google OAuth callback (server-side redirect)
    */
   fastify.register(async function (fastify) {
-    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
+    await fastify.register(rateLimit, rateLimitConfig);
 
     fastify.get('/auth/google/callback', async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -278,7 +279,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
    * Handle OAuth callback from frontend (alternative method)
    */
   fastify.register(async function (fastify) {
-    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
+    await fastify.register(rateLimit, rateLimitConfig);
 
     fastify.post(
       '/auth/google/callback',

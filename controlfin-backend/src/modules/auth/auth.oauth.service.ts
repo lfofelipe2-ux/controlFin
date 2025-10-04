@@ -119,12 +119,12 @@ export const validateGoogleProfile = (profile: unknown): profile is GoogleProfil
     'given_name' in profile &&
     'family_name' in profile &&
     'verified_email' in profile &&
-    typeof (profile as any).id === 'string' &&
-    typeof (profile as any).email === 'string' &&
-    typeof (profile as any).name === 'string' &&
-    typeof (profile as any).given_name === 'string' &&
-    typeof (profile as any).family_name === 'string' &&
-    typeof (profile as any).verified_email === 'boolean'
+    typeof (profile as GoogleProfile).id === 'string' &&
+    typeof (profile as GoogleProfile).email === 'string' &&
+    typeof (profile as GoogleProfile).name === 'string' &&
+    typeof (profile as GoogleProfile).given_name === 'string' &&
+    typeof (profile as GoogleProfile).family_name === 'string' &&
+    typeof (profile as GoogleProfile).verified_email === 'boolean'
   );
 };
 

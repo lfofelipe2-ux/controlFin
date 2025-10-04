@@ -358,7 +358,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.updateProfile(request.user!._id, request.body as any);
+        const user = await authService.updateProfile(
+          request.user!._id,
+          request.body as Record<string, unknown>
+        );
 
         return reply.send({
           message: 'Profile updated successfully',
