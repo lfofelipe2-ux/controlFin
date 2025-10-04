@@ -45,7 +45,7 @@ jobs:
           cp .github/security.yml docs-site/
           
           # Create index.html
-          cat > docs-site/index.html << 'EOF'
+          cat > docs-site/index.html << 'HTML_EOF'
           <!DOCTYPE html>
           <html lang="pt-BR">
           <head>
@@ -92,7 +92,7 @@ npm run dev
               </ul>
           </body>
           </html>
-          EOF
+          HTML_EOF
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -109,4 +109,3 @@ npm run dev
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

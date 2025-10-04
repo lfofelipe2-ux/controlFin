@@ -1,0 +1,19 @@
+name: 'Run Lint'
+description: 'Run linting for a project'
+inputs:
+  project:
+    description: 'Project name (frontend/backend)'
+    required: true
+  lint-command:
+    description: 'Lint command to run'
+    required: false
+    default: 'npm run lint'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run lint
+      run: |
+        cd controlfin-${{ inputs.project }}
+        ${{ inputs.lint-command }}
+      shell: bash

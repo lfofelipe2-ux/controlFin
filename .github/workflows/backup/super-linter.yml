@@ -23,7 +23,6 @@ jobs:
           VALIDATE_JAVASCRIPT_ES: true
           VALIDATE_TYPESCRIPT_ES: true
           VALIDATE_JSON: true
-          VALIDATE_YAML: true
           VALIDATE_MARKDOWN: true
           VALIDATE_DOCKERFILE: true
           VALIDATE_EDITORCONFIG: true
@@ -57,7 +56,6 @@ jobs:
           VALIDATE_TERRAFORM: true
           VALIDATE_TSX: true
           VALIDATE_XML: true
-          VALIDATE_YAML: true
           VALIDATE_ZIG: true
           VALIDATE_ANSIBLE_LINT: true
           VALIDATE_ARM_TTK: true

@@ -1,0 +1,152 @@
+# Documentation Workflows - ControlFin
+# Consolidates: docs.yml, pages.yml
+
+name: Documentation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'README.md'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'README.md'
+
+jobs:
+  # Build Documentation
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build documentation
+        run: |
+          echo "Building documentation..."
+          # Create docs structure if it doesn't exist
+          mkdir -p docs/build
+
+          # Copy markdown files
+          cp README.md docs/build/
+          cp docs/*.md docs/build/ 2>/dev/null || true
+
+          # Generate index
+          cat > docs/build/index.md << 'EOF'
+          # ControlFin Documentation
+
+          ## Overview
+          ControlFin is a comprehensive financial management application.
+
+          ## Quick Start
+          See [README.md](README.md) for setup instructions.
+
+          ## Guides
+          - [CI/CD Guide](CI_CD_GUIDE.md)
+          - [Security Guidelines](security/README.md)
+          EOF
+
+          echo "Documentation built successfully"
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: docs/build/
+          retention-days: 30
+
+  # Deploy to GitHub Pages
+  deploy-pages:
+    if: github.ref == 'refs/heads/main'
+    needs: build-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download documentation artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: documentation
+          path: docs/build/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/build/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+  # Validate Documentation
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Markdown
+        run: |
+          echo "Validating markdown files..."
+
+          # Check for broken links in README
+          if command -v markdown-link-check >/dev/null 2>&1; then
+            markdown-link-check README.md
+          else
+            echo "markdown-link-check not available, skipping link validation"
+          fi
+
+          # Check for common markdown issues
+          find . -name "*.md" -not -path "./node_modules/*" -exec grep -l "TODO\|FIXME\|XXX" {} \; | while read file; do
+            echo "Warning: $file contains TODO/FIXME/XXX"
+          done
+
+          echo "Documentation validation complete"
+
+      - name: Check Documentation Structure
+        run: |
+          echo "Checking documentation structure..."
+
+          # Ensure required files exist
+          required_files=(
+            "README.md"
+            "docs/README.md"
+            "docs/CI_CD_GUIDE.md"
+            "docs/security/README.md"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "✗ $file missing"
+              exit 1
+            fi
+          done
+
+          echo "Documentation structure validation complete"

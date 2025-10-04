@@ -1,0 +1,30 @@
+name: 'Setup Project'
+description: 'Setup Node.js and install dependencies for a project'
+inputs:
+  project:
+    description: 'Project name (frontend/backend)'
+    required: true
+  node-version:
+    description: 'Node.js version to use'
+    required: true
+    default: '22'
+  cache:
+    description: 'Enable npm cache'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.cache }}
+        cache-dependency-path: './controlfin-${{ inputs.project }}/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd controlfin-${{ inputs.project }}
+        npm ci
+      shell: bash

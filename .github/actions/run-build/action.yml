@@ -1,0 +1,19 @@
+name: 'Run Build'
+description: 'Run build for a project'
+inputs:
+  project:
+    description: 'Project name (frontend/backend)'
+    required: true
+  build-command:
+    description: 'Build command to run'
+    required: false
+    default: 'npm run build'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run build
+      run: |
+        cd controlfin-${{ inputs.project }}
+        ${{ inputs.build-command }}
+      shell: bash

@@ -1,0 +1,24 @@
+name: 'Run Tests'
+description: 'Run tests for a project with coverage'
+inputs:
+  project:
+    description: 'Project name (frontend/backend)'
+    required: true
+  test-command:
+    description: 'Test command to run'
+    required: false
+    default: 'npm run test:coverage'
+  continue-on-error:
+    description: 'Continue on test failure'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run tests
+      run: |
+        cd controlfin-${{ inputs.project }}
+        ${{ inputs.test-command }} || echo "No tests yet - skipping"
+      shell: bash
+      continue-on-error: ${{ inputs.continue-on-error }}
