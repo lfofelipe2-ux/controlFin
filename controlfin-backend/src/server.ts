@@ -4,6 +4,7 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { connectDatabase } from './config/database';
 import { authRoutes } from './modules/auth/auth.routes';
+import { env } from './config/env';
 
 const fastify = Fastify({
   logger:
@@ -24,15 +25,15 @@ const fastify = Fastify({
 
 // Register plugins
 fastify.register(cors, {
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: [env.frontendUrl, 'http://localhost:3000'],
   credentials: true,
 });
 
 fastify.register(helmet);
 
 fastify.register(rateLimit, {
-  max: 100,
-  timeWindow: '1 minute',
+  max: env.rateLimitMax,
+  timeWindow: `${Math.max(env.rateLimitWindowMs, 1000)} ms`,
 });
 
 // Register routes
@@ -64,9 +65,9 @@ const start = async (): Promise<void> => {
     await connectDatabase();
 
     // Start server
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
-    fastify.log.info('🚀 Server listening on http://0.0.0.0:3000');
-    fastify.log.info('📚 API Documentation available at http://0.0.0.0:3000/api/docs');
+    await fastify.listen({ port: env.port, host: '0.0.0.0' });
+    fastify.log.info(`🚀 Server listening on http://0.0.0.0:${env.port}`);
+    fastify.log.info(`📚 API Documentation available at http://0.0.0.0:${env.port}/api/docs`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

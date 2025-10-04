@@ -89,37 +89,51 @@ const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Prom
 /**
  * Login user with email and password
  */
+type TokensResponseShape = NonNullable<AuthResponse['tokens']> & {
+  accessToken: string;
+  refreshToken: string;
+};
+type LoginRegisterResponse = AuthResponse | (AuthResponse & TokensResponseShape);
+
 export const loginUser = async (credentials: LoginRequest): Promise<AuthResponse> => {
-  const response = await makeRequest<AuthResponse>('/auth/login', {
+  const response = await makeRequest<LoginRegisterResponse>('/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
+  if ('accessToken' in response && 'refreshToken' in response) {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
+  } else if ('tokens' in response && response.tokens) {
+    const tokens = response.tokens as TokensResponseShape;
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
-  return response;
+  return response as AuthResponse;
 };
 
 /**
  * Register new user
  */
 export const registerUser = async (userData: RegisterRequest): Promise<AuthResponse> => {
-  const response = await makeRequest<AuthResponse>('/auth/register', {
+  const response = await makeRequest<LoginRegisterResponse>('/auth/register', {
     method: 'POST',
     body: JSON.stringify(userData),
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
+  if ('accessToken' in response && 'refreshToken' in response) {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
+  } else if ('tokens' in response && response.tokens) {
+    const tokens = response.tokens as TokensResponseShape;
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   }
 
-  return response;
+  return response as AuthResponse;
 };
 
 /**
@@ -150,17 +164,21 @@ export const refreshAccessToken = async (): Promise<{ accessToken: string }> => 
     throw new Error('No refresh token available');
   }
 
-  const response = await makeRequest<{ accessToken: string }>('/auth/refresh', {
+  const response = await makeRequest<
+    { accessToken?: string; tokens?: { accessToken: string; refreshToken: string } }
+  >('/auth/refresh', {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
 
   // Update stored access token
-  if (response.accessToken) {
+  if (response.tokens?.accessToken) {
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+  } else if (response.accessToken) {
     localStorage.setItem('accessToken', response.accessToken);
   }
 
-  return response;
+  return { accessToken: response.tokens?.accessToken || (response.accessToken as string) };
 };
 
 /**

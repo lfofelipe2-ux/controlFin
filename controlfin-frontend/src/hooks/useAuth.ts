@@ -16,6 +16,7 @@ import type {
   PasswordResetConfirmation,
 } from '../types/auth';
 import authService from '../services/authService';
+import { extractTokens } from '../utils/authTokens';
 
 // === AUTHENTICATION STORE INTERFACE ===
 
@@ -47,25 +48,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.loginUser(credentials);
 
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken,
+            refreshToken,
           });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Login failed';
+          const err = error as Error;
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: errorMessage,
+            error: err.message || 'Login failed',
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -78,25 +80,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.registerUser(userData);
 
+          const { accessToken, refreshToken } = extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken,
+            refreshToken,
           });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+          const err = error as Error;
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: errorMessage,
+            error: err.message || 'Registration failed',
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -132,12 +135,12 @@ export const useAuthStore = create<AuthStore>()(
           await authService.requestPasswordReset(email);
           set({ isLoading: false, error: null });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Password reset request failed';
+          const err = error as Error;
           set({
             isLoading: false,
-            error: errorMessage,
+            error: err.message || 'Password reset request failed',
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -151,12 +154,12 @@ export const useAuthStore = create<AuthStore>()(
           await authService.resetPassword(data);
           set({ isLoading: false, error: null });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+          const err = error as Error;
           set({
             isLoading: false,
-            error: errorMessage,
+            error: err.message || 'Password reset failed',
           });
-          throw error;
+          throw err;
         }
       },
 
@@ -187,7 +190,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: null,
             refreshToken: null,
           });
-          throw error;
+          throw (error as Error);
         }
       },
 
@@ -224,13 +227,16 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
 
+          const { accessToken: accessTokenInit, refreshToken: refreshTokenInit } = extractTokens(
+            response
+          );
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            accessToken: accessTokenInit,
+            refreshToken: refreshTokenInit,
           });
         } catch {
           // If getting user data fails, logout

@@ -172,3 +172,5 @@ export interface UpdateProfileInput {
   lastName?: string;
   avatar?: string;
 }
+
+// Note: TS interfaces for inputs are declared above; no duplicate aliases needed.

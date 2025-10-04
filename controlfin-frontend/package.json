@@ -15,7 +15,14 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "analyze": "vite-bundle-visualizer",
-    "clean": "rm -rf dist node_modules"
+    "clean": "rm -rf dist node_modules",
+    "validate:i18n": "node scripts/i18n-only-check.js",
+    "validate:manual": "node scripts/manual-i18n-test.js",
+    "validate:pre-merge": "node scripts/pre-merge-check.js",
+    "validate:pre-pr": "node scripts/pre-pr-validation.js",
+    "validate:hardcoded": "node scripts/hardcoded-strings-detector.js",
+    "setup:hooks": "node scripts/setup-git-hooks.js",
+    "setup:hooks:remove": "node scripts/setup-git-hooks.js remove"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",

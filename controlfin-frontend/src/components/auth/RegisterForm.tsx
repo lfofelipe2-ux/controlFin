@@ -5,38 +5,39 @@
  * and Google OAuth integration, following the BlockAI design system.
  */
 
-import React, { useState } from 'react';
 import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Typography,
-  Space,
-  Divider,
-  Alert,
-  Card,
-  Row,
-  Col,
-  Progress,
-} from 'antd';
-import {
-  UserOutlined,
-  LockOutlined,
-  MailOutlined,
-  GoogleOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  GoogleOutlined,
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Progress,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { type RegisterFormData } from '../../types/auth';
-import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
+import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import authService from '../../services/authService';
+import { type RegisterFormData } from '../../types/auth';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -59,6 +60,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   // === HOOKS ===
   const [form] = useForm<RegisterFormData>();
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
   const { register, isLoading, error, clearError } = useAuth();
   const { colors, typography } = useBlockAITheme();
 
@@ -93,7 +95,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         navigate('/dashboard');
       }
     } catch (error: unknown) {
-      console.error('Registration error:', error);
+      console.error('Registration error:', error as Error);
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);
@@ -107,7 +109,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     try {
       authService.initiateGoogleLogin();
     } catch (error: unknown) {
-      console.error('Google registration error:', error);
+      console.error('Google registration error:', error as Error);
     }
   };
 
@@ -168,7 +170,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               marginBottom: '8px',
             }}
           >
-            Create Account
+            {t('register.title')}
           </Title>
           <Paragraph
             style={{
@@ -177,14 +179,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               marginBottom: '32px',
             }}
           >
-            Join ControlFin and start managing your finances
+            {t('register.subtitle')}
           </Paragraph>
         </div>
 
         {/* Error Alert */}
         {error && (
           <Alert
-            message='Registration Failed'
+            message={t('register.errorTitle')}
             description={error}
             type='error'
             showIcon
@@ -220,17 +222,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       fontWeight: typography.weights.semibold,
                     }}
                   >
-                    First Name
+                    {t('register.firstNameLabel')}
                   </Text>
                 }
                 rules={[
                   {
                     required: true,
-                    message: 'Please enter your first name',
+                    message: t('register.validation.firstNameRequired'),
                   },
                   {
                     min: 2,
-                    message: 'First name must be at least 2 characters',
+                    message: t('register.validation.firstNameMin'),
                   },
                 ]}
               >
@@ -238,7 +240,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   prefix={
                     <UserOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />
                   }
-                  placeholder='First name'
+                  placeholder={t('register.firstNamePlaceholder')}
                   style={{
                     background: colors.backgroundCards,
                     border: `1px solid rgba(255, 255, 255, 0.1)`,
@@ -259,17 +261,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       fontWeight: typography.weights.semibold,
                     }}
                   >
-                    Last Name
+                    {t('register.lastNameLabel')}
                   </Text>
                 }
                 rules={[
                   {
                     required: true,
-                    message: 'Please enter your last name',
+                    message: t('register.validation.lastNameRequired'),
                   },
                   {
                     min: 2,
-                    message: 'Last name must be at least 2 characters',
+                    message: t('register.validation.lastNameMin'),
                   },
                 ]}
               >
@@ -277,7 +279,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   prefix={
                     <UserOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />
                   }
-                  placeholder='Last name'
+                  placeholder={t('register.lastNamePlaceholder')}
                   style={{
                     background: colors.backgroundCards,
                     border: `1px solid rgba(255, 255, 255, 0.1)`,
@@ -300,23 +302,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Email Address
+                {t('register.emailLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter your email address',
+                message: t('register.validation.emailRequired'),
               },
               {
                 type: 'email',
-                message: 'Please enter a valid email address',
+                message: t('register.validation.emailInvalid'),
               },
             ]}
           >
             <Input
               prefix={<MailOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
-              placeholder='Enter your email'
+              placeholder={t('register.emailPlaceholder')}
               style={{
                 background: colors.backgroundCards,
                 border: `1px solid rgba(255, 255, 255, 0.1)`,
@@ -337,28 +339,27 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Password
+                {t('register.passwordLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please enter a password',
+                message: t('register.validation.passwordRequired'),
               },
               {
                 min: 8,
-                message: 'Password must be at least 8 characters',
+                message: t('register.validation.passwordMin'),
               },
               {
                 pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message:
-                  'Password must contain uppercase, lowercase, number, and special character',
+                message: t('register.validation.passwordPattern'),
               },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
-              placeholder='Create a strong password'
+              placeholder={t('register.passwordPlaceholder')}
               iconRender={(visible) =>
                 visible ? (
                   <EyeTwoTone style={{ color: colors.textSecondary }} />
@@ -387,7 +388,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       fontSize: typography.sizes.desktop.small,
                     }}
                   >
-                    Password Strength
+                    {t('register.passwordStrength.label')}
                   </Text>
                 </Col>
                 <Col>
@@ -399,7 +400,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       textTransform: 'capitalize',
                     }}
                   >
-                    {passwordStrength.level}
+                    {t(`register.passwordStrength.${passwordStrength.level}`)}
                   </Text>
                 </Col>
               </Row>
@@ -457,27 +458,27 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   fontWeight: typography.weights.semibold,
                 }}
               >
-                Confirm Password
+                {t('register.confirmPasswordLabel')}
               </Text>
             }
             rules={[
               {
                 required: true,
-                message: 'Please confirm your password',
+                message: t('register.validation.confirmPasswordRequired'),
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error(t('register.validation.passwordsMustMatch')));
                 },
               }),
             ]}
           >
             <Input.Password
               prefix={<LockOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
-              placeholder='Confirm your password'
+              placeholder={t('register.confirmPasswordPlaceholder')}
               iconRender={(visible) =>
                 visible ? (
                   <EyeTwoTone style={{ color: colors.textSecondary }} />
@@ -504,7 +505,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 validator: (_, value) =>
                   value
                     ? Promise.resolve()
-                    : Promise.reject(new Error('You must accept the terms and conditions')),
+                    : Promise.reject(new Error(t('register.validation.termsRequired'))),
               },
             ]}
           >
@@ -514,7 +515,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 fontSize: typography.sizes.desktop.small,
               }}
             >
-              I agree to the{' '}
+              {t('register.termsLabel')}{' '}
               <Button
                 type='link'
                 style={{
@@ -537,9 +538,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   e.currentTarget.style.outline = 'none';
                 }}
               >
-                Terms of Service
+                {t('register.termsLink')}
               </Button>{' '}
-              and{' '}
+              {t('register.and')}{' '}
               <Button
                 type='link'
                 style={{
@@ -562,7 +563,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   e.currentTarget.style.outline = 'none';
                 }}
               >
-                Privacy Policy
+                {t('register.privacyLink')}
               </Button>
             </Checkbox>
           </Form.Item>
@@ -584,7 +585,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 fontWeight: typography.weights.semibold,
               }}
             >
-              {isLoading || isSubmitting ? 'Creating Account...' : 'Create Account'}
+              {isLoading || isSubmitting ? t('register.registering') : t('register.registerButton')}
             </Button>
           </Form.Item>
         </Form>
@@ -597,7 +598,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             margin: '24px 0',
           }}
         >
-          Or continue with
+          {t('register.orContinueWith')}
         </Divider>
 
         {/* Google OAuth Button */}
@@ -616,7 +617,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           }}
           icon={<GoogleOutlined />}
         >
-          Continue with Google
+          {t('register.googleButton')}
         </Button>
 
         {/* Switch to Login */}
@@ -628,7 +629,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 fontSize: typography.sizes.desktop.body,
               }}
             >
-              Already have an account?{' '}
+              {t('register.haveAccount')}{' '}
             </Text>
             <Button
               type='link'
@@ -641,7 +642,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 height: 'auto',
               }}
             >
-              Sign in here
+              {t('register.signIn')}
             </Button>
           </div>
         )}
