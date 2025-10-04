@@ -10,7 +10,6 @@ import {
   CloseCircleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
-  GoogleOutlined,
   LockOutlined,
   MailOutlined,
   UserOutlined,
@@ -36,8 +35,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import { usePasswordStrength } from '../../hooks/usePasswordStrength';
-import authService from '../../services/authService';
 import { type RegisterFormData } from '../../types/auth';
+import GoogleOAuthButton from './GoogleOAuthButton';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -99,17 +98,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  /**
-   * Handle Google OAuth registration
-   */
-  const handleGoogleRegister = () => {
-    try {
-      authService.initiateGoogleLogin();
-    } catch (error: unknown) {
-      console.error('Google registration error:', error as Error);
     }
   };
 
@@ -602,23 +590,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         </Divider>
 
         {/* Google OAuth Button */}
-        <Button
-          onClick={handleGoogleRegister}
+        <GoogleOAuthButton
+          type='register'
+          loading={isLoading || isSubmitting}
           disabled={isLoading || isSubmitting}
-          style={{
-            width: '100%',
-            height: '48px',
-            background: 'transparent',
-            border: `1px solid rgba(255, 255, 255, 0.1)`,
-            borderRadius: '8px',
-            color: colors.textPrimary,
-            fontSize: typography.sizes.desktop.body,
-            fontWeight: typography.weights.semibold,
-          }}
-          icon={<GoogleOutlined />}
-        >
-          {t('register.googleButton')}
-        </Button>
+          fullWidth
+          size='large'
+        />
 
         {/* Switch to Login */}
         {onSwitchToLogin && (

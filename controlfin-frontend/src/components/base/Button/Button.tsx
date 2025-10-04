@@ -21,7 +21,7 @@ const getAntButtonType = (variant: ButtonVariant = 'primary'): ButtonType => {
     case 'secondary':
       return 'default';
     case 'ghost':
-      return 'ghost';
+      return 'default';
     case 'link':
       return 'link';
     case 'text':

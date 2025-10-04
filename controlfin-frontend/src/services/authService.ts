@@ -164,9 +164,10 @@ export const refreshAccessToken = async (): Promise<{ accessToken: string }> => 
     throw new Error('No refresh token available');
   }
 
-  const response = await makeRequest<
-    { accessToken?: string; tokens?: { accessToken: string; refreshToken: string } }
-  >('/auth/refresh', {
+  const response = await makeRequest<{
+    accessToken?: string;
+    tokens?: { accessToken: string; refreshToken: string };
+  }>('/auth/refresh', {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
@@ -342,9 +343,9 @@ export const handleGoogleCallback = async (code: string): Promise<AuthResponse> 
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+  if (response.tokens?.accessToken && response.tokens?.refreshToken) {
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+    localStorage.setItem('refreshToken', response.tokens.refreshToken);
   }
 
   return response;

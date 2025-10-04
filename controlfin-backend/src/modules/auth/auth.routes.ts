@@ -1,5 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import { registerAccountLinkingRoutes } from './auth.account-linking.routes';
+import { registerOAuthRoutes } from './auth.oauth.routes';
 import {
   changePasswordSchema,
   loginSchema,
@@ -487,4 +489,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
     }
   );
+
+  // Register OAuth routes
+  await registerOAuthRoutes(fastify);
+
+  // Register account linking routes
+  await registerAccountLinkingRoutes(fastify);
 }

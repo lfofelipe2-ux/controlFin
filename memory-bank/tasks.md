@@ -258,6 +258,138 @@ Implement proper internationalization system and establish UI/UX standards to ad
 
 ## 📋 FUTURE TASKS ROADMAP
 
+### **TASK-005: Google OAuth Integration** ⏳ PLANNING
+
+**Complexity**: Level 3 - Intermediate Feature  
+**Priority**: 🔴 **HIGH** (Required for MVP)  
+**Estimated Effort**: 12 hours
+
+**Description**: Implement Google OAuth 2.0 integration for authentication system. This is a critical MVP requirement as specified in the project brief.
+
+**Technology Stack**:
+
+- **Backend**: Node.js + Fastify + passport-google-oauth20
+- **Frontend**: React + existing authService integration
+- **Database**: MongoDB (existing User model with googleId field)
+- **OAuth Flow**: Authorization Code flow with PKCE
+
+**Technology Validation Checkpoints**:
+
+- [ ] Google OAuth dependencies installed
+- [ ] Google OAuth configuration validated
+- [ ] OAuth flow test successful
+- [ ] User model integration verified
+- [ ] Frontend-backend integration tested
+
+**Status**:
+
+- [x] Initialization complete
+- [x] Planning complete
+- [x] Technology validation complete ✅
+- [x] Creative phase (OAuth Flow Design) ✅
+- [x] Implementation Phase 1: Backend OAuth endpoints ✅
+- [x] Implementation Phase 2: Frontend OAuth integration ✅
+- [x] Implementation Phase 3: User account linking ✅
+- [x] Implementation Phase 4: Error handling & testing ✅
+
+**Key Deliverables**:
+
+- Backend Google OAuth endpoints (`/auth/google`, `/auth/google/callback`)
+- Frontend Google OAuth button and flow (already partially implemented)
+- User account linking (Google ID + existing accounts)
+- OAuth state management
+- Error handling for OAuth failures
+- Integration with existing auth system
+
+**Dependencies**: TASK-004 (Backend Auth), TASK-006 (Frontend Auth UI)
+
+**Implementation Plan**:
+
+#### **Phase 1: Backend OAuth Endpoints (4h)**
+
+1. **Install Dependencies**
+   - Install `passport-google-oauth20` and `@types/passport-google-oauth20`
+   - Install `passport` and `@types/passport`
+   - Install `passport-jwt` for JWT strategy
+
+2. **Create OAuth Service**
+   - Create `auth.oauth.service.ts` with Google OAuth logic
+   - Implement user creation/update from Google profile
+   - Handle account linking (existing email + Google ID)
+
+3. **Add OAuth Routes**
+   - Add `GET /auth/google` route (initiate OAuth)
+   - Add `GET /auth/google/callback` route (handle callback)
+   - Add `POST /auth/google/callback` route (frontend callback)
+
+4. **Update Auth Schemas**
+   - Add Google OAuth request/response schemas
+   - Add Google profile validation schemas
+
+#### **Phase 2: Frontend OAuth Integration (3h)**
+
+1. **Update Auth Service**
+   - Fix `handleGoogleCallback` function
+   - Add proper error handling
+   - Add loading states
+
+2. **Create OAuth Callback Page**
+   - Create `/auth/callback` route
+   - Handle OAuth callback with code parameter
+   - Redirect to appropriate page after success/error
+
+3. **Update Auth Components**
+   - Ensure Google OAuth buttons work correctly
+   - Add proper error handling and user feedback
+   - Update loading states
+
+#### **Phase 3: User Account Linking (3h)**
+
+1. **Account Linking Logic**
+   - Handle existing users with same email
+   - Link Google ID to existing account
+   - Prevent duplicate accounts
+
+2. **User Experience**
+   - Clear messaging for account linking
+   - Handle edge cases (multiple Google accounts)
+   - Proper error messages
+
+#### **Phase 4: Error Handling & Testing (2h)**
+
+1. **Error Handling**
+   - OAuth flow errors
+   - Network errors
+   - Invalid tokens
+   - Account conflicts
+
+2. **Testing**
+   - Test OAuth flow end-to-end
+   - Test account linking scenarios
+   - Test error cases
+   - Verify security
+
+**Creative Phases Required**:
+
+- [x] **OAuth Flow Design** - Design the complete OAuth flow and user experience
+- [ ] **Error Handling Strategy** - Design comprehensive error handling
+- [ ] **Account Linking UX** - Design user experience for account linking
+
+**Challenges & Mitigations**:
+
+- **Challenge**: OAuth flow complexity
+  - **Mitigation**: Use proven passport-google-oauth20 library, follow Google OAuth 2.0 best practices
+- **Challenge**: Account linking conflicts
+  - **Mitigation**: Clear business logic for handling existing accounts, user-friendly error messages
+- **Challenge**: Security concerns
+  - **Mitigation**: Validate all OAuth responses, use secure state parameters, implement proper error handling
+- **Challenge**: Frontend-backend integration
+  - **Mitigation**: Use existing authService patterns, maintain consistency with current auth flow
+
+**Dependencies**: TASK-004 (Backend Auth), TASK-006 (Frontend Auth UI)
+
+---
+
 ### **TASK-008: Automated Testing Implementation** ⏳ NEXT
 
 **Complexity**: Level 2 - Simple Enhancement  
@@ -473,8 +605,9 @@ Implement proper internationalization system and establish UI/UX standards to ad
 - ✅ Authentication system
 - ✅ UI/UX standards and i18n (TASK-007)
 
-### **Phase 2: Testing & Documentation** ⏳ CURRENT
+### **Phase 2: Authentication Completion** ⏳ CURRENT
 
+- ⏳ Google OAuth integration (TASK-005) - **HIGH PRIORITY**
 - ⏳ Automated testing (TASK-008)
 - ⏳ Component documentation (TASK-009)
 - ⏳ Language switcher (TASK-010)
@@ -503,8 +636,8 @@ Implement proper internationalization system and establish UI/UX standards to ad
 **Project:** ControlFin - Progressive Web App for Personal Finance Management
 **Complexity:** Level 4 - Complex System
 **Timeline:** 6-7 weeks (13 implementation phases)
-**Current Phase:** Phase 2 - Testing & Documentation
-**Overall Progress:** 55% (TASK-007 completed)
+**Current Phase:** Phase 2 - Authentication Completion
+**Overall Progress:** 55% (TASK-007 completed, TASK-005 pending)
 
 ## Memory Bank Structure Status
 
