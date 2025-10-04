@@ -11,12 +11,18 @@ export interface OAuthError {
   userMessage: string;
   recoverable: boolean;
   action?: string;
-  details?: any;
+  details?: {
+    originalError: Error | string | unknown;
+    context: OAuthErrorContext;
+    timestamp: string;
+    userAgent: string;
+    url: string;
+  };
 }
 
 export interface OAuthErrorContext {
   step: 'initiation' | 'callback' | 'token_exchange' | 'profile_fetch' | 'account_linking';
-  originalError?: any;
+  originalError?: Error | string | unknown;
   userEmail?: string;
   googleId?: string;
 }
@@ -224,7 +230,7 @@ export class OAuthErrorHandler {
   /**
    * Classify and handle OAuth errors
    */
-  static handleError(error: any, context: OAuthErrorContext): OAuthError {
+  static handleError(error: Error | string | unknown, context: OAuthErrorContext): OAuthError {
     // Extract error code from various error formats
     const errorCode = this.extractErrorCode(error);
 
@@ -252,22 +258,22 @@ export class OAuthErrorHandler {
   /**
    * Extract error code from various error formats
    */
-  private static extractErrorCode(error: any): string {
+  private static extractErrorCode(error: Error | string | unknown): string {
     if (typeof error === 'string') {
       return error;
     }
 
-    if (error?.code) {
-      return error.code;
+    if (error && typeof error === 'object' && 'code' in error) {
+      return String(error.code);
     }
 
-    if (error?.error) {
-      return error.error;
+    if (error && typeof error === 'object' && 'error' in error) {
+      return String(error.error);
     }
 
-    if (error?.message) {
+    if (error && typeof error === 'object' && 'message' in error) {
       // Try to extract error code from message
-      const message = error.message.toLowerCase();
+      const message = String(error.message).toLowerCase();
       if (message.includes('network')) return 'NETWORK_ERROR';
       if (message.includes('timeout')) return 'TIMEOUT_ERROR';
       if (message.includes('unauthorized')) return 'TOKEN_INVALID';
@@ -307,7 +313,7 @@ export class OAuthErrorHandler {
   /**
    * Get user-friendly error message
    */
-  static getUserMessage(error: any, context: OAuthErrorContext): string {
+  static getUserMessage(error: Error | string | unknown, context: OAuthErrorContext): string {
     const oauthError = this.handleError(error, context);
     return oauthError.userMessage;
   }
@@ -315,7 +321,7 @@ export class OAuthErrorHandler {
   /**
    * Check if error is recoverable
    */
-  static isRecoverable(error: any, context: OAuthErrorContext): boolean {
+  static isRecoverable(error: Error | string | unknown, context: OAuthErrorContext): boolean {
     const oauthError = this.handleError(error, context);
     return oauthError.recoverable;
   }
@@ -323,7 +329,7 @@ export class OAuthErrorHandler {
   /**
    * Get recommended action for error
    */
-  static getRecommendedAction(error: any, context: OAuthErrorContext): string {
+  static getRecommendedAction(error: Error | string | unknown, context: OAuthErrorContext): string {
     const oauthError = this.handleError(error, context);
     return oauthError.action || 'retry';
   }
@@ -331,7 +337,10 @@ export class OAuthErrorHandler {
   /**
    * Create error recovery strategies
    */
-  static getRecoveryStrategies(error: any, context: OAuthErrorContext): string[] {
+  static getRecoveryStrategies(
+    error: Error | string | unknown,
+    context: OAuthErrorContext
+  ): string[] {
     const oauthError = this.handleError(error, context);
     const strategies: string[] = [];
 

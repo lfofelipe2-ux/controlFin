@@ -7,9 +7,10 @@
 
 import { GoogleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../../services/authService';
+import OAuthConfigWarning from './OAuthConfigWarning';
 
 export interface GoogleOAuthButtonProps {
   /** Button text type */
@@ -41,6 +42,7 @@ const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
   style = {},
 }) => {
   const { t } = useTranslation();
+  const [showConfigWarning, setShowConfigWarning] = useState(false);
 
   const handleClick = async () => {
     if (onClick) {
@@ -51,8 +53,12 @@ const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
       // Initiate Google OAuth flow
       authService.initiateGoogleLogin();
     } catch (error) {
-      console.error('Error initiating Google OAuth:', error);
-      // Error handling is managed by the authService
+      console.error(t('auth.oauth.errors.initiation_failed'), error);
+
+      // Se for erro de configuração, mostrar warning
+      if (error instanceof Error && error.message.includes('not configured')) {
+        setShowConfigWarning(true);
+      }
     }
   };
 
@@ -109,45 +115,49 @@ const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
   };
 
   return (
-    <Button
-      type='default'
-      size={size}
-      loading={loading}
-      disabled={disabled}
-      onClick={handleClick}
-      className={`google-oauth-button ${className}`}
-      icon={
-        <GoogleOutlined
-          style={{
-            fontSize: sizeConfig.iconSize,
-            color: '#4285f4',
-          }}
-        />
-      }
-      style={buttonStyle}
-      onMouseEnter={(e) => {
-        if (!disabled && !loading) {
-          Object.assign(e.currentTarget.style, hoverStyle);
+    <>
+      <Button
+        type='default'
+        size={size}
+        loading={loading}
+        disabled={disabled}
+        onClick={handleClick}
+        className={`google-oauth-button ${className}`}
+        icon={
+          <GoogleOutlined
+            style={{
+              fontSize: sizeConfig.iconSize,
+              color: '#4285f4',
+            }}
+          />
         }
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled && !loading) {
-          Object.assign(e.currentTarget.style, buttonStyle);
-        }
-      }}
-      onMouseDown={(e) => {
-        if (!disabled && !loading) {
-          Object.assign(e.currentTarget.style, activeStyle);
-        }
-      }}
-      onMouseUp={(e) => {
-        if (!disabled && !loading) {
-          Object.assign(e.currentTarget.style, hoverStyle);
-        }
-      }}
-    >
-      {getButtonText()}
-    </Button>
+        style={buttonStyle}
+        onMouseEnter={(e) => {
+          if (!disabled && !loading) {
+            Object.assign(e.currentTarget.style, hoverStyle);
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled && !loading) {
+            Object.assign(e.currentTarget.style, buttonStyle);
+          }
+        }}
+        onMouseDown={(e) => {
+          if (!disabled && !loading) {
+            Object.assign(e.currentTarget.style, activeStyle);
+          }
+        }}
+        onMouseUp={(e) => {
+          if (!disabled && !loading) {
+            Object.assign(e.currentTarget.style, hoverStyle);
+          }
+        }}
+      >
+        {getButtonText()}
+      </Button>
+
+      {showConfigWarning && <OAuthConfigWarning onConfigure={() => setShowConfigWarning(false)} />}
+    </>
   );
 };
 

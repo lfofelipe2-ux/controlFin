@@ -258,9 +258,9 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.logout(request.user!._id);
+        await authService.logout();
 
         return reply.send({
           message: 'Logout successful',
@@ -411,7 +411,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.changePassword(request.user!._id, request.body as any);
+        await authService.changePassword(
+          request.user!._id,
+          request.body as { currentPassword: string; newPassword: string }
+        );
 
         return reply.send({
           message: 'Password changed successfully',

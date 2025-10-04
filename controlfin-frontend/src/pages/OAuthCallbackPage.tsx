@@ -7,7 +7,7 @@
 
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Button, Spin } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import AccountLinkingModal from '../components/auth/AccountLinkingModal';
@@ -40,13 +40,16 @@ const OAuthCallbackPage: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [showLinkingModal, setShowLinkingModal] = useState<boolean>(false);
-  const [googleProfile] = useState<any>(null);
+  const [googleProfile] = useState<{
+    id: string;
+    email: string;
+    given_name: string;
+    family_name: string;
+    picture: string;
+    verified_email: boolean;
+  } | null>(null);
 
-  useEffect(() => {
-    handleOAuthCallback();
-  }, []);
-
-  const handleOAuthCallback = async () => {
+  const handleOAuthCallback = useCallback(async () => {
     try {
       // Get parameters from URL
       const params: OAuthCallbackParams = {
@@ -107,7 +110,11 @@ const OAuthCallbackPage: React.FC = () => {
       setStatus('error');
       setMessage(oauthError.userMessage);
     }
-  };
+  }, [searchParams, t, navigate, isNewUser]);
+
+  useEffect(() => {
+    handleOAuthCallback();
+  }, [handleOAuthCallback]);
 
   const handleRetry = () => {
     navigate('/auth');
@@ -276,7 +283,14 @@ const OAuthCallbackPage: React.FC = () => {
           onSuccess={handleAccountLinkingSuccess}
           onCreateNew={handleCreateNewAccount}
           email={googleProfile?.email || ''}
-          googleProfile={googleProfile}
+          googleProfile={
+            googleProfile
+              ? {
+                  name: `${googleProfile.given_name} ${googleProfile.family_name}`,
+                  picture: googleProfile.picture,
+                }
+              : undefined
+          }
         />
       </div>
     </OAuthErrorBoundary>

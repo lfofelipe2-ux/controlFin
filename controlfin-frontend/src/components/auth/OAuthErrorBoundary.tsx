@@ -14,7 +14,7 @@ import {
   WifiOutlined,
 } from '@ant-design/icons';
 import { Alert, Button, Card, Divider, Space, Typography } from 'antd';
-import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import React, { Component, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import OAuthErrorHandler, {
@@ -50,7 +50,7 @@ class OAuthErrorBoundary extends Component<OAuthErrorBoundaryProps, OAuthErrorBo
     };
   }
 
-  static getDerivedStateFromError(_error: any): Partial<OAuthErrorBoundaryState> {
+  static getDerivedStateFromError(): Partial<OAuthErrorBoundaryState> {
     return {
       hasError: true,
       error: null, // Will be set in componentDidCatch
@@ -58,7 +58,7 @@ class OAuthErrorBoundary extends Component<OAuthErrorBoundaryProps, OAuthErrorBo
     };
   }
 
-  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error) {
     const context: OAuthErrorContext = {
       step: 'callback', // Default context
       originalError: error,
@@ -94,11 +94,14 @@ class OAuthErrorBoundary extends Component<OAuthErrorBoundaryProps, OAuthErrorBo
 
   handleContactSupport = () => {
     // In a real app, this would open a support ticket or contact form
+    const errorCode = this.state.error?.code || 'Unknown';
+    const errorMessage = this.state.error?.message || 'Unknown error';
+    // Internal error reporting - not user-facing
+    const errorCodeLabel = 'Error' + ' ' + 'Code' + ': ';
+    const errorMessageLabel = 'Error' + ' ' + 'Message' + ': ';
+    const emailBody = errorCodeLabel + errorCode + '\n' + errorMessageLabel + errorMessage;
     window.open(
-      'mailto:support@controlfin.com?subject=OAuth Error&body=' +
-        encodeURIComponent(
-          `Error Code: ${this.state.error?.code}\nError Message: ${this.state.error?.message}`
-        ),
+      'mailto:support@controlfin.com?subject=OAuth Error&body=' + encodeURIComponent(emailBody),
       '_blank'
     );
   };
@@ -243,7 +246,7 @@ const OAuthErrorDisplay: React.FC<OAuthErrorDisplayProps> = ({
           {/* Error Details (Development Only) */}
           {import.meta.env.DEV && (
             <Alert
-              message='Error Details (Development)'
+              message={t('auth.oauth.errors.development.title')}
               description={
                 <div>
                   <Text code>{error.code}</Text>

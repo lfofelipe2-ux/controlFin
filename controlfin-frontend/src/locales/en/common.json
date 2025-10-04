@@ -47,6 +47,26 @@
     "help": "Help",
     "logout": "Logout"
   },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "now": "Now",
+    "ago": "ago",
+    "in": "in",
+    "seconds": "seconds",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months",
+    "years": "years"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "portuguese": "Português"
+  },
   "auth": {
     "oauth": {
       "continue_with_google": "Continue with Google",
@@ -72,6 +92,37 @@
         "try_again": "Try Again",
         "go_home": "Go Home",
         "go_to_dashboard": "Go to Dashboard"
+      },
+      "errors": {
+        "connection": {
+          "title": "Connection Problem",
+          "description": "Please check your internet connection and try again."
+        },
+        "service": {
+          "title": "Service Temporarily Unavailable",
+          "description": "The authentication service is temporarily unavailable. Please try again later."
+        },
+        "support": {
+          "title": "Technical Support Required",
+          "description": "Please contact technical support for assistance with this issue.",
+          "email_body": "Error Code: {{code}}\nError Message: {{message}}"
+        },
+        "generic": {
+          "title": "Authentication Error",
+          "description": "An error occurred during authentication. Please try again."
+        },
+        "recovery": {
+          "title": "What you can try:"
+        },
+        "actions": {
+          "try_again": "Try Again",
+          "go_home": "Go to Home",
+          "contact_support": "Contact Support"
+        },
+        "initiation_failed": "Error initiating Google OAuth:",
+        "development": {
+          "title": "Error Details (Development)"
+        }
       }
     },
     "account_linking": {
@@ -95,54 +146,6 @@
       "error": {
         "link_failed": "Failed to link accounts. Please try again."
       }
-    },
-    "oauth": {
-      "errors": {
-        "generic": {
-          "title": "Authentication Error",
-          "description": "Something went wrong during authentication. Please try again."
-        },
-        "connection": {
-          "title": "Connection Problem",
-          "description": "Unable to connect to the authentication service. Please check your internet connection."
-        },
-        "service": {
-          "title": "Service Unavailable",
-          "description": "The authentication service is temporarily unavailable. Please try again later."
-        },
-        "support": {
-          "title": "Technical Issue",
-          "description": "We're experiencing technical difficulties. Please contact support for assistance."
-        },
-        "recovery": {
-          "title": "What you can do:"
-        },
-        "actions": {
-          "try_again": "Try Again",
-          "go_home": "Go Home",
-          "contact_support": "Contact Support"
-        }
-      }
     }
-  },
-  "time": {
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "tomorrow": "Tomorrow",
-    "now": "Now",
-    "ago": "ago",
-    "in": "in",
-    "seconds": "seconds",
-    "minutes": "minutes",
-    "hours": "hours",
-    "days": "days",
-    "weeks": "weeks",
-    "months": "months",
-    "years": "years"
-  },
-  "language": {
-    "label": "Language",
-    "english": "English",
-    "portuguese": "Português"
   }
 }

@@ -106,7 +106,7 @@ export class AuthService {
         iat: number;
         exp: number;
       };
-    } catch (error) {
+    } catch {
       throw new Error('Invalid token');
     }
   }
@@ -212,7 +212,7 @@ export class AuthService {
   /**
    * Logout user (invalidate refresh token)
    */
-  async logout(_userId: string): Promise<void> {
+  async logout(): Promise<void> {
     // In a production app, you might want to blacklist the refresh token
     // For now, we'll just return success
     // TODO: Implement token blacklisting with Redis

@@ -143,8 +143,17 @@ export const handleOAuthCallbackWithLinking = async (googleProfile: {
 }): Promise<{
   needsLinking: boolean;
   conflictInfo?: AccountConflictInfo;
-  user?: any;
-  tokens?: any;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+  };
+  tokens?: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }> => {
   try {
     // Check for account conflicts
@@ -161,7 +170,19 @@ export const handleOAuthCallbackWithLinking = async (googleProfile: {
       throw new Error(conflictInfo.reason || 'Account cannot be linked');
     } else {
       // No conflict, proceed with normal OAuth flow
-      const response = await makeRequest<{ user: any; tokens: any }>('/auth/google/callback', {
+      const response = await makeRequest<{
+        user: {
+          id: string;
+          email: string;
+          firstName: string;
+          lastName: string;
+          avatar?: string;
+        };
+        tokens: {
+          accessToken: string;
+          refreshToken: string;
+        };
+      }>('/auth/google/callback', {
         method: 'POST',
         body: JSON.stringify({
           code: 'direct_oauth', // Special code for direct OAuth

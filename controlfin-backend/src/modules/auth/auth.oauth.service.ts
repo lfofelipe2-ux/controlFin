@@ -109,15 +109,22 @@ export const generateOAuthTokens = async (
 /**
  * Validate Google OAuth profile data
  */
-export const validateGoogleProfile = (profile: any): profile is GoogleProfile => {
+export const validateGoogleProfile = (profile: unknown): profile is GoogleProfile => {
   return (
-    profile &&
-    typeof profile.id === 'string' &&
-    typeof profile.email === 'string' &&
-    typeof profile.name === 'string' &&
-    typeof profile.given_name === 'string' &&
-    typeof profile.family_name === 'string' &&
-    typeof profile.verified_email === 'boolean'
+    profile !== null &&
+    typeof profile === 'object' &&
+    'id' in profile &&
+    'email' in profile &&
+    'name' in profile &&
+    'given_name' in profile &&
+    'family_name' in profile &&
+    'verified_email' in profile &&
+    typeof (profile as any).id === 'string' &&
+    typeof (profile as any).email === 'string' &&
+    typeof (profile as any).name === 'string' &&
+    typeof (profile as any).given_name === 'string' &&
+    typeof (profile as any).family_name === 'string' &&
+    typeof (profile as any).verified_email === 'boolean'
   );
 };
 

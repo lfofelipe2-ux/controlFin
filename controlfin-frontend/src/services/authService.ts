@@ -318,8 +318,22 @@ export const initiateGoogleLogin = (): void => {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const redirectUri = `${window.location.origin}/auth/callback`;
 
-  if (!googleClientId) {
-    throw new Error('Google Client ID not configured');
+  if (!googleClientId || googleClientId === 'your_google_client_id_here') {
+    console.warn(
+      'Google OAuth Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file.'
+    );
+    console.warn(
+      'For development, you can get a Client ID from: https://console.cloud.google.com/'
+    );
+
+    // Em desenvolvimento, mostrar um alerta mais amigável
+    if (import.meta.env.DEV) {
+      alert('Google OAuth não configurado. Verifique o console para instruções.');
+    }
+
+    throw new Error(
+      'Google Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your environment variables.'
+    );
   }
 
   const googleAuthUrl = new URL('https://accounts.google.com/oauth/authorize');
