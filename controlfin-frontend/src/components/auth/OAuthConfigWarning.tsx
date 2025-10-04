@@ -8,7 +8,6 @@
 import { GoogleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Space, Typography } from 'antd';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,14 +17,12 @@ interface OAuthConfigWarningProps {
 }
 
 const OAuthConfigWarning: React.FC<OAuthConfigWarningProps> = ({ onConfigure, className = '' }) => {
-  const { t } = useTranslation('common');
-
   const handleConfigure = () => {
     if (onConfigure) {
       onConfigure();
     } else {
       // Abrir documentação de configuração
-      window.open('https://console.cloud.google.com/', '_blank');
+      window.open('https://console.cloud.google.com/', '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -65,7 +62,7 @@ const OAuthConfigWarning: React.FC<OAuthConfigWarningProps> = ({ onConfigure, cl
             <li>
               <Text>
                 Configure as URIs de redirecionamento:{' '}
-                <Text code>http://localhost:3001/auth/callback</Text>
+                <Text code>http://localhost:5173/auth/callback</Text>
               </Text>
             </li>
             <li>

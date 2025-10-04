@@ -18,7 +18,7 @@ export default defineConfig({
   },
   // Configuração adicional para desenvolvimento
   server: {
-    port: 3001,
+    port: 5173,
     host: true,
   },
 });

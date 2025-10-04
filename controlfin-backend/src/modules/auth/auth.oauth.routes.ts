@@ -11,6 +11,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { z } from 'zod';
+import crypto from 'crypto';
 import { GoogleProfile, handleOAuthCallback, validateGoogleProfile } from './auth.oauth.service';
 
 // Google OAuth callback schema
@@ -95,11 +96,24 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
       const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
       const redirectUri = `${frontendUrl}/auth/callback`;
 
-      // Generate state parameter for CSRF protection
+      // Generate cryptographically secure state parameter for CSRF protection
+      const stateData = {
+        timestamp: Date.now(),
+        redirectUri,
+        nonce: crypto.randomBytes(16).toString('hex'),
+      };
+
+      // Create HMAC signature for state validation
+      const stateString = JSON.stringify(stateData);
+      const signature = crypto
+        .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+        .update(stateString)
+        .digest('hex');
+
       const state = Buffer.from(
         JSON.stringify({
-          timestamp: Date.now(),
-          redirectUri,
+          ...stateData,
+          signature,
         })
       ).toString('base64');
 
@@ -136,16 +150,32 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
         );
       }
 
-      // Validate state parameter
+      // Validate state parameter with HMAC signature verification
       if (state) {
         try {
           const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
           const now = Date.now();
           const maxAge = 10 * 60 * 1000; // 10 minutes
 
+          // Check timestamp
           if (now - stateData.timestamp > maxAge) {
             return reply.redirect(
               `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=State expired`
+            );
+          }
+
+          // Verify HMAC signature
+          const { signature, ...stateDataWithoutSignature } = stateData;
+          const stateString = JSON.stringify(stateDataWithoutSignature);
+          const expectedSignature = crypto
+            .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+            .update(stateString)
+            .digest('hex');
+
+          if (signature !== expectedSignature) {
+            console.error('Invalid state signature');
+            return reply.redirect(
+              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state signature`
             );
           }
         } catch (stateError) {
