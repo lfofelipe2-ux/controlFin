@@ -5,6 +5,7 @@
  */
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import logger from '../../utils/logger';
 import {
   accountConflictCheckSchema,
   AccountLinkingRequest,
@@ -48,8 +49,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(conflictInfo);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error checking account conflict:', error);
+        logger.error('Error checking account conflict:', error);
         return reply.status(500).send({
           message: 'Failed to check account conflict',
           error: 'ACCOUNT_CONFLICT_CHECK_ERROR',
@@ -108,8 +108,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(result);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error linking Google account:', error);
+        logger.error('Error linking Google account:', error);
         return reply.status(400).send({
           message: 'Failed to link Google account',
           error: 'ACCOUNT_LINKING_ERROR',
@@ -168,8 +167,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(result);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error creating Google account:', error);
+        logger.error('Error creating Google account:', error);
         return reply.status(400).send({
           message: 'Failed to create Google account',
           error: 'ACCOUNT_CREATION_ERROR',

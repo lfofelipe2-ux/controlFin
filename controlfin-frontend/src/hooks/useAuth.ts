@@ -8,14 +8,14 @@
 import React from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type {
-  AuthState,
-  AuthActions,
-  LoginRequest,
-  RegisterRequest,
-  PasswordResetConfirmation,
-} from '../types/auth';
 import authService from '../services/authService';
+import type {
+  AuthActions,
+  AuthState,
+  LoginRequest,
+  PasswordResetConfirmation,
+  RegisterRequest,
+} from '../types/auth';
 import { extractTokens } from '../utils/authTokens';
 import logger from '../utils/logger';
 

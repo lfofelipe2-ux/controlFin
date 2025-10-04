@@ -7,6 +7,7 @@
  * - JWT token generation for OAuth users
  */
 
+import logger from '../../utils/logger';
 import { IUser, User } from '../users/user.model';
 import { authService } from './auth.service';
 
@@ -83,8 +84,7 @@ export const createOrUpdateUserFromGoogle = async (
 
     return { user, isNewUser };
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error creating/updating user from Google profile:', error);
+    logger.error('Error creating/updating user from Google profile:', error);
     throw new Error('Failed to create or update user account');
   }
 };
@@ -102,8 +102,7 @@ export const generateOAuthTokens = async (
     const tokens = authService.generateTokensForOAuth(user._id.toString());
     return tokens;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error generating OAuth tokens:', error);
+    logger.error('Error generating OAuth tokens:', error);
     throw new Error('Failed to generate authentication tokens');
   }
 };
@@ -172,8 +171,7 @@ export const handleOAuthCallback = async (
       isNewUser,
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error handling OAuth callback:', error);
+    logger.error('Error handling OAuth callback:', error);
     throw new Error('OAuth authentication failed');
   }
 };
@@ -198,8 +196,7 @@ export const canUserUseOAuth = async (email: string): Promise<boolean> => {
     // If user exists but no password, they must use OAuth
     return true;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error checking OAuth eligibility:', error);
+    logger.error('Error checking OAuth eligibility:', error);
     return false;
   }
 };
