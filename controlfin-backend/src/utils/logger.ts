@@ -57,6 +57,7 @@ const stream = {
 
 // Add stream to logger with proper typing
 // Winston Logger already has a stream property, so we extend it
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (logger as any).stream = stream;
 
 export default logger;
