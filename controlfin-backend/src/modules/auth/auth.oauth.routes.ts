@@ -32,7 +32,7 @@ const rateLimitConfig = {
 // Google OAuth callback schema
 const googleCallbackSchema = z.object({
   code: z.string().min(1, 'Authorization code is required'),
-  state: z.string().optional(),
+  state: z.string().min(1, 'State parameter is required for security'),
 });
 
 // OAuth response schema
@@ -87,6 +87,7 @@ const configureGoogleStrategy = () => {
 
           return done(null, result);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Google OAuth strategy error:', error);
           return done(error, undefined);
         }
@@ -135,9 +136,16 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
           })
         ).toString('base64');
 
+        const googleClientId = process.env['GOOGLE_CLIENT_ID'];
+        const googleRedirectUri = process.env['GOOGLE_REDIRECT_URI'];
+
+        if (!googleClientId || !googleRedirectUri) {
+          throw new Error('Google OAuth configuration missing');
+        }
+
         const googleAuthUrl = new URL('https://accounts.google.com/oauth/authorize');
-        googleAuthUrl.searchParams.set('client_id', process.env['GOOGLE_CLIENT_ID']!);
-        googleAuthUrl.searchParams.set('redirect_uri', process.env['GOOGLE_REDIRECT_URI']!);
+        googleAuthUrl.searchParams.set('client_id', googleClientId);
+        googleAuthUrl.searchParams.set('redirect_uri', googleRedirectUri);
         googleAuthUrl.searchParams.set('response_type', 'code');
         googleAuthUrl.searchParams.set('scope', 'openid email profile');
         googleAuthUrl.searchParams.set('access_type', 'offline');
@@ -146,6 +154,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
 
         return reply.redirect(googleAuthUrl.toString());
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error initiating Google OAuth:', error);
         return reply.status(500).send({
           message: 'Failed to initiate Google authentication',
@@ -168,6 +177,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
 
         // Strict validation of authorization code
         if (!code || typeof code !== 'string' || code.trim().length === 0) {
+          // eslint-disable-next-line no-console
           console.error('Invalid or missing authorization code:', { code, state });
           return reply.redirect(
             `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid authorization code`
@@ -176,60 +186,95 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
 
         // Additional validation: ensure code is not a malicious string
         if (code.length > 1000 || !/^[a-zA-Z0-9._-]+$/.test(code)) {
+          // eslint-disable-next-line no-console
           console.error('Suspicious authorization code format:', { codeLength: code.length });
           return reply.redirect(
             `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid authorization code format`
           );
         }
 
-        // Validate state parameter with HMAC signature verification
-        if (state) {
-          try {
-            const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
-            const now = Date.now();
-            const maxAge = 10 * 60 * 1000; // 10 minutes
+        // Validate state parameter with HMAC signature verification (MANDATORY)
+        if (!state || typeof state !== 'string' || state.trim().length === 0) {
+          // eslint-disable-next-line no-console
+          console.error('Missing or invalid state parameter:', { state });
+          return reply.redirect(
+            `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Missing state parameter`
+          );
+        }
 
-            // Check timestamp
-            if (now - stateData.timestamp > maxAge) {
-              return reply.redirect(
-                `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=State expired`
-              );
-            }
+        try {
+          const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+          const now = Date.now();
+          const maxAge = 10 * 60 * 1000; // 10 minutes
 
-            // Verify HMAC signature
-            const { signature, ...stateDataWithoutSignature } = stateData;
-            const stateString = JSON.stringify(stateDataWithoutSignature);
-            const expectedSignature = crypto
-              .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
-              .update(stateString)
-              .digest('hex');
-
-            if (signature !== expectedSignature) {
-              console.error('Invalid state signature');
-              return reply.redirect(
-                `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state signature`
-              );
-            }
-          } catch (stateError) {
-            console.error('Invalid state parameter:', stateError);
+          // Validate state data structure
+          if (!stateData.timestamp || !stateData.nonce || !stateData.signature) {
+            // eslint-disable-next-line no-console
+            console.error('Invalid state data structure:', { stateData });
             return reply.redirect(
-              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state`
+              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state structure`
             );
           }
+
+          // Check timestamp
+          if (now - stateData.timestamp > maxAge) {
+            // eslint-disable-next-line no-console
+            console.error('State parameter expired:', {
+              timestamp: stateData.timestamp,
+              now,
+              age: now - stateData.timestamp,
+            });
+            return reply.redirect(
+              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=State expired`
+            );
+          }
+
+          // Verify HMAC signature
+          const { signature, ...stateDataWithoutSignature } = stateData;
+          const stateString = JSON.stringify(stateDataWithoutSignature);
+          const expectedSignature = crypto
+            .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+            .update(stateString)
+            .digest('hex');
+
+          if (signature !== expectedSignature) {
+            // eslint-disable-next-line no-console
+            console.error('Invalid state signature:', {
+              provided: signature,
+              expected: expectedSignature,
+            });
+            return reply.redirect(
+              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state signature`
+            );
+          }
+        } catch (stateError) {
+          // eslint-disable-next-line no-console
+          console.error('Invalid state parameter:', stateError);
+          return reply.redirect(
+            `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state`
+          );
         }
 
         // Exchange code for tokens and user info
+        const googleClientId = process.env['GOOGLE_CLIENT_ID'];
+        const googleClientSecret = process.env['GOOGLE_CLIENT_SECRET'];
+        const googleRedirectUri = process.env['GOOGLE_REDIRECT_URI'];
+
+        if (!googleClientId || !googleClientSecret || !googleRedirectUri) {
+          throw new Error('Google OAuth configuration missing for token exchange');
+        }
+
         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({
-            client_id: process.env['GOOGLE_CLIENT_ID']!,
-            client_secret: process.env['GOOGLE_CLIENT_SECRET']!,
+            client_id: googleClientId,
+            client_secret: googleClientSecret,
             code,
             grant_type: 'authorization_code',
-            redirect_uri: process.env['GOOGLE_REDIRECT_URI']!,
+            redirect_uri: googleRedirectUri,
           }),
         });
 
@@ -266,6 +311,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
 
         return reply.redirect(redirectUrl.toString());
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error handling Google OAuth callback:', error);
         return reply.redirect(
           `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Authentication failed`
@@ -293,10 +339,11 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
       },
       async (request: FastifyRequest, reply: FastifyReply) => {
         try {
-          const { code } = request.body as { code: string };
+          const { code, state } = request.body as { code: string; state?: string };
 
           // Strict validation of authorization code
           if (!code || typeof code !== 'string' || code.trim().length === 0) {
+            // eslint-disable-next-line no-console
             console.error('Invalid or missing authorization code in POST request:', { code });
             return reply.status(400).send({
               message: 'Invalid authorization code',
@@ -306,6 +353,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
 
           // Additional validation: ensure code is not a malicious string
           if (code.length > 1000 || !/^[a-zA-Z0-9._-]+$/.test(code)) {
+            // eslint-disable-next-line no-console
             console.error('Suspicious authorization code format in POST request:', {
               codeLength: code.length,
             });
@@ -315,18 +363,94 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
             });
           }
 
+          // Validate state parameter (MANDATORY for security)
+          if (!state || typeof state !== 'string' || state.trim().length === 0) {
+            // eslint-disable-next-line no-console
+            console.error('Missing or invalid state parameter in POST request:', { state });
+            return reply.status(400).send({
+              message: 'Missing state parameter',
+              error: 'OAUTH_MISSING_STATE',
+            });
+          }
+
+          // Validate state parameter with HMAC signature verification
+          try {
+            const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+            const now = Date.now();
+            const maxAge = 10 * 60 * 1000; // 10 minutes
+
+            // Validate state data structure
+            if (!stateData.timestamp || !stateData.nonce || !stateData.signature) {
+              // eslint-disable-next-line no-console
+              console.error('Invalid state data structure in POST request:', { stateData });
+              return reply.status(400).send({
+                message: 'Invalid state structure',
+                error: 'OAUTH_INVALID_STATE_STRUCTURE',
+              });
+            }
+
+            // Check timestamp
+            if (now - stateData.timestamp > maxAge) {
+              // eslint-disable-next-line no-console
+              console.error('State parameter expired in POST request:', {
+                timestamp: stateData.timestamp,
+                now,
+                age: now - stateData.timestamp,
+              });
+              return reply.status(400).send({
+                message: 'State expired',
+                error: 'OAUTH_STATE_EXPIRED',
+              });
+            }
+
+            // Verify HMAC signature
+            const { signature, ...stateDataWithoutSignature } = stateData;
+            const stateString = JSON.stringify(stateDataWithoutSignature);
+            const expectedSignature = crypto
+              .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+              .update(stateString)
+              .digest('hex');
+
+            if (signature !== expectedSignature) {
+              // eslint-disable-next-line no-console
+              console.error('Invalid state signature in POST request:', {
+                provided: signature,
+                expected: expectedSignature,
+              });
+              return reply.status(400).send({
+                message: 'Invalid state signature',
+                error: 'OAUTH_INVALID_STATE_SIGNATURE',
+              });
+            }
+          } catch (stateError) {
+            // eslint-disable-next-line no-console
+            console.error('Invalid state parameter in POST request:', stateError);
+            return reply.status(400).send({
+              message: 'Invalid state parameter',
+              error: 'OAUTH_INVALID_STATE',
+            });
+          }
+
           // Exchange code for tokens and user info
+          const googleClientId = process.env['GOOGLE_CLIENT_ID'];
+          const googleClientSecret = process.env['GOOGLE_CLIENT_SECRET'];
+          const googleRedirectUri = process.env['GOOGLE_REDIRECT_URI'];
+
+          if (!googleClientId || !googleClientSecret || !googleRedirectUri) {
+            throw new Error('Google OAuth configuration missing for token exchange');
+          }
+
           const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-              client_id: process.env['GOOGLE_CLIENT_ID']!,
-              client_secret: process.env['GOOGLE_CLIENT_SECRET']!,
+              client_id: googleClientId,
+              client_secret: googleClientSecret,
               code,
               grant_type: 'authorization_code',
-              redirect_uri: process.env['GOOGLE_REDIRECT_URI']!,
+              redirect_uri: googleRedirectUri,
             }),
           });
 
@@ -370,6 +494,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
             isNewUser: result.isNewUser,
           });
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Error handling Google OAuth callback:', error);
           return reply.status(400).send({
             message: 'OAuth authentication failed',

@@ -284,7 +284,8 @@ function main() {
 
   displayTestScenarios();
 
-  generateTestReport();
+  const report = generateTestReport();
+  console.log('Report generated with', Object.keys(report).length, 'sections');
 
   console.log('\n🎯 Testing Instructions:');
   console.log('========================\n');

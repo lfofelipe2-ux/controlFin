@@ -18,7 +18,7 @@ Este guia explica como configurar o Google OAuth para o ControlFin.
    - **Application type**: Web application
    - **Name**: ControlFin Development
    - **Authorized redirect URIs**:
-     - `http://localhost:3001/auth/callback` (desenvolvimento)
+     - `http://localhost:5173/auth/callback` (desenvolvimento)
      - `https://yourdomain.com/auth/callback` (produção)
 
 ### 3. Configurar Variáveis de Ambiente
@@ -53,7 +53,7 @@ npm run dev
 
 Para diferentes ambientes, configure as seguintes URIs:
 
-- **Desenvolvimento**: `http://localhost:3001/auth/callback`
+- **Desenvolvimento**: `http://localhost:5173/auth/callback`
 - **Staging**: `https://staging.controlfin.com/auth/callback`
 - **Produção**: `https://controlfin.com/auth/callback`
 
