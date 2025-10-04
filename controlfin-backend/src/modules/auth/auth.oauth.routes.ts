@@ -19,12 +19,12 @@ import rateLimit from '@fastify/rate-limit';
 const rateLimitConfig = {
   max: 10, // Maximum 10 requests
   timeWindow: '15 minutes', // Per 15 minutes
-  errorResponseBuilder: (_request: FastifyRequest, context: { after: number }) => {
+  errorResponseBuilder: (_request: FastifyRequest, context: { after: string }) => {
     return {
       statusCode: 429,
       error: 'Too Many Requests',
       message: 'OAuth rate limit exceeded. Please try again later.',
-      retryAfter: Math.round(context.after / 1000) || 15,
+      retryAfter: Math.round(parseInt(context.after) / 1000) || 15,
     };
   },
 };
@@ -109,7 +109,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
   fastify.register(async function (fastify) {
     await fastify.register(rateLimit, rateLimitConfig);
 
-    fastify.get('/auth/google', async (request: FastifyRequest, reply: FastifyReply) => {
+    fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
         const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
         const redirectUri = `${frontendUrl}/auth/callback`;
