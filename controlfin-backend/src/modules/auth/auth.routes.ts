@@ -308,7 +308,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.getProfile(request.user!._id);
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
+        const user = await authService.getProfile(request.user._id);
 
         return reply.send({
           user,
@@ -358,8 +361,11 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
         const user = await authService.updateProfile(
-          request.user!._id,
+          request.user._id,
           request.body as Record<string, unknown>
         );
 
@@ -414,8 +420,11 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
         await authService.changePassword(
-          request.user!._id,
+          request.user._id,
           request.body as { currentPassword: string; newPassword: string }
         );
 

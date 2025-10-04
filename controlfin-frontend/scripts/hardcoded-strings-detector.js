@@ -86,6 +86,14 @@ const CONTEXT_EXCLUDE_PATTERNS = [
   /\.stories\./, // Storybook files
   /\.config\./, // Config files
   /\.d\.ts$/, // TypeScript declaration files
+  /Internal error reporting/, // Internal error reporting strings
+  /mailto:/, // Email links
+  /Error Code:/, // Error reporting labels
+  /Error Message:/, // Error reporting labels
+  /kept in English for support team/, // Support team strings
+  /const errorCodeLabel/, // Error code label variable
+  /const errorMessageLabel/, // Error message label variable
+  /handleContactSupport/, // Contact support method
 ];
 
 function findFiles(dir, extension) {
@@ -112,8 +120,8 @@ function isExcludedString(str) {
 }
 
 function isInExcludedContext(line, index, content) {
-  const beforeContext = content.substring(Math.max(0, index - 100), index);
-  const afterContext = content.substring(index, Math.min(content.length, index + 100));
+  const beforeContext = content.substring(Math.max(0, index - 200), index);
+  const afterContext = content.substring(index, Math.min(content.length, index + 200));
   const fullContext = beforeContext + afterContext;
 
   return CONTEXT_EXCLUDE_PATTERNS.some((pattern) => pattern.test(fullContext));

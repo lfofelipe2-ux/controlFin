@@ -103,6 +103,7 @@ export const checkAccountConflict = async (email: string): Promise<AccountConfli
       reason: 'Account exists but cannot be linked',
     };
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error checking account conflict:', error);
     throw new Error('Failed to check account conflict');
   }
@@ -155,6 +156,7 @@ export const linkGoogleAccount = async (
       tokens,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error linking Google account:', error);
     throw new Error('Failed to link Google account');
   }
@@ -208,6 +210,7 @@ export const createAccountWithGoogle = async (
       tokens,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error creating Google account:', error);
     throw new Error('Failed to create Google account');
   }

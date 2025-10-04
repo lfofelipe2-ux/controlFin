@@ -48,6 +48,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(conflictInfo);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error checking account conflict:', error);
         return reply.status(500).send({
           message: 'Failed to check account conflict',
@@ -107,6 +108,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(result);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error linking Google account:', error);
         return reply.status(400).send({
           message: 'Failed to link Google account',
@@ -166,6 +168,7 @@ export const registerAccountLinkingRoutes = async (fastify: FastifyInstance) => 
 
         return reply.send(result);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error creating Google account:', error);
         return reply.status(400).send({
           message: 'Failed to create Google account',

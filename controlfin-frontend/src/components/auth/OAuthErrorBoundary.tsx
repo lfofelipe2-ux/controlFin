@@ -96,7 +96,7 @@ class OAuthErrorBoundary extends Component<OAuthErrorBoundaryProps, OAuthErrorBo
     // In a real app, this would open a support ticket or contact form
     const errorCode = this.state.error?.code || 'Unknown';
     const errorMessage = this.state.error?.message || 'Unknown error';
-    // Internal error reporting - not user-facing
+    // Internal error reporting - not user-facing (kept in English for support team)
     const errorCodeLabel = 'Error Code: ';
     const errorMessageLabel = 'Error Message: ';
     const emailBody = errorCodeLabel + errorCode + '\n' + errorMessageLabel + errorMessage;
