@@ -55,12 +55,8 @@ const stream = {
   },
 };
 
-// Define interface for logger with stream property
-interface LoggerWithStream extends winston.Logger {
-  stream: { write: (message: string) => void };
-}
-
 // Add stream to logger with proper typing
-(logger as LoggerWithStream).stream = stream;
+// Winston Logger already has a stream property, so we extend it
+(logger as any).stream = stream;
 
 export default logger;
