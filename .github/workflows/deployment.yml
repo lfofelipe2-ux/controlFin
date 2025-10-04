@@ -15,7 +15,7 @@ jobs:
   load-config:
     runs-on: ubuntu-latest
     outputs:
-      config: ${{ steps.read-config.outputs.content }}
+      config: ${{ steps.read-config.outputs.config }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
             const yaml = require('js-yaml');
             const configPath = '.github/config/ci-config.yml';
             const config = yaml.load(fs.readFileSync(configPath, 'utf8'));
-            core.setOutput('content', JSON.stringify(config));
+            core.setOutput('config', JSON.stringify(config));
 
   # Build and Test
   build-and-test:
@@ -91,7 +91,7 @@ jobs:
     needs: [load-config, build-and-test]
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    environment: staging
+    environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -175,7 +175,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./artifacts/
           asset_name: build-artifacts-v${{ github.run_number }}.zip
           asset_content_type: application/zip

@@ -13,7 +13,7 @@ jobs:
   load-config:
     runs-on: ubuntu-latest
     outputs:
-      config: ${{ steps.read-config.outputs.content }}
+      config: ${{ steps.read-config.outputs.config }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
             const yaml = require('js-yaml');
             const configPath = '.github/config/ci-config.yml';
             const config = yaml.load(fs.readFileSync(configPath, 'utf8'));
-            core.setOutput('content', JSON.stringify(config));
+            core.setOutput('config', JSON.stringify(config));
 
   # Close Stale Issues
   close-stale-issues:
