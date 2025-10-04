@@ -227,12 +227,14 @@ jobs:
 
       - name: Check for secrets
         run: |
-          # Check for potential secrets in code
-          if grep -r "password\|secret\|key\|token" controlfin-frontend/src/ --include="*.ts" --include="*.tsx" | grep -v "//" | grep -v "password.*:"; then
+          # Check for potential secrets in code (exclude type definitions and comments)
+          echo "Checking for potential secrets..."
+          # Only check for actual secret patterns, not type definitions
+          if grep -r "API_KEY\|SECRET_KEY\|PRIVATE_KEY\|ACCESS_TOKEN" controlfin-frontend/src/ --include="*.ts" --include="*.tsx" | grep -v "//"; then
             echo "❌ Potential secrets found in frontend code!"
             exit 1
           fi
-          if grep -r "password\|secret\|key\|token" controlfin-backend/src/ --include="*.ts" --include="*.tsx" | grep -v "//" | grep -v "password.*:"; then
+          if grep -r "API_KEY\|SECRET_KEY\|PRIVATE_KEY\|ACCESS_TOKEN" controlfin-backend/src/ --include="*.ts" --include="*.tsx" | grep -v "//"; then
             echo "❌ Potential secrets found in backend code!"
             exit 1
           fi

@@ -20,7 +20,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-        cache: ${{ inputs.cache }}
+        cache: ${{ inputs.cache == 'true' }}
         cache-dependency-path: './controlfin-${{ inputs.project }}/package-lock.json'
 
     - name: Install dependencies
