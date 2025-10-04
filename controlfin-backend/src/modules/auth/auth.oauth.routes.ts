@@ -7,12 +7,26 @@
  * - POST /auth/google/callback - Frontend callback handler
  */
 
+import crypto from 'crypto';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { z } from 'zod';
-import crypto from 'crypto';
 import { GoogleProfile, handleOAuthCallback, validateGoogleProfile } from './auth.oauth.service';
+
+// Rate limiting configuration
+const rateLimitConfig = {
+  max: 10, // Maximum 10 requests
+  timeWindow: '15 minutes', // Per 15 minutes
+  errorResponseBuilder: (request: FastifyRequest, context: any) => {
+    return {
+      statusCode: 429,
+      error: 'Too Many Requests',
+      message: 'OAuth rate limit exceeded. Please try again later.',
+      retryAfter: Math.round(context.after / 1000) || 15,
+    };
+  },
+};
 
 // Google OAuth callback schema
 const googleCallbackSchema = z.object({
@@ -91,173 +105,117 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
    * GET /auth/google
    * Initiate Google OAuth flow
    */
-  fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
-      const redirectUri = `${frontendUrl}/auth/callback`;
+  fastify.register(async function (fastify) {
+    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
 
-      // Generate cryptographically secure state parameter for CSRF protection
-      const stateData = {
-        timestamp: Date.now(),
-        redirectUri,
-        nonce: crypto.randomBytes(16).toString('hex'),
-      };
+    fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
+        const redirectUri = `${frontendUrl}/auth/callback`;
 
-      // Create HMAC signature for state validation
-      const stateString = JSON.stringify(stateData);
-      const signature = crypto
-        .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
-        .update(stateString)
-        .digest('hex');
+        // Generate cryptographically secure state parameter for CSRF protection
+        const stateData = {
+          timestamp: Date.now(),
+          redirectUri,
+          nonce: crypto.randomBytes(16).toString('hex'),
+        };
 
-      const state = Buffer.from(
-        JSON.stringify({
-          ...stateData,
-          signature,
-        })
-      ).toString('base64');
+        // Create HMAC signature for state validation
+        const stateString = JSON.stringify(stateData);
+        const signature = crypto
+          .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+          .update(stateString)
+          .digest('hex');
 
-      const googleAuthUrl = new URL('https://accounts.google.com/oauth/authorize');
-      googleAuthUrl.searchParams.set('client_id', process.env['GOOGLE_CLIENT_ID']!);
-      googleAuthUrl.searchParams.set('redirect_uri', process.env['GOOGLE_REDIRECT_URI']!);
-      googleAuthUrl.searchParams.set('response_type', 'code');
-      googleAuthUrl.searchParams.set('scope', 'openid email profile');
-      googleAuthUrl.searchParams.set('access_type', 'offline');
-      googleAuthUrl.searchParams.set('prompt', 'consent');
-      googleAuthUrl.searchParams.set('state', state);
+        const state = Buffer.from(
+          JSON.stringify({
+            ...stateData,
+            signature,
+          })
+        ).toString('base64');
 
-      return reply.redirect(googleAuthUrl.toString());
-    } catch (error) {
-      console.error('Error initiating Google OAuth:', error);
-      return reply.status(500).send({
-        message: 'Failed to initiate Google authentication',
-        error: 'OAUTH_INIT_ERROR',
-      });
-    }
+        const googleAuthUrl = new URL('https://accounts.google.com/oauth/authorize');
+        googleAuthUrl.searchParams.set('client_id', process.env['GOOGLE_CLIENT_ID']!);
+        googleAuthUrl.searchParams.set('redirect_uri', process.env['GOOGLE_REDIRECT_URI']!);
+        googleAuthUrl.searchParams.set('response_type', 'code');
+        googleAuthUrl.searchParams.set('scope', 'openid email profile');
+        googleAuthUrl.searchParams.set('access_type', 'offline');
+        googleAuthUrl.searchParams.set('prompt', 'consent');
+        googleAuthUrl.searchParams.set('state', state);
+
+        return reply.redirect(googleAuthUrl.toString());
+      } catch (error) {
+        console.error('Error initiating Google OAuth:', error);
+        return reply.status(500).send({
+          message: 'Failed to initiate Google authentication',
+          error: 'OAUTH_INIT_ERROR',
+        });
+      }
+    });
   });
 
   /**
    * GET /auth/google/callback
    * Handle Google OAuth callback (server-side redirect)
    */
-  fastify.get('/auth/google/callback', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { code, state } = request.query as { code?: string; state?: string };
+  fastify.register(async function (fastify) {
+    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
 
-      if (!code) {
-        return reply.redirect(
-          `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Authorization code missing`
-        );
-      }
+    fastify.get('/auth/google/callback', async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { code, state } = request.query as { code?: string; state?: string };
 
-      // Validate state parameter with HMAC signature verification
-      if (state) {
-        try {
-          const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
-          const now = Date.now();
-          const maxAge = 10 * 60 * 1000; // 10 minutes
-
-          // Check timestamp
-          if (now - stateData.timestamp > maxAge) {
-            return reply.redirect(
-              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=State expired`
-            );
-          }
-
-          // Verify HMAC signature
-          const { signature, ...stateDataWithoutSignature } = stateData;
-          const stateString = JSON.stringify(stateDataWithoutSignature);
-          const expectedSignature = crypto
-            .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
-            .update(stateString)
-            .digest('hex');
-
-          if (signature !== expectedSignature) {
-            console.error('Invalid state signature');
-            return reply.redirect(
-              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state signature`
-            );
-          }
-        } catch (stateError) {
-          console.error('Invalid state parameter:', stateError);
+        // Strict validation of authorization code
+        if (!code || typeof code !== 'string' || code.trim().length === 0) {
+          console.error('Invalid or missing authorization code:', { code, state });
           return reply.redirect(
-            `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state`
+            `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid authorization code`
           );
         }
-      }
 
-      // Exchange code for tokens and user info
-      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: process.env['GOOGLE_CLIENT_ID']!,
-          client_secret: process.env['GOOGLE_CLIENT_SECRET']!,
-          code,
-          grant_type: 'authorization_code',
-          redirect_uri: process.env['GOOGLE_REDIRECT_URI']!,
-        }),
-      });
+        // Additional validation: ensure code is not a malicious string
+        if (code.length > 1000 || !/^[a-zA-Z0-9._-]+$/.test(code)) {
+          console.error('Suspicious authorization code format:', { codeLength: code.length });
+          return reply.redirect(
+            `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid authorization code format`
+          );
+        }
 
-      if (!tokenResponse.ok) {
-        throw new Error('Failed to exchange code for tokens');
-      }
+        // Validate state parameter with HMAC signature verification
+        if (state) {
+          try {
+            const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+            const now = Date.now();
+            const maxAge = 10 * 60 * 1000; // 10 minutes
 
-      const tokenData = (await tokenResponse.json()) as { access_token: string };
-      const { access_token } = tokenData;
+            // Check timestamp
+            if (now - stateData.timestamp > maxAge) {
+              return reply.redirect(
+                `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=State expired`
+              );
+            }
 
-      // Get user profile from Google
-      const profileResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
+            // Verify HMAC signature
+            const { signature, ...stateDataWithoutSignature } = stateData;
+            const stateString = JSON.stringify(stateDataWithoutSignature);
+            const expectedSignature = crypto
+              .createHmac('sha256', process.env['GOOGLE_CLIENT_SECRET'] || 'fallback-secret')
+              .update(stateString)
+              .digest('hex');
 
-      if (!profileResponse.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
-
-      const profile = (await profileResponse.json()) as GoogleProfile;
-
-      // Handle OAuth callback
-      const result = await handleOAuthCallback(profile);
-
-      // Redirect to frontend with tokens
-      const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
-      const redirectUrl = new URL(`${frontendUrl}/auth/callback`);
-      redirectUrl.searchParams.set('access_token', result.tokens.accessToken);
-      redirectUrl.searchParams.set('refresh_token', result.tokens.refreshToken);
-      redirectUrl.searchParams.set('is_new_user', result.isNewUser.toString());
-      redirectUrl.searchParams.set('user_id', result.user._id.toString());
-
-      return reply.redirect(redirectUrl.toString());
-    } catch (error) {
-      console.error('Error handling Google OAuth callback:', error);
-      return reply.redirect(
-        `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Authentication failed`
-      );
-    }
-  });
-
-  /**
-   * POST /auth/google/callback
-   * Handle OAuth callback from frontend (alternative method)
-   */
-  fastify.post(
-    '/auth/google/callback',
-    {
-      schema: {
-        body: googleCallbackSchema,
-        response: {
-          200: oauthResponseSchema,
-        },
-      },
-    },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        const { code } = request.body as { code: string };
+            if (signature !== expectedSignature) {
+              console.error('Invalid state signature');
+              return reply.redirect(
+                `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state signature`
+              );
+            }
+          } catch (stateError) {
+            console.error('Invalid state parameter:', stateError);
+            return reply.redirect(
+              `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Invalid state`
+            );
+          }
+        }
 
         // Exchange code for tokens and user info
         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -275,8 +233,7 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
         });
 
         if (!tokenResponse.ok) {
-          const errorData = (await tokenResponse.json()) as { error_description?: string };
-          throw new Error(errorData.error_description || 'Failed to exchange code for tokens');
+          throw new Error('Failed to exchange code for tokens');
         }
 
         const tokenData = (await tokenResponse.json()) as { access_token: string };
@@ -298,31 +255,130 @@ export const registerOAuthRoutes = async (fastify: FastifyInstance) => {
         // Handle OAuth callback
         const result = await handleOAuthCallback(profile);
 
-        return reply.send({
-          message: result.isNewUser ? 'Account created successfully' : 'Login successful',
-          user: {
-            _id: result.user._id.toString(),
-            email: result.user.email,
-            firstName: result.user.firstName,
-            lastName: result.user.lastName,
-            avatar: result.user.avatar,
-            isEmailVerified: result.user.isEmailVerified,
-            createdAt: result.user.createdAt.toISOString(),
-            updatedAt: result.user.updatedAt.toISOString(),
-          },
-          tokens: result.tokens,
-          isNewUser: result.isNewUser,
-        });
+        // Redirect to frontend with tokens
+        const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:5173';
+        const redirectUrl = new URL(`${frontendUrl}/auth/callback`);
+        redirectUrl.searchParams.set('access_token', result.tokens.accessToken);
+        redirectUrl.searchParams.set('refresh_token', result.tokens.refreshToken);
+        redirectUrl.searchParams.set('is_new_user', result.isNewUser.toString());
+        redirectUrl.searchParams.set('user_id', result.user._id.toString());
+
+        return reply.redirect(redirectUrl.toString());
       } catch (error) {
         console.error('Error handling Google OAuth callback:', error);
-        return reply.status(400).send({
-          message: 'OAuth authentication failed',
-          error: 'OAUTH_CALLBACK_ERROR',
-          details: error instanceof Error ? error.message : 'Unknown error',
-        });
+        return reply.redirect(
+          `${process.env['FRONTEND_URL']}/auth?error=oauth_error&message=Authentication failed`
+        );
       }
-    }
-  );
+    });
+  });
+
+  /**
+   * POST /auth/google/callback
+   * Handle OAuth callback from frontend (alternative method)
+   */
+  fastify.register(async function (fastify) {
+    await fastify.register(require('@fastify/rate-limit'), rateLimitConfig);
+
+    fastify.post(
+      '/auth/google/callback',
+      {
+        schema: {
+          body: googleCallbackSchema,
+          response: {
+            200: oauthResponseSchema,
+          },
+        },
+      },
+      async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+          const { code } = request.body as { code: string };
+
+          // Strict validation of authorization code
+          if (!code || typeof code !== 'string' || code.trim().length === 0) {
+            console.error('Invalid or missing authorization code in POST request:', { code });
+            return reply.status(400).send({
+              message: 'Invalid authorization code',
+              error: 'OAUTH_INVALID_CODE',
+            });
+          }
+
+          // Additional validation: ensure code is not a malicious string
+          if (code.length > 1000 || !/^[a-zA-Z0-9._-]+$/.test(code)) {
+            console.error('Suspicious authorization code format in POST request:', {
+              codeLength: code.length,
+            });
+            return reply.status(400).send({
+              message: 'Invalid authorization code format',
+              error: 'OAUTH_INVALID_CODE_FORMAT',
+            });
+          }
+
+          // Exchange code for tokens and user info
+          const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              client_id: process.env['GOOGLE_CLIENT_ID']!,
+              client_secret: process.env['GOOGLE_CLIENT_SECRET']!,
+              code,
+              grant_type: 'authorization_code',
+              redirect_uri: process.env['GOOGLE_REDIRECT_URI']!,
+            }),
+          });
+
+          if (!tokenResponse.ok) {
+            const errorData = (await tokenResponse.json()) as { error_description?: string };
+            throw new Error(errorData.error_description || 'Failed to exchange code for tokens');
+          }
+
+          const tokenData = (await tokenResponse.json()) as { access_token: string };
+          const { access_token } = tokenData;
+
+          // Get user profile from Google
+          const profileResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          });
+
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch user profile');
+          }
+
+          const profile = (await profileResponse.json()) as GoogleProfile;
+
+          // Handle OAuth callback
+          const result = await handleOAuthCallback(profile);
+
+          return reply.send({
+            message: result.isNewUser ? 'Account created successfully' : 'Login successful',
+            user: {
+              _id: result.user._id.toString(),
+              email: result.user.email,
+              firstName: result.user.firstName,
+              lastName: result.user.lastName,
+              avatar: result.user.avatar,
+              isEmailVerified: result.user.isEmailVerified,
+              createdAt: result.user.createdAt.toISOString(),
+              updatedAt: result.user.updatedAt.toISOString(),
+            },
+            tokens: result.tokens,
+            isNewUser: result.isNewUser,
+          });
+        } catch (error) {
+          console.error('Error handling Google OAuth callback:', error);
+          return reply.status(400).send({
+            message: 'OAuth authentication failed',
+            error: 'OAUTH_CALLBACK_ERROR',
+            details: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      }
+    );
+  });
 };
 
 export default registerOAuthRoutes;
