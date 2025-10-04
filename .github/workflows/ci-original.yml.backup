@@ -44,7 +44,7 @@ jobs:
         run: npm run build
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         continue-on-error: true
         with:
           file: ./controlfin-frontend/coverage/lcov.info
@@ -87,7 +87,7 @@ jobs:
         run: npm run build
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         continue-on-error: true
         with:
           file: ./controlfin-backend/coverage/lcov.info

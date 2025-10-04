@@ -1,3 +1,4 @@
+---
 # CI - Continuous Integration (Centralized)
 # Uses central configuration and reusable actions
 
@@ -21,7 +22,7 @@ jobs:
 
       - name: Read CI Config
         id: read-config
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
