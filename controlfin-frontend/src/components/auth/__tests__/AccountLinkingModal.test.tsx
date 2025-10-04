@@ -32,14 +32,13 @@ const defaultProps: AccountLinkingModalProps = {
   email: 'test@example.com',
   googleProfile: {
     // Test data - not user-facing strings
-    name: 'John Doe', // eslint-disable-line
+    name: 'John Doe',
     picture: 'https://example.com/avatar.jpg',
   },
 };
 
 // Test suite - strings are test data, not user-facing
 describe('AccountLinkingModal', () => {
-  // eslint-disable-line
   it('should be defined', () => {
     expect(AccountLinkingModal).toBeDefined();
   });
