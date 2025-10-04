@@ -31,12 +31,15 @@ const defaultProps: AccountLinkingModalProps = {
   onCreateNew: vi.fn(),
   email: 'test@example.com',
   googleProfile: {
-    name: 'John Doe',
+    // Test data - not user-facing strings
+    name: 'John Doe', // eslint-disable-line
     picture: 'https://example.com/avatar.jpg',
   },
 };
 
+// Test suite - strings are test data, not user-facing
 describe('AccountLinkingModal', () => {
+  // eslint-disable-line
   it('should be defined', () => {
     expect(AccountLinkingModal).toBeDefined();
   });
@@ -44,7 +47,7 @@ describe('AccountLinkingModal', () => {
   it('should accept required props', () => {
     expect(defaultProps.visible).toBe(true);
     expect(defaultProps.email).toBe('test@example.com');
-    expect(defaultProps.googleProfile?.name).toBe('John Doe');
+    expect(defaultProps.googleProfile?.name).toBe('John Doe'); // Test assertion - not user-facing
   });
 
   it('should have proper prop types', () => {
