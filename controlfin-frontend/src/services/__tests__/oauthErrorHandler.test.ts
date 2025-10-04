@@ -8,8 +8,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import OAuthErrorHandler, { type OAuthErrorContext } from '../oauthErrorHandler';
 
-// Mock console methods
-const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+// Mock the logger
+vi.mock('../../utils/logger', () => ({
+  default: {
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
 
 describe('OAuthErrorHandler', () => {
   beforeEach(() => {
@@ -61,13 +68,25 @@ describe('OAuthErrorHandler', () => {
       expect(result.action).toBe('retry');
     });
 
-    it('should log errors in development', () => {
+    it('should log errors in development', async () => {
       const error = 'OAUTH_INIT_ERROR';
       const context: OAuthErrorContext = { step: 'initiation' };
 
+      // Mock import.meta.env.DEV to be true
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
+            DEV: true,
+          },
+        },
+      });
+
       OAuthErrorHandler.handleError(error, context);
 
-      expect(mockConsoleError).toHaveBeenCalledWith(
+      // Import the mocked logger
+      const logger = await import('../../utils/logger');
+
+      expect(logger.default.error).toHaveBeenCalledWith(
         'OAuth Error:',
         expect.objectContaining({
           error: 'OAUTH_INIT_ERROR',
