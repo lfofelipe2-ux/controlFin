@@ -12,6 +12,7 @@ import type {
   PasswordResetConfirmation,
   RegisterRequest,
 } from '../types/auth';
+import logger from '../utils/logger';
 
 // === API CONFIGURATION ===
 
@@ -146,7 +147,7 @@ export const logoutUser = async (): Promise<void> => {
     });
   } catch (error) {
     // Even if logout fails on server, clear local tokens
-    console.warn('Logout request failed, but clearing local tokens:', error);
+    logger.warn('Logout request failed, but clearing local tokens:', error);
   } finally {
     // Always clear local tokens
     localStorage.removeItem('accessToken');
@@ -319,12 +320,10 @@ export const initiateGoogleLogin = (): void => {
   const redirectUri = `${window.location.origin}/auth/callback`;
 
   if (!googleClientId || googleClientId === 'your_google_client_id_here') {
-    console.warn(
+    logger.warn(
       'Google OAuth Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file.'
     );
-    console.warn(
-      'For development, you can get a Client ID from: https://console.cloud.google.com/'
-    );
+    logger.warn('For development, you can get a Client ID from: https://console.cloud.google.com/');
 
     // Em desenvolvimento, mostrar um alerta mais amigável
     if (import.meta.env.DEV) {

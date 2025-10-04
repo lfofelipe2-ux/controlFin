@@ -36,6 +36,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import { usePasswordStrength } from '../../hooks/usePasswordStrength';
 import { type RegisterFormData } from '../../types/auth';
+import logger from '../../utils/logger';
 import GoogleOAuthButton from './GoogleOAuthButton';
 
 const { Title, Text, Paragraph } = Typography;
@@ -94,7 +95,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         navigate('/dashboard');
       }
     } catch (error: unknown) {
-      console.error('Registration error:', error as Error);
+      logger.error('Registration error:', error as Error);
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);

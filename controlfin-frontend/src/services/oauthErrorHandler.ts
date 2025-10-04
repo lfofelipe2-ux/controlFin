@@ -5,6 +5,8 @@
  * including error classification, user-friendly messages, and recovery strategies.
  */
 
+import logger from '../utils/logger';
+
 export interface OAuthError {
   code: string;
   message: string;
@@ -303,7 +305,7 @@ export class OAuthErrorHandler {
 
     // Log to console in development
     if (import.meta.env.DEV) {
-      console.error('OAuth Error:', logData);
+      logger.error('OAuth Error:', logData);
     }
 
     // In production, you might want to send to error tracking service

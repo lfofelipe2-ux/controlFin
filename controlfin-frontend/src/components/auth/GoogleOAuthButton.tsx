@@ -10,6 +10,7 @@ import { Button } from 'antd';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../../services/authService';
+import logger from '../../utils/logger';
 import OAuthConfigWarning from './OAuthConfigWarning';
 
 export interface GoogleOAuthButtonProps {
@@ -53,7 +54,7 @@ const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
       // Initiate Google OAuth flow
       authService.initiateGoogleLogin();
     } catch (error) {
-      console.error(t('auth.oauth.errors.initiation_failed'), error);
+      logger.error(t('auth.oauth.errors.initiation_failed'), error);
 
       // Se for erro de configuração, mostrar warning
       if (error instanceof Error && error.message.includes('not configured')) {

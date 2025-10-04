@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
 import { type LoginFormData } from '../../types/auth';
+import logger from '../../utils/logger';
 import GoogleOAuthButton from './GoogleOAuthButton';
 
 const { Title, Text, Paragraph } = Typography;
@@ -80,7 +81,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         navigate('/dashboard');
       }
     } catch (error: unknown) {
-      console.error('Login error:', error as Error);
+      logger.error('Login error:', error as Error);
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);

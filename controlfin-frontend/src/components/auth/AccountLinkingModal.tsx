@@ -10,6 +10,7 @@ import { Alert, Button, Divider, Modal, Space, Typography } from 'antd';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
+import logger from '../../utils/logger';
 
 const { Title, Text } = Typography;
 
@@ -56,7 +57,7 @@ const AccountLinkingModal: React.FC<AccountLinkingModalProps> = ({
       // Call success callback
       onSuccess();
     } catch (error) {
-      console.error('Account linking error:', error);
+      logger.error('Account linking error:', error);
       setError(t('auth.account_linking.error.link_failed'));
     } finally {
       setIsLinking(false);

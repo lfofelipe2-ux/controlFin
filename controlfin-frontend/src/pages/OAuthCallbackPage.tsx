@@ -18,6 +18,7 @@ import OAuthErrorHandler, {
   type OAuthError,
   type OAuthErrorContext,
 } from '../services/oauthErrorHandler';
+import logger from '../utils/logger';
 
 type CallbackStatus = 'loading' | 'success' | 'error';
 
@@ -98,7 +99,7 @@ const OAuthCallbackPage: React.FC = () => {
         navigate('/dashboard');
       }, 2000);
     } catch (error) {
-      console.error('OAuth callback error:', error);
+      logger.error('OAuth callback error:', error);
 
       const context: OAuthErrorContext = {
         step: 'callback',
@@ -215,7 +216,7 @@ const OAuthCallbackPage: React.FC = () => {
   return (
     <OAuthErrorBoundary
       onError={(error: OAuthError, context: OAuthErrorContext) => {
-        console.error('OAuth Error Boundary caught error:', error, context);
+        logger.error('OAuth Error Boundary caught error:', error, context);
       }}
     >
       <div

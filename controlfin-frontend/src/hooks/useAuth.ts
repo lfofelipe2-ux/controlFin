@@ -17,6 +17,7 @@ import type {
 } from '../types/auth';
 import authService from '../services/authService';
 import { extractTokens } from '../utils/authTokens';
+import logger from '../utils/logger';
 
 // === AUTHENTICATION STORE INTERFACE ===
 
@@ -112,7 +113,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await authService.logoutUser();
         } catch (error) {
-          console.warn('Logout error:', error);
+          logger.warn('Logout error:', error);
         } finally {
           set({
             user: null,
@@ -190,7 +191,7 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: null,
             refreshToken: null,
           });
-          throw (error as Error);
+          throw error as Error;
         }
       },
 
@@ -227,9 +228,8 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
 
-          const { accessToken: accessTokenInit, refreshToken: refreshTokenInit } = extractTokens(
-            response
-          );
+          const { accessToken: accessTokenInit, refreshToken: refreshTokenInit } =
+            extractTokens(response);
           set({
             user: response.user,
             isAuthenticated: true,

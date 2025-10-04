@@ -5,6 +5,8 @@
  * and managing account conflicts during the authentication process.
  */
 
+import logger from '../utils/logger';
+
 // Helper function to make API requests
 const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -75,7 +77,7 @@ export const checkAccountConflict = async (email: string): Promise<AccountConfli
     });
     return response;
   } catch (error) {
-    console.error('Error checking account conflict:', error);
+    logger.error('Error checking account conflict:', error);
     throw new Error('Failed to check account conflict');
   }
 };
@@ -100,7 +102,7 @@ export const linkGoogleAccount = async (
 
     return response;
   } catch (error) {
-    console.error('Error linking Google account:', error);
+    logger.error('Error linking Google account:', error);
     throw new Error('Failed to link Google account');
   }
 };
@@ -125,7 +127,7 @@ export const createAccountWithGoogle = async (
 
     return response;
   } catch (error) {
-    console.error('Error creating Google account:', error);
+    logger.error('Error creating Google account:', error);
     throw new Error('Failed to create Google account');
   }
 };
@@ -197,7 +199,7 @@ export const handleOAuthCallbackWithLinking = async (googleProfile: {
       };
     }
   } catch (error) {
-    console.error('Error handling OAuth callback with linking:', error);
+    logger.error('Error handling OAuth callback with linking:', error);
     throw error;
   }
 };
