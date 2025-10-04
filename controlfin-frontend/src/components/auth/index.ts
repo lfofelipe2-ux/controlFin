@@ -7,7 +7,10 @@
 
 export { default as AuthPage } from './AuthPage';
 export { default as ForgotPasswordForm } from './ForgotPasswordForm';
+export { default as GoogleOAuthButton } from './GoogleOAuthButton';
 export { default as LoginForm } from './LoginForm';
+export { default as OAuthConfigWarning } from './OAuthConfigWarning';
+export { default as OAuthErrorBoundary } from './OAuthErrorBoundary';
 export { default as RegisterForm } from './RegisterForm';
 export { default as ResetPasswordForm } from './ResetPasswordForm';
 

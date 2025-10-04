@@ -1,6 +1,49 @@
-# React + TypeScript + Vite
+# ControlFin Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React + TypeScript + Vite application for personal finance management with Google OAuth integration.
+
+## Features
+
+- 🔐 **Google OAuth Integration** - Secure authentication with Google
+- 🌍 **Internationalization** - Multi-language support (EN/PT)
+- 🎨 **BlockAI Design System** - Modern, dark theme UI
+- 📱 **Responsive Design** - Works on all devices
+- ⚡ **Fast Development** - Vite + HMR for rapid iteration
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
+```
+
+### OAuth Configuration
+
+1. Copy environment file:
+
+   ```bash
+   cp env.example .env
+   ```
+
+2. Configure Google OAuth (see [OAUTH_SETUP.md](./OAUTH_SETUP.md) for detailed instructions)
+
+3. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+## Documentation
+
+- [OAuth Setup Guide](./OAUTH_SETUP.md) - Complete Google OAuth configuration
+- [React 19 + Ant Design Compatibility](./REACT19_ANTD_COMPATIBILITY.md) - Technical decisions
+
+## Development
 
 Currently, two official plugins are available:
 
@@ -40,15 +83,15 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from 'eslint-plugin-react-x';
+import reactDom from 'eslint-plugin-react-dom';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -69,5 +112,5 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```

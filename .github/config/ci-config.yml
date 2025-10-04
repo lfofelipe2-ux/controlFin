@@ -1,0 +1,77 @@
+# Central CI/CD Configuration - ControlFin
+# Schema Version: 1.0.0
+# Last Updated: 2025-10-04
+
+# Node.js versions for consistent use across workflows
+node_versions:
+  primary: '22' # Main CI uses latest LTS
+  matrix: ['20', '22'] # Compatibility testing
+  security: '22' # Security scans use latest
+
+# Project configurations
+projects:
+  frontend:
+    name: 'Frontend'
+    path: './controlfin-frontend'
+    package_manager: 'npm'
+    build_command: 'npm run build'
+    test_command: 'npm run test:coverage'
+    lint_command: 'npm run lint'
+    type_check_command: 'npm run type-check'
+    coverage_file: './controlfin-frontend/coverage/lcov.info'
+    coverage_flag: 'frontend'
+
+  backend:
+    name: 'Backend'
+    path: './controlfin-backend'
+    package_manager: 'npm'
+    build_command: 'npm run build'
+    test_command: 'npm run test:coverage'
+    lint_command: 'ESLINT_USE_FLAT_CONFIG=false npm run lint'
+    type_check_command: 'npm run type-check'
+    coverage_file: './controlfin-backend/coverage/lcov.info'
+    coverage_flag: 'backend'
+
+# Cache configuration
+cache:
+  npm: true
+  node_modules: true
+
+# Security settings
+security:
+  audit_level: 'moderate'
+  snyk_enabled: true
+  codeql_enabled: true
+
+# Quality gates
+quality:
+  i18n_check: true
+  hardcoded_strings_check: true
+  eslint_max_warnings: 0
+
+# Build matrix configuration
+build_matrix:
+  node_versions: ['20', '22']
+  projects: ['frontend', 'backend']
+  exclude: [] # Add any combinations to exclude
+
+# Workflow triggers
+triggers:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * 1' # Weekly security scan
+
+# Common steps/commands that can be reused
+commands:
+  install_dependencies: 'npm ci'
+  checkout_code: 'actions/checkout@v4'
+  setup_node: 'actions/setup-node@v4'
+  upload_coverage: 'codecov/codecov-action@v3'
+
+# Default settings for jobs
+job_defaults:
+  runs_on: 'ubuntu-latest'
+  continue_on_error: true # For non-critical steps like coverage upload

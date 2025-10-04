@@ -13,8 +13,10 @@ import {
 // JWT configuration
 const JWT_SECRET = env.jwtSecret;
 const JWT_REFRESH_SECRET = env.jwtRefreshSecret;
-const JWT_EXPIRES_IN: SignOptions['expiresIn'] = env.jwtExpiresIn as unknown as SignOptions['expiresIn'];
-const JWT_REFRESH_EXPIRES_IN: SignOptions['expiresIn'] = env.jwtRefreshExpiresIn as unknown as SignOptions['expiresIn'];
+const JWT_EXPIRES_IN: SignOptions['expiresIn'] =
+  env.jwtExpiresIn as unknown as SignOptions['expiresIn'];
+const JWT_REFRESH_EXPIRES_IN: SignOptions['expiresIn'] =
+  env.jwtRefreshExpiresIn as unknown as SignOptions['expiresIn'];
 
 export interface AuthTokens {
   accessToken: string;
@@ -93,7 +95,10 @@ export class AuthService {
   /**
    * Verify JWT token
    */
-  private verifyToken(token: string, secret: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
+  private verifyToken(
+    token: string,
+    secret: string
+  ): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
     try {
       return jwt.verify(token, secret) as {
         userId: string;
@@ -101,7 +106,7 @@ export class AuthService {
         iat: number;
         exp: number;
       };
-    } catch (error) {
+    } catch {
       throw new Error('Invalid token');
     }
   }
@@ -207,7 +212,7 @@ export class AuthService {
   /**
    * Logout user (invalidate refresh token)
    */
-  async logout(_userId: string): Promise<void> {
+  async logout(): Promise<void> {
     // In a production app, you might want to blacklist the refresh token
     // For now, we'll just return success
     // TODO: Implement token blacklisting with Redis
@@ -277,15 +282,32 @@ export class AuthService {
   /**
    * Verify JWT access token
    */
-  verifyAccessToken(token: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
+  verifyAccessToken(token: string): {
+    userId: string;
+    type: 'access' | 'refresh';
+    iat: number;
+    exp: number;
+  } {
     return this.verifyToken(token, JWT_SECRET);
   }
 
   /**
    * Verify JWT refresh token
    */
-  verifyRefreshToken(token: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
+  verifyRefreshToken(token: string): {
+    userId: string;
+    type: 'access' | 'refresh';
+    iat: number;
+    exp: number;
+  } {
     return this.verifyToken(token, JWT_REFRESH_SECRET);
+  }
+
+  /**
+   * Generate tokens for OAuth users
+   */
+  generateTokensForOAuth(userId: string): AuthTokens {
+    return this.generateTokens(userId);
   }
 }
 

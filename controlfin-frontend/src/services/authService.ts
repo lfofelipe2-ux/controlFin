@@ -12,6 +12,7 @@ import type {
   PasswordResetConfirmation,
   RegisterRequest,
 } from '../types/auth';
+import logger from '../utils/logger';
 
 // === API CONFIGURATION ===
 
@@ -146,7 +147,7 @@ export const logoutUser = async (): Promise<void> => {
     });
   } catch (error) {
     // Even if logout fails on server, clear local tokens
-    console.warn('Logout request failed, but clearing local tokens:', error);
+    logger.warn('Logout request failed, but clearing local tokens:', error);
   } finally {
     // Always clear local tokens
     localStorage.removeItem('accessToken');
@@ -164,9 +165,10 @@ export const refreshAccessToken = async (): Promise<{ accessToken: string }> => 
     throw new Error('No refresh token available');
   }
 
-  const response = await makeRequest<
-    { accessToken?: string; tokens?: { accessToken: string; refreshToken: string } }
-  >('/auth/refresh', {
+  const response = await makeRequest<{
+    accessToken?: string;
+    tokens?: { accessToken: string; refreshToken: string };
+  }>('/auth/refresh', {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
@@ -317,8 +319,20 @@ export const initiateGoogleLogin = (): void => {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const redirectUri = `${window.location.origin}/auth/callback`;
 
-  if (!googleClientId) {
-    throw new Error('Google Client ID not configured');
+  if (!googleClientId || googleClientId === 'your_google_client_id_here') {
+    logger.warn(
+      'Google OAuth Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file.'
+    );
+    logger.warn('For development, you can get a Client ID from: https://console.cloud.google.com/');
+
+    // Em desenvolvimento, mostrar um alerta mais amigável
+    if (import.meta.env.DEV) {
+      alert('Google OAuth não configurado. Verifique o console para instruções.');
+    }
+
+    throw new Error(
+      'Google Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your environment variables.'
+    );
   }
 
   const googleAuthUrl = new URL('https://accounts.google.com/oauth/authorize');
@@ -342,9 +356,9 @@ export const handleGoogleCallback = async (code: string): Promise<AuthResponse> 
   });
 
   // Store tokens in localStorage
-  if (response.accessToken && response.refreshToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+  if (response.tokens?.accessToken && response.tokens?.refreshToken) {
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+    localStorage.setItem('refreshToken', response.tokens.refreshToken);
   }
 
   return response;

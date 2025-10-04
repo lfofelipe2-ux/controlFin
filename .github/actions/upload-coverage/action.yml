@@ -1,0 +1,29 @@
+name: 'Upload Coverage'
+description: 'Upload coverage reports to Codecov'
+inputs:
+  project:
+    description: 'Project name (frontend/backend)'
+    required: true
+  coverage-file:
+    description: 'Coverage file path'
+    required: false
+    default: './controlfin-${{ inputs.project }}/coverage/lcov.info'
+  coverage-flag:
+    description: 'Coverage flag for reporting'
+    required: false
+    default: '${{ inputs.project }}'
+  continue-on-error:
+    description: 'Continue on upload failure'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      continue-on-error: ${{ inputs.continue-on-error }}
+      with:
+        file: ${{ inputs.coverage-file }}
+        flags: ${{ inputs.coverage-flag }}
+        name: ${{ inputs.project }}-coverage

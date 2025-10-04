@@ -1,0 +1,202 @@
+# Automation Workflows - ControlFin
+# Consolidates: auto-label.yml, auto-assign.yml, auto-approve.yml, auto-merge.yml, auto-merge-bot.yml, auto-close.yml
+
+name: Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  issues:
+    types: [opened, closed]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly stale check
+
+jobs:
+  # Auto Label PR
+  auto-label:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto Label PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number
+            });
+
+            // Label based on PR type
+            const labels = [];
+            if (pr.title.includes('feat:')) labels.push('enhancement');
+            if (pr.title.includes('fix:')) labels.push('bug');
+            if (pr.title.includes('docs:')) labels.push('documentation');
+            if (pr.title.includes('refactor:')) labels.push('refactoring');
+            if (pr.title.includes('test:')) labels.push('testing');
+            if (pr.title.includes('ci:')) labels.push('ci/cd');
+            if (pr.title.includes('chore:')) labels.push('maintenance');
+
+            // Add size labels
+            const changes = pr.additions + pr.deletions;
+            if (changes < 50) labels.push('size:XS');
+            else if (changes < 200) labels.push('size:S');
+            else if (changes < 500) labels.push('size:M');
+            else if (changes < 1000) labels.push('size:L');
+            else labels.push('size:XL');
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: number,
+                labels
+              });
+            }
+
+  # Auto Assign PR
+  auto-assign:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto Assign PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number
+            });
+
+            // Assign based on file changes
+            const assignees = [];
+            const changedFiles = pr.changed_files;
+
+            // Check for frontend changes
+            if (changedFiles.some(file => file.startsWith('controlfin-frontend/'))) {
+              assignees.push('frontend-team');
+            }
+
+            // Check for backend changes
+            if (changedFiles.some(file => file.startsWith('controlfin-backend/'))) {
+              assignees.push('backend-team');
+            }
+
+            // Check for CI/CD changes
+            if (changedFiles.some(file => file.startsWith('.github/'))) {
+              assignees.push('devops-team');
+            }
+
+            if (assignees.length > 0) {
+              await github.rest.issues.addAssignees({
+                owner,
+                repo,
+                issue_number: number,
+                assignees
+              });
+            }
+
+  # Auto Approve PR (for specific conditions)
+  auto-approve:
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto Approve Dependabot PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number: number,
+              event: 'APPROVE',
+              body: '🤖 Auto-approved by automation workflow'
+            });
+
+  # Auto Merge PR (for specific conditions)
+  auto-merge:
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    needs: [auto-approve]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto Merge Dependabot PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number
+            });
+
+            // Only merge if PR is approved and all checks pass
+            if (pr.mergeable && pr.mergeable_state === 'clean') {
+              await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: number,
+                merge_method: 'squash'
+              });
+            }
+
+  # Auto Close Stale Issues/PRs
+  auto-close:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Close Stale Issues
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const staleDays = 30;
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - staleDays);
+
+            // Get stale issues
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              sort: 'updated',
+              direction: 'asc'
+            });
+
+            for (const issue of issues) {
+              if (new Date(issue.updated_at) < cutoffDate) {
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'not_planned'
+                });
+                
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  body: `This issue has been automatically closed due to inactivity (${staleDays} days). Please reopen if still relevant.`
+                });
+              }
+            }

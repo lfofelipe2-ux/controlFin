@@ -1,11 +1,12 @@
+import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Button, Card, Typography, Space, Row, Col } from 'antd';
-import { LockOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import './App.css';
+import { AuthPage } from './components/auth';
 import BlockAIThemeProvider from './components/BlockAIThemeProvider';
 import { useBlockAITheme } from './hooks/useBlockAITheme';
-import { AuthPage } from './components/auth';
-import './App.css';
+import OAuthCallbackPage from './pages/OAuthCallbackPage';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -233,6 +234,7 @@ const App: React.FC = () => {
           <Route path='/auth' element={<AuthPage />} />
           <Route path='/login' element={<AuthPage initialMode='login' />} />
           <Route path='/register' element={<AuthPage initialMode='register' />} />
+          <Route path='/auth/callback' element={<OAuthCallbackPage />} />
 
           {/* Protected Routes */}
           <Route path='/dashboard' element={<Dashboard />} />

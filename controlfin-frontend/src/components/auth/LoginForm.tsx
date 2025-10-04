@@ -5,13 +5,7 @@
  * and Google OAuth integration, following the BlockAI design system.
  */
 
-import {
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-  GoogleOutlined,
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -31,8 +25,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBlockAITheme } from '../../hooks/useBlockAITheme';
-import authService from '../../services/authService';
 import { type LoginFormData } from '../../types/auth';
+import logger from '../../utils/logger';
+import GoogleOAuthButton from './GoogleOAuthButton';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -86,21 +81,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
         navigate('/dashboard');
       }
     } catch (error: unknown) {
-      console.error('Login error:', error as Error);
+      logger.error('Login error:', error as Error);
       // Error is handled by the auth hook
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  /**
-   * Handle Google OAuth login
-   */
-  const handleGoogleLogin = () => {
-    try {
-      authService.initiateGoogleLogin();
-    } catch (error: unknown) {
-      console.error('Google login error:', error as Error);
     }
   };
 
@@ -313,23 +297,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </Divider>
 
         {/* Google OAuth Button */}
-        <Button
-          onClick={handleGoogleLogin}
+        <GoogleOAuthButton
+          type='login'
+          loading={isLoading || isSubmitting}
           disabled={isLoading || isSubmitting}
-          style={{
-            width: '100%',
-            height: '48px',
-            background: 'transparent',
-            border: `1px solid rgba(255, 255, 255, 0.1)`,
-            borderRadius: '8px',
-            color: colors.textPrimary,
-            fontSize: typography.sizes.desktop.body,
-            fontWeight: typography.weights.semibold,
-          }}
-          icon={<GoogleOutlined />}
-        >
-          {t('login.googleButton')}
-        </Button>
+          fullWidth
+          size='large'
+        />
 
         {/* Switch to Register */}
         {onSwitchToRegister && (
