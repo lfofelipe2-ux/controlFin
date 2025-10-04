@@ -20,8 +20,8 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-        cache: ${{ inputs.cache == 'true' }}
-        cache-dependency-path: './controlfin-${{ inputs.project }}/package-lock.json'
+        cache: ${{ inputs.cache == 'true' && 'npm' || '' }}
+        cache-dependency-path: ${{ inputs.cache == 'true' && format('./controlfin-{0}/package-lock.json', inputs.project) || '' }}
 
     - name: Install dependencies
       run: |
