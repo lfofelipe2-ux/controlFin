@@ -244,8 +244,8 @@ export class OAuthErrorHandler {
         originalError: error,
         context,
         timestamp: new Date().toISOString(),
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'test-environment',
-        url: typeof window !== 'undefined' ? window.location.href : 'test-url',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server-side-render',
+        url: typeof window !== 'undefined' ? window.location.href : 'ssr-context',
       },
     };
 

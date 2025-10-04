@@ -185,7 +185,7 @@ export const handleOAuthCallbackWithLinking = async (googleProfile: {
       }>('/auth/google/callback', {
         method: 'POST',
         body: JSON.stringify({
-          code: 'direct_oauth', // Special code for direct OAuth
+          code: 'DIRECT_OAUTH_FLOW', // Special code for direct OAuth flow
           profile: googleProfile,
         }),
       });

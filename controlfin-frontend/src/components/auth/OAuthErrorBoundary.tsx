@@ -97,8 +97,8 @@ class OAuthErrorBoundary extends Component<OAuthErrorBoundaryProps, OAuthErrorBo
     const errorCode = this.state.error?.code || 'Unknown';
     const errorMessage = this.state.error?.message || 'Unknown error';
     // Internal error reporting - not user-facing
-    const errorCodeLabel = 'Error' + ' ' + 'Code' + ': ';
-    const errorMessageLabel = 'Error' + ' ' + 'Message' + ': ';
+    const errorCodeLabel = 'Error Code: ';
+    const errorMessageLabel = 'Error Message: ';
     const emailBody = errorCodeLabel + errorCode + '\n' + errorMessageLabel + errorMessage;
     window.open(
       'mailto:support@controlfin.com?subject=OAuth Error&body=' + encodeURIComponent(emailBody),
