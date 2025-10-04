@@ -1,0 +1,90 @@
+name: Super Linter
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  super-linter:
+    name: Super Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Super Linter
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_JSON: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_DOCKERFILE: true
+          VALIDATE_EDITORCONFIG: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_HTML: true
+          VALIDATE_CSS: true
+          VALIDATE_SCSS: true
+          VALIDATE_SHELL_SHFMT: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_ANSIBLE: true
+          VALIDATE_ARM: true
+          VALIDATE_BASH: true
+          VALIDATE_CLOJURE: true
+          VALIDATE_COFFEE: true
+          VALIDATE_CSHARP: true
+          VALIDATE_DART: true
+          VALIDATE_GO: true
+          VALIDATE_GROOVY: true
+          VALIDATE_JAVA: true
+          VALIDATE_KOTLIN: true
+          VALIDATE_LUA: true
+          VALIDATE_PERL: true
+          VALIDATE_PHP: true
+          VALIDATE_POWERSHELL: true
+          VALIDATE_PYTHON: true
+          VALIDATE_R: true
+          VALIDATE_RAKU: true
+          VALIDATE_RUBY: true
+          VALIDATE_RUST: true
+          VALIDATE_SQL: true
+          VALIDATE_TERRAFORM: true
+          VALIDATE_TSX: true
+          VALIDATE_XML: true
+          VALIDATE_ZIG: true
+          VALIDATE_ANSIBLE_LINT: true
+          VALIDATE_ARM_TTK: true
+          VALIDATE_BASH_EXEC: true
+          VALIDATE_CLOJURE_LINT: true
+          VALIDATE_COFFEE_LINT: true
+          VALIDATE_CSHARP_DOTNET_FORMAT: true
+          VALIDATE_DART_ANALYZER: true
+          VALIDATE_GO_GOLANGCI_LINT: true
+          VALIDATE_GROOVY_NPM: true
+          VALIDATE_JAVA_MAVEN: true
+          VALIDATE_KOTLIN_ANDROID: true
+          VALIDATE_LUA_LUACHECK: true
+          VALIDATE_PERL_PERLCRITIC: true
+          VALIDATE_PHP_BUILTIN: true
+          VALIDATE_POWERSHELL_PSSCRIPTANALYZER: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_PYTHON_FLAKE8: true
+          VALIDATE_PYTHON_ISORT: true
+          VALIDATE_PYTHON_PYLINT: true
+          VALIDATE_R_LINT: true
+          VALIDATE_RAKU_RAKUDO: true
+          VALIDATE_RUBY_RUBOCOP: true
+          VALIDATE_RUST_CLIPPY: true
+          VALIDATE_SQL_SQLFLUFF: true
+          VALIDATE_TERRAFORM_TFLINT: true
+          VALIDATE_TSX_ESLINT: true
+          VALIDATE_TYPESCRIPT_ESLINT: true
+          VALIDATE_XML_LIBXML: true
+          VALIDATE_YAML_YAMLLINT: true
+          VALIDATE_ZIG_ZIG: true
+

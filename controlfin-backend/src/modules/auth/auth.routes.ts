@@ -1,5 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import { registerAccountLinkingRoutes } from './auth.account-linking.routes';
+import { registerOAuthRoutes } from './auth.oauth.routes';
 import {
   changePasswordSchema,
   loginSchema,
@@ -256,9 +258,9 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.logout(request.user!._id);
+        await authService.logout();
 
         return reply.send({
           message: 'Logout successful',
@@ -306,7 +308,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.getProfile(request.user!._id);
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
+        const user = await authService.getProfile(request.user._id);
 
         return reply.send({
           user,
@@ -356,7 +361,13 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.updateProfile(request.user!._id, request.body as any);
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
+        const user = await authService.updateProfile(
+          request.user._id,
+          request.body as Record<string, unknown>
+        );
 
         return reply.send({
           message: 'Profile updated successfully',
@@ -409,7 +420,13 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.changePassword(request.user!._id, request.body as any);
+        if (!request.user?._id) {
+          return reply.status(401).send({ message: 'User not authenticated' });
+        }
+        await authService.changePassword(
+          request.user._id,
+          request.body as { currentPassword: string; newPassword: string }
+        );
 
         return reply.send({
           message: 'Password changed successfully',
@@ -487,4 +504,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
     }
   );
+
+  // Register OAuth routes
+  await registerOAuthRoutes(fastify);
+
+  // Register account linking routes
+  await registerAccountLinkingRoutes(fastify);
 }

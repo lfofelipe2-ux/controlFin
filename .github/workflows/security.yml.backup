@@ -1,0 +1,187 @@
+---
+# Security Workflows - ControlFin
+# Consolidates: codeql.yml, code-scanning.yml, snyk.yml
+
+name: Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * 1' # Weekly security scan
+
+jobs:
+  # Load centralized configuration
+  load-config:
+    runs-on: ubuntu-latest
+    outputs:
+      config: ${{ steps.read-config.outputs.config }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read CI Config
+        id: read-config
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const configPath = '.github/config/ci-config.yml';
+            const config = yaml.load(fs.readFileSync(configPath, 'utf8'));
+            core.setOutput('config', JSON.stringify(config));
+
+  # CodeQL Analysis
+  codeql-analysis:
+    if: github.event_name != 'schedule'
+    needs: load-config
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'typescript']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ fromJson(needs.load-config.outputs.config).node_versions.security }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd controlfin-frontend && npm ci
+          cd ../controlfin-backend && npm ci
+
+      - name: Build applications
+        run: |
+          cd controlfin-frontend && npm run build
+          cd ../controlfin-backend && npm run build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: '/language:${{matrix.language}}'
+
+  # Snyk Security Scan
+  snyk-scan:
+    needs: load-config
+    name: Snyk Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ fromJson(needs.load-config.outputs.config).node_versions.security }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd controlfin-frontend && npm ci
+          cd ../controlfin-backend && npm ci
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Upload Snyk results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: snyk.sarif
+
+  # Dependency Review
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    needs: load-config
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-2.0, GPL-3.0
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause
+
+  # Security Audit
+  security-audit:
+    needs: load-config
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ fromJson(needs.load-config.outputs.config).node_versions.security }}
+          cache: 'npm'
+
+      - name: Frontend Security Audit
+        run: |
+          cd controlfin-frontend
+          npm ci
+          npm audit --audit-level=moderate || echo "Frontend audit completed with warnings"
+
+      - name: Backend Security Audit
+        run: |
+          cd controlfin-backend
+          npm ci
+          npm audit --audit-level=moderate || echo "Backend audit completed with warnings"
+
+  # License Check
+  license-check:
+    needs: load-config
+    name: License Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ fromJson(needs.load-config.outputs.config).node_versions.security }}
+          cache: 'npm'
+
+      - name: Install license checker
+        run: npm install -g license-checker
+
+      - name: Check Frontend Licenses
+        run: |
+          cd controlfin-frontend
+          npm ci
+          license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC' --excludePrivatePackages
+
+      - name: Check Backend Licenses
+        run: |
+          cd controlfin-backend
+          npm ci
+          license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC' --excludePrivatePackages

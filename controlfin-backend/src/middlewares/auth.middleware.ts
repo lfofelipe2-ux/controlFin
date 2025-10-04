@@ -78,10 +78,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
  * Optional authentication middleware
  * Adds user to request if token is valid, but doesn't require it
  */
-export async function optionalAuthMiddleware(
-  request: FastifyRequest,
-  _reply: FastifyReply
-): Promise<void> {
+export async function optionalAuthMiddleware(request: FastifyRequest): Promise<void> {
   try {
     const authHeader = request.headers.authorization;
 

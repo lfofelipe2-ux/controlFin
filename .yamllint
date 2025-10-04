@@ -1,0 +1,27 @@
+extends: default
+
+rules:
+  # Relaxed rules for GitHub Actions workflows
+  line-length:
+    max: 120
+    level: warning
+  
+  # Allow missing document start for workflows
+  document-start:
+    present: false
+    level: warning
+  
+  # Allow truthy values in workflows
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+    check-keys: false
+    level: warning
+  
+  # Relaxed comment spacing
+  comments:
+    min-spaces-from-content: 1
+    level: warning
+  
+  # Allow trailing spaces in some cases
+  trailing-spaces:
+    level: warning

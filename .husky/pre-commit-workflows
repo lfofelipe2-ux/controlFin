@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Workflow validation pre-commit hook
+# This hook validates GitHub Actions workflows before commit
+
+echo "🔍 Validating GitHub Actions workflows..."
+
+# Check if any workflow files are being committed
+if git diff --cached --name-only | grep -q "\.github/workflows/.*\.yml$"; then
+    echo "📝 Workflow files detected, running validation..."
+    
+    # Run workflow validation
+    if ! ./scripts/validate-workflows.sh; then
+        echo "❌ Workflow validation failed!"
+        echo "Please fix the errors above before committing."
+        exit 1
+    fi
+    
+    echo "✅ Workflow validation passed!"
+fi
