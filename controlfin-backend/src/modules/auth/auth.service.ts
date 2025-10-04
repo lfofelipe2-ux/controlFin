@@ -26,6 +26,15 @@ export interface AuthResponse {
   tokens: AuthTokens;
 }
 
+export interface JwtPayload {
+  userId: string;
+  type: 'access' | 'refresh';
+  iat?: number;
+  exp?: number;
+  iss?: string;
+  aud?: string;
+}
+
 export class AuthService {
   /**
    * Hash password using bcrypt
@@ -57,7 +66,7 @@ export class AuthService {
         type: 'access',
       },
       JWT_SECRET,
-      options
+      options,
     );
   }
 
@@ -76,7 +85,7 @@ export class AuthService {
         type: 'refresh',
       },
       JWT_REFRESH_SECRET,
-      options
+      options,
     );
   }
 
@@ -93,7 +102,10 @@ export class AuthService {
   /**
    * Verify JWT token
    */
-  private verifyToken(token: string, secret: string): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
+  private verifyToken(
+    token: string,
+    secret: string,
+  ): { userId: string; type: 'access' | 'refresh'; iat: number; exp: number } {
     try {
       return jwt.verify(token, secret) as {
         userId: string;

@@ -2,11 +2,16 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import {
   changePasswordSchema,
+  ChangePasswordInput,
+  LoginInput,
   loginSchema,
   passwordResetRequestSchema,
   passwordResetSchema,
+  RefreshTokenInput,
   refreshTokenSchema,
+  RegisterInput,
   registerSchema,
+  UpdateProfileInput,
   updateProfileSchema,
 } from './auth.schemas';
 import { authService } from './auth.service';
@@ -92,7 +97,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Login user
@@ -175,7 +180,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Refresh token
@@ -237,7 +242,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Logout user
@@ -272,7 +277,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Get current user profile
@@ -320,7 +325,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Update user profile
@@ -356,7 +361,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.updateProfile(request.user!._id, request.body as any);
+        const user = await authService.updateProfile(request.user!._id, request.body as UpdateProfileInput);
 
         return reply.send({
           message: 'Profile updated successfully',
@@ -379,7 +384,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Change password
@@ -409,7 +414,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.changePassword(request.user!._id, request.body as any);
+        await authService.changePassword(request.user!._id, request.body as ChangePasswordInput);
 
         return reply.send({
           message: 'Password changed successfully',
@@ -431,7 +436,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           code: 'INTERNAL_ERROR',
         });
       }
-    }
+    },
   );
 
   // Request password reset (placeholder - requires email service)
@@ -458,7 +463,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       return reply.send({
         message: 'Password reset email sent (placeholder)',
       });
-    }
+    },
   );
 
   // Reset password (placeholder - requires email service)
@@ -485,6 +490,6 @@ export async function authRoutes(fastify: FastifyInstance) {
       return reply.send({
         message: 'Password reset successful (placeholder)',
       });
-    }
+    },
   );
 }

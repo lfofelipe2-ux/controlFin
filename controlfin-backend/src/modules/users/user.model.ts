@@ -63,15 +63,13 @@ const userSchema = new Schema<IUser>(
   {
     timestamps: true,
     toJSON: {
-      transform: function (_doc, ret) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (ret as any).password;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (ret as any).__v;
+      transform: function (_doc, ret: Record<string, unknown>) {
+        delete ret['password'];
+        delete ret['__v'];
         return ret;
       },
     },
-  }
+  },
 );
 
 // Indexes for performance (email and googleId already have unique indexes)

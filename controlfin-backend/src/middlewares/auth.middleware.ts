@@ -80,7 +80,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
  */
 export async function optionalAuthMiddleware(
   request: FastifyRequest,
-  _reply: FastifyReply
+  _reply: FastifyReply,
 ): Promise<void> {
   try {
     const authHeader = request.headers.authorization;
@@ -119,7 +119,7 @@ export async function optionalAuthMiddleware(
  */
 export async function emailVerificationRequiredMiddleware(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   // First run auth middleware
   await authMiddleware(request, reply);
