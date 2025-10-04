@@ -641,3 +641,210 @@ After successfully resolving CI/CD pipeline failures in TASK-019, this task focu
 ---
 
 ## 📋 FUTURE TASKS ROADMAP
+
+### **TASK-008: Automated Testing Implementation** ⏳ NEXT
+
+**Complexity**: Level 2 - Simple Enhancement  
+**Priority**: 🔴 **HIGH** (Follow-up from TASK-007)  
+**Estimated Effort**: 8 hours
+
+**Description**: Implement comprehensive automated testing infrastructure for base components, i18n functionality, and auth components created in TASK-007.
+
+**Key Deliverables**:
+
+- Configure Vitest testing framework
+- Unit tests for Input, Button, FormField components
+- i18n functionality testing
+- Auth components integration tests
+- Test coverage > 70% for base components
+
+---
+
+### **TASK-009: Component Documentation & Storybook** ⏳ PENDING
+
+**Complexity**: Level 2 - Simple Enhancement  
+**Priority**: 🟡 **MEDIUM**  
+**Estimated Effort**: 6 hours
+
+**Description**: Create comprehensive documentation for the base component library using Storybook.
+
+**Key Deliverables**:
+
+- Storybook setup and configuration
+- Component stories with usage examples
+- API documentation for all base components
+- Design token documentation
+- Interactive component playground
+
+---
+
+### **TASK-010: Language Switcher UI** ⏳ PENDING
+
+**Complexity**: Level 1 - Quick Enhancement  
+**Priority**: 🟡 **MEDIUM**  
+**Estimated Effort**: 3 hours
+
+**Description**: Add user interface for language switching functionality.
+
+**Key Deliverables**:
+
+- Language selection dropdown component
+- User profile integration
+- Language persistence in localStorage
+- Visual language indicators
+
+---
+
+### **TASK-011: Transaction Management System** ⏳ PENDING
+
+**Complexity**: Level 4 - Complex System  
+**Priority**: 🔴 **HIGH**  
+**Estimated Effort**: 40 hours
+
+**Description**: Implement complete transaction management system with CRUD operations, categorization, and filtering.
+
+**Key Deliverables**:
+
+- Transaction CRUD endpoints (Backend)
+- Transaction management UI (Frontend)
+- Category management system
+- Payment method tracking
+- Transaction filtering and search
+- Credit card integration
+- Recurring transactions support
+
+---
+
+### **TASK-012: Financial Spaces & Collaboration** ⏳ PENDING
+
+**Complexity**: Level 4 - Complex System  
+**Priority**: 🔴 **HIGH**  
+**Estimated Effort**: 32 hours
+
+**Description**: Implement shared financial spaces for couples/families with invitation system.
+
+**Key Deliverables**:
+
+- Financial spaces CRUD (Backend)
+- Space invitation system
+- Member management
+- Space switching UI
+- Collaborative transaction tracking
+- Space-specific settings
+
+---
+
+### **TASK-013: Budget & Planning System** ⏳ PENDING
+
+**Complexity**: Level 3 - Intermediate Feature  
+**Priority**: 🟡 **MEDIUM**  
+**Estimated Effort**: 24 hours
+
+**Description**: Implement budget planning and tracking system with visual indicators.
+
+**Key Deliverables**:
+
+- Budget CRUD operations
+- Budget vs actual tracking
+- Visual progress indicators
+- Budget alerts and notifications
+- Monthly budget planning UI
+- Budget category management
+
+---
+
+### **TASK-014: Analytics Dashboard** ⏳ PENDING
+
+**Complexity**: Level 3 - Intermediate Feature  
+**Priority**: 🟡 **MEDIUM**  
+**Estimated Effort**: 20 hours
+
+**Description**: Create comprehensive analytics dashboard with charts and insights.
+
+**Key Deliverables**:
+
+- Expense vs income charts
+- Category breakdown visualizations
+- Monthly/yearly trends
+- Spending patterns analysis
+- Financial health indicators
+- Export functionality
+
+---
+
+### **TASK-015: Savings Goals System** ⏳ PENDING
+
+**Complexity**: Level 2 - Simple Enhancement  
+**Priority**: 🟢 **LOW**  
+**Estimated Effort**: 16 hours
+
+**Description**: Implement savings goals tracking with progress visualization.
+
+**Key Deliverables**:
+
+- Savings goals CRUD
+- Progress tracking
+- Goal contribution system
+- Visual progress indicators
+- Goal completion celebrations
+- Goal sharing between space members
+
+---
+
+### **TASK-016: PWA Features Implementation** ⏳ PENDING
+
+**Complexity**: Level 3 - Intermediate Feature  
+**Priority**: 🟡 **MEDIUM**  
+**Estimated Effort**: 20 hours
+
+**Description**: Implement Progressive Web App features for offline functionality.
+
+**Key Deliverables**:
+
+- Service worker implementation
+- Offline data caching
+- App installation prompts
+- Push notifications setup
+- Offline indicators
+- Background sync
+
+---
+
+### **TASK-017: Notifications & Alerts System** ⏳ PENDING
+
+**Complexity**: Level 2 - Simple Enhancement  
+**Priority**: 🟢 **LOW**  
+**Estimated Effort**: 12 hours
+
+**Description**: Implement notification system for budget alerts and reminders.
+
+**Key Deliverables**:
+
+- Notification CRUD (Backend)
+- Budget alert system
+- Bill reminder notifications
+- Notification preferences
+- Notification center UI
+- Email notification integration
+
+---
+
+### **TASK-018: Production Deployment & Monitoring** ⏳ PENDING
+
+**Complexity**: Level 3 - Intermediate Feature  
+**Priority**: 🔴 **HIGH**  
+**Estimated Effort**: 16 hours
+
+**Description**: Deploy application to production with monitoring and error tracking.
+
+**Key Deliverables**:
+
+- Production environment setup
+- Domain configuration
+- SSL certificate setup
+- Performance monitoring
+- Error tracking integration
+- Backup and recovery procedures
+- Security audit and hardening
+
+---
