@@ -5,6 +5,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import noHardcodedStrings from '../eslint-plugins/no-hardcoded-strings/index.js';
+import noDuplicateI18nKeys from '../eslint-plugins/no-duplicate-i18n-keys/index.js';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -18,6 +19,7 @@ export default defineConfig([
     ],
     plugins: {
       'no-hardcoded-strings': noHardcodedStrings,
+      'no-duplicate-i18n-keys': noDuplicateI18nKeys,
     },
     languageOptions: {
       ecmaVersion: 2020,
@@ -27,6 +29,15 @@ export default defineConfig([
       'no-console': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       'no-hardcoded-strings/no-hardcoded-strings': 'error',
+      'no-duplicate-i18n-keys/no-duplicate-i18n-keys': [
+        'error',
+        {
+          translationFiles: [
+            'src/locales/en/common.json',
+            'src/locales/pt/common.json',
+          ],
+        },
+      ],
     },
   },
 ]);
