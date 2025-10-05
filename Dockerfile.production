@@ -1,6 +1,9 @@
 # Multi-stage build for production
 FROM node:22-alpine AS base
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
@@ -53,10 +56,13 @@ COPY --from=deps --chown=nextjs:nodejs /app/package*.json ./
 COPY --from=deps --chown=nextjs:nodejs /app/controlfin-frontend/package*.json ./controlfin-frontend/
 COPY --from=deps --chown=nextjs:nodejs /app/controlfin-backend/package*.json ./controlfin-backend/
 
-# Copy node_modules
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=nextjs:nodejs /app/controlfin-frontend/node_modules ./controlfin-frontend/node_modules
-COPY --from=deps --chown=nextjs:nodejs /app/controlfin-backend/node_modules ./controlfin-backend/node_modules
+# Install production dependencies in runner stage
+RUN npm ci --only=production
+WORKDIR /app/controlfin-frontend
+RUN npm ci --only=production
+WORKDIR /app/controlfin-backend
+RUN npm ci --only=production
+WORKDIR /app
 
 # Create logs directory
 RUN mkdir -p /app/logs && chown nextjs:nodejs /app/logs
