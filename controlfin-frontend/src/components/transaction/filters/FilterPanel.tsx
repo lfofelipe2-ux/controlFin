@@ -16,6 +16,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { TransactionFilters } from '../../../types/transaction';
 
@@ -40,6 +41,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onLoadPreset,
   presets,
 }) => {
+  const { t } = useTranslation();
   const { filters, categories, paymentMethods, setFilters } = useTransactionStore();
 
   const [localFilters, setLocalFilters] = useState<TransactionFilters>(filters);
@@ -137,7 +139,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       extra={
         <Space>
           <Button size='small' onClick={() => setShowAdvanced(!showAdvanced)}>
-            {showAdvanced ? 'Hide' : 'Show'} Advanced
+            {showAdvanced ? t('transaction.hide') : t('transaction.show')}{' '}
+            {t('transaction.advanced')}
           </Button>
           <Button size='small' icon={<ClearOutlined />} onClick={handleClearFilters}>
             Clear All
@@ -168,7 +171,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             onChange={(value) => handleFilterChange('category', value)}
             style={{ width: '100%', marginTop: 4 }}
             allowClear
-            placeholder='Select category'
+            placeholder={t('transaction.selectCategory')}
             showSearch
             optionFilterProp='children'
           >
@@ -190,7 +193,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             onChange={(value) => handleFilterChange('paymentMethod', value)}
             style={{ width: '100%', marginTop: 4 }}
             allowClear
-            placeholder='Select payment method'
+            placeholder={t('transaction.selectPaymentMethod')}
             showSearch
             optionFilterProp='children'
           >
@@ -236,11 +239,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 value: [dayjs().subtract(30, 'day'), dayjs()],
               },
               {
-                label: 'This month',
+                label: t('transaction.thisMonth'),
                 value: [dayjs().startOf('month'), dayjs().endOf('month')],
               },
               {
-                label: 'Last month',
+                label: t('transaction.lastMonth'),
                 value: [
                   dayjs().subtract(1, 'month').startOf('month'),
                   dayjs().subtract(1, 'month').endOf('month'),
@@ -281,7 +284,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <>
           <Divider />
           <Collapse ghost>
-            <Panel header='Advanced Filters' key='advanced'>
+            <Panel header={t('transaction.advancedFilters')} key='advanced'>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Text strong>Search Tags</Text>
@@ -303,7 +306,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                       onChange={(value) => handleFilterChange('isRecurring', value)}
                       style={{ width: '100%' }}
                       allowClear
-                      placeholder='All transactions'
+                      placeholder={t('transaction.allTransactions')}
                     >
                       <Option value={true}>Recurring only</Option>
                       <Option value={false}>One-time only</Option>
@@ -380,7 +383,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           <Text strong>Saved Presets</Text>
           <div style={{ marginTop: 4 }}>
             <Select
-              placeholder='Load saved filter preset'
+              placeholder={t('transaction.loadSavedFilterPreset')}
               style={{ width: '100%' }}
               onChange={(value) => {
                 const preset = presets.find((p) => p.name === value);
@@ -400,7 +403,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           <Text strong>Save Current Filters</Text>
           <Space.Compact style={{ width: '100%', marginTop: 4 }}>
             <Input
-              placeholder='Preset name'
+              placeholder={t('transaction.presetName')}
               value={presetName}
               onChange={(e) => setPresetName(e.target.value)}
             />

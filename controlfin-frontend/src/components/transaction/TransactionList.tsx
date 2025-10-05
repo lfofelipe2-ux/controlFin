@@ -27,7 +27,7 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import type { SortOrder } from 'antd/es/table/interface';
+import type { FilterValue, SorterResult, TablePaginationConfig } from 'antd/es/table/interface';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
@@ -381,14 +381,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   ];
 
   const handleTableChange = (
-    pagination: { current?: number; pageSize?: number },
-    _tableFilters: unknown,
-    sorter: { field?: string | string[] }
+    pagination: TablePaginationConfig,
+    _tableFilters: Record<string, FilterValue | null>,
+    sorter: SorterResult<Transaction> | SorterResult<Transaction>[]
   ) => {
-    const sortField = Array.isArray(sorter.field) ? sorter.field[0] : sorter.field;
-    if (sortField) {
-      handleSortChange(sortField);
+    const sorterArray = Array.isArray(sorter) ? sorter : [sorter];
+    const activeSorter = sorterArray.find((s) => s.columnKey || s.field);
+
+    if (activeSorter?.field) {
+      const sortField = Array.isArray(activeSorter.field)
+        ? activeSorter.field[0]
+        : activeSorter.field;
+      if (sortField) {
+        handleSortChange(sortField as string);
+      }
     }
+
     if (pagination.current !== currentPage) {
       setPage(pagination.current || 1);
     }

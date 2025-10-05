@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { TransactionStats } from '../../../types/transaction';
 
@@ -21,6 +22,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
   onDateRangeChange,
   onChartTypeChange,
 }) => {
+  const { t } = useTranslation();
   const { loading } = useTransactionStore();
 
   // Category breakdown chart options
@@ -34,7 +36,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         },
       },
       title: {
-        text: 'Expenses by Category',
+        text: t('transaction.expensesByCategory'),
         style: {
           color: '#ffffff',
           fontSize: '16px',
@@ -90,7 +92,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         },
       },
       title: {
-        text: 'Transactions by Payment Method',
+        text: t('transaction.transactionsByPaymentMethod'),
         style: {
           color: '#ffffff',
           fontSize: '16px',
@@ -155,7 +157,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         },
       },
       title: {
-        text: 'Monthly Trend',
+        text: t('transaction.monthlyTrend'),
         style: {
           color: '#ffffff',
           fontSize: '16px',
@@ -230,7 +232,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         },
       },
       title: {
-        text: 'Income vs Expense',
+        text: t('transaction.incomeVsExpense'),
         style: {
           color: '#ffffff',
           fontSize: '16px',
@@ -238,7 +240,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         },
       },
       xAxis: {
-        categories: ['Total'],
+        categories: [t('transaction.total')],
         labels: {
           style: {
             color: '#ffffff',

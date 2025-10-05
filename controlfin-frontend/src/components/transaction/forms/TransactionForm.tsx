@@ -18,6 +18,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { TransactionFormData } from '../../../types/transaction';
 
@@ -36,6 +37,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   onCancel,
   loading = false,
 }) => {
+  const { t } = useTranslation();
   const { formData, categories, paymentMethods, formMode, setFormData, resetForm } =
     useTransactionStore();
 
@@ -92,7 +94,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         description: values.description as string,
         categoryId: values.categoryId as string,
         paymentMethodId: values.paymentMethodId as string,
-        date: (values.date as Dayjs).format('YYYY-MM-DD'),
+        date: (values.date as any).format('YYYY-MM-DD'),
         tags: formData.tags,
         isRecurring: (values.isRecurring as boolean | undefined) || false,
         metadata: {
@@ -104,12 +106,14 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       await onSave(submitData);
       message.success(
         formMode === 'create'
-          ? 'Transaction created successfully!'
-          : 'Transaction updated successfully!'
+          ? t('transaction.transactionCreatedSuccessfully')
+          : t('transaction.transactionUpdatedSuccessfully')
       );
       resetForm();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to save transaction');
+      message.error(
+        error instanceof Error ? error.message : t('transaction.failedToSaveTransaction')
+      );
     }
   };
 
@@ -122,10 +126,10 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     <Card>
       <Title level={4}>
         {formMode === 'create'
-          ? 'Add New Transaction'
+          ? t('transaction.addNewTransaction')
           : formMode === 'edit'
-            ? 'Edit Transaction'
-            : 'View Transaction'}
+            ? t('transaction.editTransaction')
+            : t('transaction.viewTransaction')}
       </Title>
 
       <Form
@@ -149,13 +153,13 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <Col span={8}>
             <Form.Item
               name='type'
-              label='Transaction Type'
-              rules={[{ required: true, message: 'Please select transaction type' }]}
+              label={t('transaction.transactionType')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectTransactionType') }]}
             >
               <Select onChange={handleTypeChange}>
-                <Option value='income'>Income</Option>
-                <Option value='expense'>Expense</Option>
-                <Option value='transfer'>Transfer</Option>
+                <Option value='income'>{t('transaction.income')}</Option>
+                <Option value='expense'>{t('transaction.expense')}</Option>
+                <Option value='transfer'>{t('transaction.transfer')}</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -163,10 +167,14 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <Col span={8}>
             <Form.Item
               name='amount'
-              label='Amount'
+              label={t('transaction.amount')}
               rules={[
-                { required: true, message: 'Please enter amount' },
-                { type: 'number', min: 0.01, message: 'Amount must be greater than 0' },
+                { required: true, message: t('transaction.pleaseEnterAmount') },
+                {
+                  type: 'number',
+                  min: 0.01,
+                  message: t('transaction.amountMustBeGreaterThanZero'),
+                },
               ]}
             >
               <InputNumber style={{ width: '100%' }} prefix='$' precision={2} min={0} step={0.01} />
@@ -176,8 +184,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <Col span={8}>
             <Form.Item
               name='date'
-              label='Date'
-              rules={[{ required: true, message: 'Please select date' }]}
+              label={t('transaction.date')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectDate') }]}
             >
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
@@ -188,11 +196,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <Col span={12}>
             <Form.Item
               name='categoryId'
-              label='Category'
-              rules={[{ required: true, message: 'Please select category' }]}
+              label={t('transaction.category')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectCategory') }]}
             >
               <Select
-                placeholder='Select category'
+                placeholder={t('transaction.selectCategory')}
                 showSearch
                 optionFilterProp='children'
                 filterOption={(input, option) =>
@@ -216,11 +224,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <Col span={12}>
             <Form.Item
               name='paymentMethodId'
-              label='Payment Method'
-              rules={[{ required: true, message: 'Please select payment method' }]}
+              label={t('transaction.paymentMethod')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectPaymentMethod') }]}
             >
               <Select
-                placeholder='Select payment method'
+                placeholder={t('transaction.selectPaymentMethod')}
                 showSearch
                 optionFilterProp='children'
                 filterOption={(input, option) =>
@@ -244,16 +252,16 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
         <Form.Item
           name='description'
-          label='Description'
+          label={t('transaction.description')}
           rules={[
-            { required: true, message: 'Please enter description' },
-            { max: 500, message: 'Description must be less than 500 characters' },
+            { required: true, message: t('transaction.pleaseEnterDescription') },
+            { max: 500, message: t('transaction.descriptionMustBeLessThan500Characters') },
           ]}
         >
-          <Input placeholder='Enter transaction description' />
+          <Input placeholder={t('transaction.enterTransactionDescription')} />
         </Form.Item>
 
-        <Form.Item label='Tags'>
+        <Form.Item label={t('transaction.tags')}>
           <div>
             <Space wrap style={{ marginBottom: 8 }}>
               {formData.tags.map((tag) => (
@@ -272,7 +280,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  placeholder='Add tag'
+                  placeholder={t('transaction.addTag')}
                   onPressEnter={handleAddTag}
                 />
                 <Button type='dashed' icon={<PlusOutlined />} onClick={handleAddTag}>
@@ -287,27 +295,38 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name='location' label='Location'>
-              <Input placeholder='Enter location (optional)' />
+            <Form.Item name='location' label={t('transaction.location')}>
+              <Input placeholder={t('transaction.enterLocationOptional')} />
             </Form.Item>
           </Col>
 
           <Col span={12}>
-            <Form.Item name='isRecurring' label='Recurring Transaction' valuePropName='checked'>
+            <Form.Item
+              name='isRecurring'
+              label={t('transaction.recurringTransaction')}
+              valuePropName='checked'
+            >
               <Switch />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item name='notes' label='Notes'>
-          <TextArea rows={3} placeholder='Additional notes (optional)' maxLength={1000} showCount />
+        <Form.Item name='notes' label={t('transaction.notes')}>
+          <TextArea
+            rows={3}
+            placeholder={t('transaction.additionalNotesOptional')}
+            maxLength={1000}
+            showCount
+          />
         </Form.Item>
 
         {formMode !== 'view' && (
           <Form.Item>
             <Space>
               <Button type='primary' htmlType='submit' loading={loading}>
-                {formMode === 'create' ? 'Create Transaction' : 'Update Transaction'}
+                {formMode === 'create'
+                  ? t('transaction.createTransaction')
+                  : t('transaction.updateTransaction')}
               </Button>
               <Button onClick={handleCancel}>Cancel</Button>
             </Space>

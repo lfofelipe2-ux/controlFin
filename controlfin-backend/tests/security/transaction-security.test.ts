@@ -16,8 +16,8 @@ describe('Transaction Security Tests', () => {
   let spaceId: string;
   let categoryId: string;
   let paymentMethodId: string;
-  let otherUserId: string;
-  let otherSpaceId: string;
+  // let otherUserId: string;
+  // let otherSpaceId: string;
 
   beforeAll(async () => {
     // Start in-memory MongoDB

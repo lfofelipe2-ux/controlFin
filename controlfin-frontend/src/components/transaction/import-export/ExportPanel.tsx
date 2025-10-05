@@ -47,7 +47,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
     try {
       setExportProgress(0);
 
-      const dateRange = values.dateRange as [Dayjs, Dayjs] | undefined;
+      const dateRange = values.dateRange as [any, any] | undefined;
       const exportOptions: ExportOptions = {
         format: values.format as ExportOptions['format'],
         dateRange: dateRange
@@ -72,7 +72,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
       // Prepare data for export
       const exportDataArray = filteredTransactions.map((transaction) => {
         const baseData: Record<string, string> = {
-          'Transaction ID': transaction.id,
+          [t('transaction.transactionId')]: transaction.id,
           Type: transaction.type.toUpperCase(),
           Amount: transaction.amount.toString(),
           Description: transaction.description,
@@ -119,10 +119,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
           fileName += '.pdf';
           mimeType = 'application/pdf';
           // PDF generation would require additional library like jsPDF
-          message.warning('PDF export not yet implemented');
+          message.warning(t('transaction.pdfExportNotYetImplemented'));
           return;
         default:
-          throw new Error('Unsupported export format');
+          throw new Error(t('transaction.unsupportedExportFormat'));
       }
 
       setExportProgress(75);
@@ -138,7 +138,9 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
 
       onClose();
     } catch (error) {
-      message.error(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      message.error(
+        `${t('transaction.exportFailed')}: ${error instanceof Error ? error.message : t('transaction.unknownError')}`
+      );
     } finally {
       setExportProgress(0);
     }

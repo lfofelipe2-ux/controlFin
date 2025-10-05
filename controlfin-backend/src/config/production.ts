@@ -78,9 +78,9 @@ export const productionConfig = {
   // Google OAuth configuration
   oauth: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      callbackUrl: `${process.env.BACKEND_URL || 'http://localhost:3001'}/api/auth/google/callback`,
+      clientId: process.env['GOOGLE_CLIENT_ID'] || '',
+      clientSecret: process.env['GOOGLE_CLIENT_SECRET'] || '',
+      callbackUrl: `${process.env['BACKEND_URL'] || 'http://localhost:3001'}/api/auth/google/callback`,
     },
   },
 
@@ -102,12 +102,12 @@ export const productionConfig = {
   email: {
     enabled: false, // Disabled by default
     provider: 'smtp',
-    host: process.env.SMTP_HOST || 'localhost',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true',
+    host: process.env['SMTP_HOST'] || 'localhost',
+    port: Number(process.env['SMTP_PORT']) || 587,
+    secure: process.env['SMTP_SECURE'] === 'true',
     auth: {
-      user: process.env.SMTP_USER || '',
-      pass: process.env.SMTP_PASS || '',
+      user: process.env['SMTP_USER'] || '',
+      pass: process.env['SMTP_PASS'] || '',
     },
   },
 

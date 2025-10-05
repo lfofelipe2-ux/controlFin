@@ -61,20 +61,20 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
 
   const steps = [
     {
-      title: 'Upload File',
-      description: 'Select CSV or Excel file',
+      title: t('transaction.uploadFile'),
+      description: t('transaction.selectCsvOrExcelFile'),
     },
     {
-      title: 'Map Fields',
-      description: 'Match columns to transaction fields',
+      title: t('transaction.mapFields'),
+      description: t('transaction.matchColumnsToTransactionFields'),
     },
     {
-      title: 'Review Data',
-      description: 'Preview and validate data',
+      title: t('transaction.reviewData'),
+      description: t('transaction.previewAndValidateData'),
     },
     {
-      title: 'Import',
-      description: 'Process and import transactions',
+      title: t('transaction.import'),
+      description: t('transaction.processAndImportTransactions'),
     },
   ];
 
@@ -96,7 +96,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         if (jsonData.length < 2) {
-          message.error('File must contain at least a header row and one data row');
+          message.error(t('transaction.fileMustContainAtLeastHeaderRowAndOneDataRow'));
           return;
         }
 
@@ -206,7 +206,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
         mappedRows.push(transactionData);
       } catch (error) {
         errors.push(
-          `Row ${_index + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          `Row ${_index + 2}: ${error instanceof Error ? error.message : t('transaction.unknownError')}`
         );
       }
     });
@@ -312,12 +312,12 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
               }))}
               columns={[
                 {
-                  title: 'File Column',
+                  title: t('transaction.fileColumn'),
                   dataIndex: 'header',
                   key: 'header',
                 },
                 {
-                  title: 'Transaction Field',
+                  title: t('transaction.transactionField'),
                   dataIndex: 'mapping',
                   key: 'mapping',
                   render: (value, record) => (
@@ -325,16 +325,16 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
                       value={value}
                       onChange={(newValue: string) => handleFieldMapping(record.header, newValue)}
                       style={{ width: '100%' }}
-                      placeholder='Select field'
+                      placeholder={t('transaction.selectField')}
                     >
-                      <optgroup label='Required Fields'>
+                      <optgroup label={t('transaction.requiredFields')}>
                         {requiredFields.map((field) => (
                           <Option key={field} value={field}>
                             {field} *
                           </Option>
                         ))}
                       </optgroup>
-                      <optgroup label='Optional Fields'>
+                      <optgroup label={t('transaction.optionalFields')}>
                         {optionalFields.map((field) => (
                           <Option key={field} value={field}>
                             {field}
@@ -378,7 +378,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
               dataSource={mappedData.slice(0, 10)} // Show first 10 rows
               columns={[
                 {
-                  title: 'Type',
+                  title: t('transaction.type'),
                   dataIndex: 'type',
                   key: 'type',
                   render: (type) => (
@@ -388,19 +388,19 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
                   ),
                 },
                 {
-                  title: 'Amount',
+                  title: t('transaction.amount'),
                   dataIndex: 'amount',
                   key: 'amount',
                   render: (amount) => `$${amount.toFixed(2)}`,
                 },
                 {
-                  title: 'Description',
+                  title: t('transaction.description'),
                   dataIndex: 'description',
                   key: 'description',
                   ellipsis: true,
                 },
                 {
-                  title: 'Date',
+                  title: t('transaction.date'),
                   dataIndex: 'date',
                   key: 'date',
                 },
@@ -437,7 +437,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
               <div>
                 {importResult.success ? (
                   <Alert
-                    message='Import Successful'
+                    message={t('transaction.importSuccessful')}
                     description={`Successfully imported ${importResult.imported} transactions`}
                     type='success'
                     icon={<CheckCircleOutlined />}
@@ -445,8 +445,8 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
                   />
                 ) : (
                   <Alert
-                    message='Import Failed'
-                    description='There were errors during the import process'
+                    message={t('transaction.importFailed')}
+                    description={t('transaction.thereWereErrorsDuringImportProcess')}
                     type='error'
                     icon={<ExclamationCircleOutlined />}
                     style={{ marginBottom: 16 }}
@@ -454,7 +454,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
                 )}
 
                 {importResult.errors.length > 0 && (
-                  <Card title='Errors' style={{ marginBottom: 16 }}>
+                  <Card title={t('transaction.errors')} style={{ marginBottom: 16 }}>
                     {importResult.errors.map((error, index) => (
                       <div key={index} style={{ marginBottom: 8 }}>
                         <Text type='danger'>
@@ -466,7 +466,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
                 )}
 
                 {importResult.warnings.length > 0 && (
-                  <Card title='Warnings' style={{ marginBottom: 16 }}>
+                  <Card title={t('transaction.warnings')} style={{ marginBottom: 16 }}>
                     {importResult.warnings.map((warning, index) => (
                       <div key={index} style={{ marginBottom: 8 }}>
                         <Text type='warning'>
@@ -506,7 +506,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
 
   return (
     <Modal
-      title='Import Transactions'
+      title={t('transaction.importTransactions')}
       open={visible}
       onCancel={handleClose}
       footer={null}
