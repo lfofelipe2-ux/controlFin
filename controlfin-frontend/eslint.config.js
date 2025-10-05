@@ -4,6 +4,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import noHardcodedStrings from '../eslint-plugins/no-hardcoded-strings/index.js';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -15,13 +16,17 @@ export default defineConfig([
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
+    plugins: {
+      'no-hardcoded-strings': noHardcodedStrings,
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
     rules: {
-      'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+      'no-console': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      'no-hardcoded-strings/no-hardcoded-strings': 'error',
     },
   },
 ]);
