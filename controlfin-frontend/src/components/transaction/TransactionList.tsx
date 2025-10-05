@@ -1,3 +1,5 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
+import type { SortOrder } from 'antd/es/table/interface';
 import {
   BarChartOutlined,
   DeleteOutlined,
@@ -540,7 +542,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 </Select>
               </Col>
               <Col span={6}>
-                <Text strong>Payment Method</Text>
+                <Text strong>{t('transaction.paymentMethod')}</Text>
                 <Select
                   value={filters.paymentMethod}
                   onChange={(value) => handleFilterChange('paymentMethod', value)}

@@ -267,7 +267,7 @@ export const useTransactionStore = create<TransactionState>()(
       //     set({ isExporting: true, error: null });
       //     try {
       //         // TODO: Implement export functionality
-      //         console.log('Exporting data with options:', options);
+      //         logger.info('Exporting data with options:', options);
       //     } catch (error) {
       //         set({ error: error instanceof Error ? error.message : 'Export failed' });
       //     } finally {
@@ -279,7 +279,7 @@ export const useTransactionStore = create<TransactionState>()(
       //     set({ isImporting: true, error: null });
       //     try {
       //         // TODO: Implement import functionality
-      //         console.log('Importing file:', file.name);
+      //         logger.info('Importing file:', file.name);
       //         const result: ImportResult = {
       //             success: true,
       //             imported: 0,

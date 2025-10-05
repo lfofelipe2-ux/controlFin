@@ -46,9 +46,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
           fontSize: '16px',
           color: '#666',
         }}
-      >
-        Loading...
-      </div>
+      >Loading...</div>
     );
   }
 

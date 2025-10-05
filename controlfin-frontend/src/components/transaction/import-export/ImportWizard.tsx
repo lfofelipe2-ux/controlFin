@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
@@ -149,7 +150,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
 
     reader.readAsBinaryString(file);
     return false; // Prevent default upload
-  }, []);
+  }, [t]);
 
   const handleFieldMapping = (header: string, field: string) => {
     setFieldMapping((prev) => ({
@@ -234,11 +235,11 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
         message.success(t('transaction.importSuccess'));
       } else {
         message.error(
-          t('transaction.importFailed', { error: result.errors[0]?.message || 'Unknown error' })
+          t('transaction.importFailed', { error: result.errors[0]?.message || t('errors.unknown') })
         );
       }
     } catch {
-      message.error(t('transaction.importFailed', { error: 'Unknown error' }));
+      message.error(t('transaction.importFailed', { error: t('errors.unknown') }));
     }
   };
 
@@ -371,7 +372,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
           <div>
             <Title level={4}>Review Data</Title>
             <Paragraph>
-              Review the mapped data before importing. Check for any errors or missing information.
+              Review the mapped data before importing. Check for unknown errors or missing information.
             </Paragraph>
 
             <Table

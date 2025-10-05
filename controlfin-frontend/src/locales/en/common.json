@@ -172,6 +172,7 @@
     "total": "Total",
     "add": "Add Transaction",
     "view": "View Transaction",
+    "delete": "Delete Transaction",
     "deleteConfirm": "Are you sure you want to delete this transaction?",
     "deleteSuccess": "Transaction deleted successfully",
     "importSuccess": "Filter preset loaded successfully",

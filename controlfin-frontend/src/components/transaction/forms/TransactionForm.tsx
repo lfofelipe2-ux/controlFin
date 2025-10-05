@@ -94,7 +94,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         description: values.description as string,
         categoryId: values.categoryId as string,
         paymentMethodId: values.paymentMethodId as string,
-        date: (values.date as any).format('YYYY-MM-DD'),
+        date: (values.date as dayjs.Dayjs).format('YYYY-MM-DD'),
         tags: formData.tags,
         isRecurring: (values.isRecurring as boolean | undefined) || false,
         metadata: {

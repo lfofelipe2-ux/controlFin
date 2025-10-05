@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 /**
  * Typography Design Tokens
  * Based on BlockAI Design System

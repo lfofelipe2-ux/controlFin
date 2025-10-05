@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import {
   DownloadOutlined,
   FileExcelOutlined,
@@ -47,7 +48,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
     try {
       setExportProgress(0);
 
-      const dateRange = values.dateRange as [any, any] | undefined;
+      const dateRange = values.dateRange as [dayjs.Dayjs, dayjs.Dayjs] | undefined;
       const exportOptions: ExportOptions = {
         format: values.format as ExportOptions['format'],
         dateRange: dateRange

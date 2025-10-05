@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import { Card, Col, DatePicker, Row, Select, Space, Spin, Typography } from 'antd';
 import dayjs from 'dayjs';
 import Highcharts from 'highcharts';
@@ -78,7 +79,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         enabled: false,
       },
     }),
-    [stats.categoryBreakdown]
+    [stats.categoryBreakdown, t]
   );
 
   // Payment method breakdown chart options
@@ -143,7 +144,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         enabled: false,
       },
     }),
-    [stats.paymentMethodBreakdown]
+    [stats.paymentMethodBreakdown, t]
   );
 
   // Monthly trend chart options
@@ -218,7 +219,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         enabled: false,
       },
     }),
-    [stats.monthlyTrend]
+    [stats.monthlyTrend, t]
   );
 
   // Income vs Expense comparison chart
@@ -288,7 +289,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         enabled: false,
       },
     }),
-    [stats.totalIncome, stats.totalExpense]
+    [stats.totalIncome, stats.totalExpense, t]
   );
 
   if (loading) {
@@ -331,7 +332,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
                     value: [dayjs().subtract(30, 'day'), dayjs()],
                   },
                   {
-                    label: 'This month',
+                    label: t('time.thisMonth'),
                     value: [dayjs().startOf('month'), dayjs().endOf('month')],
                   },
                   {

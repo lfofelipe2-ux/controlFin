@@ -223,7 +223,7 @@ export const TransactionManagement: React.FC = () => {
       message.success(`Successfully imported ${result.imported} transactions`);
     } else {
       message.error(
-        t('transaction.importFailed', { error: result.errors[0]?.message || 'Unknown error' })
+        t('transaction.importFailed', { error: result.errors[0]?.message || t('errors.unknown') })
       );
     }
   };

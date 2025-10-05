@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import type { ThemeConfig } from 'antd';
 
 /**

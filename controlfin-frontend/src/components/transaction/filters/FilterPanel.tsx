@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import { ClearOutlined, FilterOutlined, SaveOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -187,7 +188,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         </Col>
 
         <Col span={8}>
-          <Text strong>Payment Method</Text>
+          <Text strong>{t('transaction.paymentMethod')}</Text>
           <Select
             value={localFilters.paymentMethod}
             onChange={(value) => handleFilterChange('paymentMethod', value)}

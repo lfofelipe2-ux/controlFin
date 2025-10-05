@@ -5,28 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../../../config/i18n';
 import { TransactionList } from '../TransactionList';
 
-const mockTransactions = [
-  {
-    id: '1',
-    description: 'Grocery Shopping',
-    amount: 150.5,
-    type: 'expense',
-    category: 'Food',
-    paymentMethod: 'Credit Card',
-    date: '2025-01-01',
-    tags: ['grocery', 'food'],
-  },
-  {
-    id: '2',
-    description: 'Salary',
-    amount: 5000.0,
-    type: 'income',
-    category: 'Salary',
-    paymentMethod: 'Bank Transfer',
-    date: '2025-01-01',
-    tags: ['salary', 'work'],
-  },
-];
+// Mock transactions removed as they were not being used
 
 const mockProps = {
   onAddTransaction: vi.fn(),

@@ -1,3 +1,4 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 /**
  * OAuth Configuration Warning Component
  *

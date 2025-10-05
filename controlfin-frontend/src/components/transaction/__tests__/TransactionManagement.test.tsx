@@ -66,7 +66,7 @@ describe('TransactionManagement', () => {
   });
 
   it('displays error state', () => {
-    mockTransactionStore.error = 'Failed to load transactions';
+    (mockTransactionStore as { error: string | null }).error = 'Failed to load transactions';
     renderWithProviders(<TransactionManagement />);
 
     // Test passes if component renders without throwing
@@ -96,7 +96,7 @@ describe('TransactionManagement', () => {
   });
 
   it('displays transaction list when transactions are available', () => {
-    mockTransactionStore.transactions = [
+    (mockTransactionStore as { transactions: unknown[] }).transactions = [
       {
         id: '1',
         description: 'Test Transaction',
