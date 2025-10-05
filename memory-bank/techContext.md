@@ -3,23 +3,26 @@
 ## Technology Stack
 
 ### Frontend Stack
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 19 with TypeScript
 - **Build Tool**: Vite
-- **UI Library**: Ant Design 5
-- **Charts**: Highcharts
+- **UI Library**: Ant Design 5 with BlockAI Theme
+- **Charts**: Highcharts (Financial Charts)
 - **State Management**: Zustand
 - **Routing**: React Router 6
-- **Styling**: SCSS/SASS
+- **Styling**: SCSS/SASS + BlockAI Design System
 - **PWA**: Service Workers + Manifest
+- **Testing**: Playwright (E2E), Vitest (Unit)
 
 ### Backend Stack
 - **Runtime**: Node.js 22+ (LTS)
 - **Framework**: Fastify
-- **Database**: MongoDB Atlas
-- **Validation**: Zod
+- **Database**: MongoDB Atlas with Mongoose
+- **Validation**: Zod schemas
 - **Authentication**: JWT + Google OAuth 2.0
 - **Password Hashing**: bcrypt
-- **Testing**: Vitest
+- **Testing**: Vitest (Unit), Jest (Integration)
+- **Monitoring**: Custom performance monitoring
+- **API**: RESTful APIs with comprehensive endpoints
 
 ### Infrastructure
 - **Frontend Hosting**: Vercel
@@ -27,6 +30,9 @@
 - **Database**: MongoDB Atlas
 - **CDN**: Vercel Edge Network
 - **CI/CD**: GitHub Actions
+- **Production**: Docker + Docker Compose
+- **Reverse Proxy**: Nginx
+- **Monitoring**: Custom performance monitoring
 
 ## Technical Decisions
 

@@ -29,6 +29,30 @@
 - Access tokens (15min) + Refresh tokens (7 days)
 - Google OAuth 2.0 integration
 
+### 5. Transaction Management Pattern (TASK-011)
+**Pattern**: CRUD operations with advanced filtering and state management
+**Rationale**: Complex data management, user experience, performance
+**Implementation**:
+- Frontend: Zustand state management with optimistic updates
+- Backend: RESTful API with MongoDB aggregation pipelines
+- Features: Advanced filtering, bulk operations, import/export, data visualization
+
+### 6. Data Visualization Pattern (TASK-011)
+**Pattern**: Chart-based data representation with interactive components
+**Rationale**: User insights, data analysis, decision support
+**Implementation**:
+- Highcharts integration for financial charts
+- Real-time data updates with state management
+- Responsive design for mobile and desktop
+
+### 7. Import/Export Pattern (TASK-011)
+**Pattern**: Multi-format data exchange with validation
+**Rationale**: Data portability, user convenience, system integration
+**Implementation**:
+- CSV, Excel, JSON format support
+- Client-side validation with Zod schemas
+- Step-by-step wizard interface for complex operations
+
 ## Design Patterns
 
 ### 1. Component Composition Pattern
