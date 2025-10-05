@@ -80,7 +80,7 @@ module.exports = {
                     // Check for duplicates within each file individually
                     for (const filePath of translationFiles) {
                         const { keys, errors } = parseTranslationFile(filePath);
-                        
+
                         if (errors.length > 0) {
                             context.report({
                                 loc: { line: 1, column: 0 },
