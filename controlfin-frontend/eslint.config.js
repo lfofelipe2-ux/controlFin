@@ -21,6 +21,7 @@ export default defineConfig([
     },
     rules: {
       'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
 ]);
