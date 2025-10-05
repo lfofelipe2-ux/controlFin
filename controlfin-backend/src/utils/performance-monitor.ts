@@ -100,7 +100,7 @@ export const performanceMiddleware = async (request: any, reply: any) => {
 
 // Decorator for monitoring function performance
 export function monitorPerformance(operationName: string) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {

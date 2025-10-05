@@ -32,7 +32,9 @@ vi.mock('../../../stores/transactionStore', () => ({
 // Mock Highcharts
 vi.mock('highcharts-react-official', () => ({
   __esModule: true,
-  default: ({ options }: any) => <div data-testid='chart' data-options={JSON.stringify(options)} />,
+  default: ({ options }: { options: unknown }) => (
+    <div data-testid='chart' data-options={JSON.stringify(options)} />
+  ),
 }));
 
 const renderWithProviders = (component: React.ReactElement) => {

@@ -31,6 +31,7 @@ import type { SortOrder } from 'antd/es/table/interface';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTransactionStore } from '../../stores/transactionStore';
 import type { Transaction, TransactionFilters } from '../../types/transaction';
 
@@ -58,6 +59,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onImportData,
   onViewCharts,
 }) => {
+  const { t } = useTranslation();
   const {
     transactions,
     categories,
@@ -148,27 +150,31 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
     // Sort transactions
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number | Date, bValue: string | number | Date;
 
       switch (sortBy) {
-        case 'date':
+        case 'date': {
           aValue = new Date(a.date);
           bValue = new Date(b.date);
           break;
-        case 'amount':
+        }
+        case 'amount': {
           aValue = a.amount;
           bValue = b.amount;
           break;
-        case 'description':
+        }
+        case 'description': {
           aValue = a.description.toLowerCase();
           bValue = b.description.toLowerCase();
           break;
-        case 'category':
+        }
+        case 'category': {
           const categoryA = categories.find((c) => c.id === a.categoryId);
           const categoryB = categories.find((c) => c.id === b.categoryId);
           aValue = categoryA?.name || '';
           bValue = categoryB?.name || '';
           break;
+        }
         default:
           return 0;
       }
@@ -192,7 +198,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     setTotalCount(filteredTransactions.length);
   }, [filteredTransactions.length, setTotalCount]);
 
-  const handleFilterChange = (key: keyof TransactionFilters, value: any) => {
+  const handleFilterChange = (
+    key: keyof TransactionFilters,
+    value: string | number | boolean | null
+  ) => {
     setFilters({ [key]: value });
   };
 
@@ -214,12 +223,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   const getCategoryName = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId);
-    return category?.name || 'Unknown';
+    return category?.name || t('transaction.unknown');
   };
 
   const getPaymentMethodName = (paymentMethodId: string) => {
     const paymentMethod = paymentMethods.find((pm) => pm.id === paymentMethodId);
-    return paymentMethod?.name || 'Unknown';
+    return paymentMethod?.name || t('transaction.unknown');
   };
 
   const getTransactionTypeColor = (type: string) => {
@@ -250,7 +259,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   const columns = [
     {
-      title: 'Type',
+      title: t('transaction.type'),
       dataIndex: 'type',
       key: 'type',
       width: 80,
@@ -263,7 +272,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       sortOrder: sortBy === 'type' ? (sortOrder as SortOrder) : undefined,
     },
     {
-      title: 'Description',
+      title: t('transaction.description'),
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
@@ -285,7 +294,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       sortOrder: sortBy === 'description' ? (sortOrder as SortOrder) : undefined,
     },
     {
-      title: 'Amount',
+      title: t('transaction.amount'),
       dataIndex: 'amount',
       key: 'amount',
       width: 120,
@@ -310,7 +319,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       sortOrder: sortBy === 'amount' ? (sortOrder as SortOrder) : undefined,
     },
     {
-      title: 'Category',
+      title: t('transaction.category'),
       dataIndex: 'categoryId',
       key: 'category',
       width: 120,
@@ -319,14 +328,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       sortOrder: sortBy === 'category' ? (sortOrder as SortOrder) : undefined,
     },
     {
-      title: 'Payment Method',
+      title: t('transaction.paymentMethod'),
       dataIndex: 'paymentMethodId',
       key: 'paymentMethod',
       width: 120,
       render: (paymentMethodId: string) => getPaymentMethodName(paymentMethodId),
     },
     {
-      title: 'Date',
+      title: t('transaction.date'),
       dataIndex: 'date',
       key: 'date',
       width: 100,
@@ -335,28 +344,28 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       sortOrder: sortBy === 'date' ? (sortOrder as SortOrder) : undefined,
     },
     {
-      title: 'Actions',
+      title: t('transaction.actions'),
       key: 'actions',
       width: 100,
-      render: (_: any, record: Transaction) => (
+      render: (_: unknown, record: Transaction) => (
         <Dropdown
           menu={{
             items: [
               {
                 key: 'view',
-                label: 'View',
+                label: t('transaction.view'),
                 icon: <EyeOutlined />,
                 onClick: () => onViewTransaction(record),
               },
               {
                 key: 'edit',
-                label: 'Edit',
+                label: t('transaction.edit'),
                 icon: <EditOutlined />,
                 onClick: () => onEditTransaction(record),
               },
               {
                 key: 'delete',
-                label: 'Delete',
+                label: t('transaction.delete'),
                 icon: <DeleteOutlined />,
                 danger: true,
                 onClick: () => onDeleteTransaction(record.id),
@@ -371,15 +380,20 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     },
   ];
 
-  const handleTableChange = (pagination: any, _tableFilters: any, sorter: any) => {
-    if (sorter.field) {
-      handleSortChange(sorter.field);
+  const handleTableChange = (
+    pagination: { current?: number; pageSize?: number },
+    _tableFilters: unknown,
+    sorter: { field?: string | string[] }
+  ) => {
+    const sortField = Array.isArray(sorter.field) ? sorter.field[0] : sorter.field;
+    if (sortField) {
+      handleSortChange(sortField);
     }
     if (pagination.current !== currentPage) {
-      setPage(pagination.current);
+      setPage(pagination.current || 1);
     }
     if (pagination.pageSize !== pageSize) {
-      setPageSize(pagination.pageSize);
+      setPageSize(pagination.pageSize || 10);
     }
   };
 
@@ -391,7 +405,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   if (error) {
     return (
       <Card>
-        <Empty description='Failed to load transactions' image={Empty.PRESENTED_IMAGE_SIMPLE}>
+        <Empty description={t('transaction.failedToLoad')} image={Empty.PRESENTED_IMAGE_SIMPLE}>
           <Button type='primary' onClick={refreshData}>
             Try Again
           </Button>
@@ -408,7 +422,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           <Row gutter={16}>
             <Col span={6}>
               <Statistic
-                title='Total Income'
+                title={t('transaction.totalIncome')}
                 value={stats.totalIncome}
                 prefix='$'
                 valueStyle={{ color: '#52c41a' }}
@@ -416,7 +430,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             </Col>
             <Col span={6}>
               <Statistic
-                title='Total Expense'
+                title={t('transaction.totalExpense')}
                 value={stats.totalExpense}
                 prefix='$'
                 valueStyle={{ color: '#ff4d4f' }}
@@ -424,7 +438,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             </Col>
             <Col span={6}>
               <Statistic
-                title='Net Amount'
+                title={t('transaction.netAmount')}
                 value={stats.netAmount}
                 prefix='$'
                 valueStyle={{ color: stats.netAmount >= 0 ? '#52c41a' : '#ff4d4f' }}
@@ -432,7 +446,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             </Col>
             <Col span={6}>
               <Statistic
-                title='Transactions'
+                title={t('transaction.transactions')}
                 value={stats.transactionCount}
                 suffix={`this ${dayjs().format('MMMM')}`}
               />
@@ -508,7 +522,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   onChange={(value) => handleFilterChange('category', value)}
                   style={{ width: '100%', marginTop: 4 }}
                   allowClear
-                  placeholder='Select category'
+                  placeholder={t('transaction.selectCategory')}
                 >
                   {categories.map((category) => (
                     <Option key={category.id} value={category.id}>
@@ -524,7 +538,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   onChange={(value) => handleFilterChange('paymentMethod', value)}
                   style={{ width: '100%', marginTop: 4 }}
                   allowClear
-                  placeholder='Select payment method'
+                  placeholder={t('transaction.selectPaymentMethod')}
                 >
                   {paymentMethods.map((pm) => (
                     <Option key={pm.id} value={pm.id}>
@@ -560,7 +574,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   onChange={(value) => handleFilterChange('isRecurring', value)}
                   style={{ width: '100%', marginTop: 4 }}
                   allowClear
-                  placeholder='All transactions'
+                  placeholder={t('transaction.allTransactions')}
                 >
                   <Option value={true}>Recurring only</Option>
                   <Option value={false}>One-time only</Option>

@@ -22,6 +22,7 @@ import {
   Upload,
 } from 'antd';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as XLSX from 'xlsx';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { ImportResult, TransactionFormData } from '../../../types/transaction';
@@ -38,7 +39,7 @@ interface ImportWizardProps {
 }
 
 interface ParsedData {
-  data: any[];
+  data: Record<string, unknown>[];
   headers: string[];
   errors: string[];
 }
@@ -48,6 +49,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
   onClose,
   onImportComplete,
 }) => {
+  const { t } = useTranslation();
   const { isImporting } = useTransactionStore();
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -99,7 +101,13 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
         }
 
         const headers = jsonData[0] as string[];
-        const dataRows = jsonData.slice(1) as any[][];
+        const dataRows = (jsonData.slice(1) as unknown[][]).map((row) => {
+          const rowData: Record<string, unknown> = {};
+          headers.forEach((header, index) => {
+            rowData[header] = row[index];
+          });
+          return rowData;
+        });
 
         // Auto-map common field names
         const autoMapping: Record<string, string> = {};
@@ -134,9 +142,8 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
           headers,
           errors: [],
         });
-      } catch (error) {
+      } catch {
         message.error('Failed to parse file. Please check the file format.');
-        console.error('File parsing error:', error);
       }
     };
 
@@ -159,7 +166,7 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
 
     parsedData.data.forEach((row, _index) => {
       try {
-        const mappedRow: any = {};
+        const mappedRow: Record<string, unknown> = {};
 
         // Map each field
         Object.entries(fieldMapping).forEach(([header, field]) => {
@@ -177,18 +184,22 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
         }
 
         // Transform data to proper format
+        const typeValue = mappedRow.type as string | undefined;
+        const amountValue = mappedRow.amount as string | number | undefined;
+        const tagsValue = mappedRow.tags as string | undefined;
+
         const transactionData: TransactionFormData = {
-          type: mappedRow.type?.toLowerCase() || 'expense',
-          amount: parseFloat(mappedRow.amount) || 0,
-          description: mappedRow.description || '',
-          categoryId: mappedRow.categoryId || '',
-          paymentMethodId: mappedRow.paymentMethodId || '',
-          date: mappedRow.date || new Date().toISOString().split('T')[0],
-          tags: mappedRow.tags ? mappedRow.tags.split(',').map((tag: string) => tag.trim()) : [],
+          type: (typeValue?.toString().toLowerCase() || 'expense') as TransactionFormData['type'],
+          amount: parseFloat(amountValue?.toString() || '0') || 0,
+          description: (mappedRow.description as string | undefined) || '',
+          categoryId: (mappedRow.categoryId as string | undefined) || '',
+          paymentMethodId: (mappedRow.paymentMethodId as string | undefined) || '',
+          date: (mappedRow.date as string | undefined) || new Date().toISOString().split('T')[0],
+          tags: tagsValue ? tagsValue.split(',').map((tag) => tag.trim()) : [],
           isRecurring: mappedRow.isRecurring === 'true' || mappedRow.isRecurring === true,
           metadata: {
-            location: mappedRow.location || '',
-            notes: mappedRow.notes || '',
+            location: (mappedRow.location as string | undefined) || '',
+            notes: (mappedRow.notes as string | undefined) || '',
           },
         };
 
@@ -220,12 +231,14 @@ export const ImportWizard: React.FC<ImportWizardProps> = ({
       onImportComplete(result);
 
       if (result.success) {
-        message.success(`Successfully imported ${result.imported} transactions`);
+        message.success(t('transaction.importSuccess'));
       } else {
-        message.error(`Import failed: ${result.errors[0]?.message || 'Unknown error'}`);
+        message.error(
+          t('transaction.importFailed', { error: result.errors[0]?.message || 'Unknown error' })
+        );
       }
-    } catch (error) {
-      message.error('Import failed. Please try again.');
+    } catch {
+      message.error(t('transaction.importFailed', { error: 'Unknown error' }));
     }
   };
 

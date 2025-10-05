@@ -22,6 +22,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as XLSX from 'xlsx';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { ExportOptions, Transaction } from '../../../types/transaction';
@@ -37,22 +38,24 @@ interface ExportPanelProps {
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, transactions }) => {
+  const { t } = useTranslation();
   const { isExporting } = useTransactionStore();
   const [form] = Form.useForm();
   const [exportProgress, setExportProgress] = useState(0);
 
-  const handleExport = async (values: any) => {
+  const handleExport = async (values: Record<string, unknown>) => {
     try {
       setExportProgress(0);
 
+      const dateRange = values.dateRange as [Dayjs, Dayjs] | undefined;
       const exportOptions: ExportOptions = {
-        format: values.format,
-        dateRange: values.dateRange
-          ? [values.dateRange[0].format('YYYY-MM-DD'), values.dateRange[1].format('YYYY-MM-DD')]
+        format: values.format as ExportOptions['format'],
+        dateRange: dateRange
+          ? [dateRange[0].format('YYYY-MM-DD'), dateRange[1].format('YYYY-MM-DD')]
           : [dayjs().subtract(1, 'month').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')],
-        includeCategories: values.includeCategories || false,
-        includePaymentMethods: values.includePaymentMethods || false,
-        includeMetadata: values.includeMetadata || false,
+        includeCategories: (values.includeCategories as boolean | undefined) || false,
+        includePaymentMethods: (values.includePaymentMethods as boolean | undefined) || false,
+        includeMetadata: (values.includeMetadata as boolean | undefined) || false,
       };
 
       // Filter transactions by date range
@@ -68,27 +71,27 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
 
       // Prepare data for export
       const exportDataArray = filteredTransactions.map((transaction) => {
-        const baseData: any = {
+        const baseData: Record<string, string> = {
           'Transaction ID': transaction.id,
           Type: transaction.type.toUpperCase(),
-          Amount: transaction.amount,
+          Amount: transaction.amount.toString(),
           Description: transaction.description,
           Date: dayjs(transaction.date).format('YYYY-MM-DD'),
           Tags: transaction.tags.join(', '),
-          Recurring: transaction.isRecurring ? 'Yes' : 'No',
+          Recurring: transaction.isRecurring ? t('common.yes') : t('common.no'),
         };
 
         if (exportOptions.includeCategories) {
-          baseData['Category'] = transaction.categoryId; // Would need to resolve to name
+          baseData[t('transaction.category')] = transaction.categoryId; // Would need to resolve to name
         }
 
         if (exportOptions.includePaymentMethods) {
-          baseData['Payment Method'] = transaction.paymentMethodId; // Would need to resolve to name
+          baseData[t('transaction.paymentMethod')] = transaction.paymentMethodId; // Would need to resolve to name
         }
 
         if (exportOptions.includeMetadata) {
-          baseData['Location'] = transaction.metadata.location || '';
-          baseData['Notes'] = transaction.metadata.notes || '';
+          baseData[t('transaction.location')] = transaction.metadata.location || '';
+          baseData[t('transaction.notes')] = transaction.metadata.notes || '';
         }
 
         return baseData;
@@ -99,7 +102,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
       // Generate file based on format
       let fileName = `transactions_${dayjs().format('YYYY-MM-DD')}`;
       let mimeType = '';
-      let fileContent: any;
+      let fileContent: string;
 
       switch (exportOptions.format) {
         case 'csv':
@@ -141,7 +144,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
     }
   };
 
-  const convertToCSV = (data: any[]) => {
+  const convertToCSV = (data: Record<string, string>[]) => {
     if (data.length === 0) return '';
 
     const headers = Object.keys(data[0]);
@@ -164,7 +167,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
     return csvContent;
   };
 
-  const convertToExcel = (data: any[]) => {
+  const convertToExcel = (data: Record<string, string>[]) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
@@ -173,7 +176,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
     return XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
   };
 
-  const downloadFile = (content: any, fileName: string, mimeType: string) => {
+  const downloadFile = (content: string | ArrayBuffer, fileName: string, mimeType: string) => {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -193,7 +196,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
 
   return (
     <Modal
-      title='Export Transactions'
+      title={t('transaction.export')}
       open={visible}
       onCancel={handleClose}
       footer={null}
@@ -217,8 +220,8 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
           <Col span={12}>
             <Form.Item
               name='format'
-              label='Export Format'
-              rules={[{ required: true, message: 'Please select export format' }]}
+              label={t('transaction.exportFormat')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectFormat') }]}
             >
               <Select>
                 <Option value='excel'>
@@ -246,8 +249,8 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
           <Col span={12}>
             <Form.Item
               name='dateRange'
-              label='Date Range'
-              rules={[{ required: true, message: 'Please select date range' }]}
+              label={t('transaction.dateRange')}
+              rules={[{ required: true, message: t('transaction.pleaseSelectDateRange') }]}
             >
               <RangePicker
                 style={{ width: '100%' }}
@@ -261,7 +264,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ visible, onClose, tran
                     value: [dayjs().subtract(30, 'day'), dayjs()],
                   },
                   {
-                    label: 'This month',
+                    label: t('transaction.thisMonth'),
                     value: [dayjs().startOf('month'), dayjs().endOf('month')],
                   },
                   {

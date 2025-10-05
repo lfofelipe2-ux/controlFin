@@ -84,20 +84,20 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     setFormData({ tags: newTags });
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     try {
       const submitData: TransactionFormData = {
-        type: values.type,
-        amount: values.amount,
-        description: values.description,
-        categoryId: values.categoryId,
-        paymentMethodId: values.paymentMethodId,
-        date: values.date.format('YYYY-MM-DD'),
+        type: values.type as TransactionFormData['type'],
+        amount: values.amount as number,
+        description: values.description as string,
+        categoryId: values.categoryId as string,
+        paymentMethodId: values.paymentMethodId as string,
+        date: (values.date as Dayjs).format('YYYY-MM-DD'),
         tags: formData.tags,
-        isRecurring: values.isRecurring || false,
+        isRecurring: (values.isRecurring as boolean | undefined) || false,
         metadata: {
-          location: values.location || '',
-          notes: values.notes || '',
+          location: (values.location as string | undefined) || '',
+          notes: (values.notes as string | undefined) || '',
         },
       };
 

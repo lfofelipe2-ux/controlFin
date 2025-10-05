@@ -3,7 +3,7 @@ import { PerformanceMonitor } from './performance-monitor';
 
 // Create logger instance
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env['LOG_LEVEL'] || 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
@@ -17,7 +17,7 @@ const logger = winston.createLogger({
 });
 
 // Add console transport in development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env['NODE_ENV'] !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
@@ -91,7 +91,7 @@ export class MonitoringSystem {
     this.logEvent({
       type: 'warning',
       message,
-      metadata,
+      metadata: metadata || {},
     });
   }
 
@@ -99,7 +99,7 @@ export class MonitoringSystem {
     this.logEvent({
       type: 'info',
       message,
-      metadata,
+      metadata: metadata || {},
     });
   }
 
@@ -119,7 +119,7 @@ export class MonitoringSystem {
     this.logEvent({
       type: 'security',
       message,
-      metadata,
+      metadata: metadata || {},
     });
   }
 
@@ -157,24 +157,24 @@ export class MonitoringSystem {
     // Database connectivity check
     try {
       // This would be a real database ping in production
-      checks.database = { status: 'healthy', responseTime: 10 };
+      checks['database'] = { status: 'healthy', responseTime: 10 };
     } catch (error) {
-      checks.database = { status: 'unhealthy', error: error.message };
+      checks['database'] = { status: 'unhealthy', error: (error as Error).message };
       overallStatus = 'unhealthy';
     }
 
     // Memory usage check
     const memoryUsage = process.memoryUsage();
     const memoryUsageMB = memoryUsage.heapUsed / 1024 / 1024;
-    checks.memory = {
+    checks['memory'] = {
       status: memoryUsageMB < 500 ? 'healthy' : memoryUsageMB < 1000 ? 'degraded' : 'unhealthy',
       heapUsed: memoryUsageMB,
       heapTotal: memoryUsage.heapTotal / 1024 / 1024,
     };
 
-    if (checks.memory.status === 'unhealthy') {
+    if (checks['memory'].status === 'unhealthy') {
       overallStatus = 'unhealthy';
-    } else if (checks.memory.status === 'degraded') {
+    } else if (checks['memory'].status === 'degraded') {
       overallStatus = 'degraded';
     }
 
@@ -182,13 +182,13 @@ export class MonitoringSystem {
     const performanceMetrics = this.getPerformanceMetrics();
     const slowOperations = this.getSlowOperations(2000); // 2 second threshold
 
-    checks.performance = {
+    checks['performance'] = {
       status: slowOperations.length === 0 ? 'healthy' : 'degraded',
       averageResponseTime: performanceMetrics.averageDuration,
       slowOperations: slowOperations.length,
     };
 
-    if (checks.performance.status === 'degraded' && overallStatus === 'healthy') {
+    if (checks['performance'].status === 'degraded' && overallStatus === 'healthy') {
       overallStatus = 'degraded';
     }
 
@@ -201,7 +201,6 @@ export class MonitoringSystem {
 
   // Alert methods
   async checkAlerts(): Promise<void> {
-    const performanceMetrics = this.getPerformanceMetrics();
     const slowOperations = this.getSlowOperations(5000); // 5 second threshold
 
     // Alert on slow operations

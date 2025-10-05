@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Layout, message, Modal, Space, Tabs, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTransactionStore } from '../../stores/transactionStore';
 import type {
   ImportResult,
@@ -25,6 +26,7 @@ const { Content } = Layout;
 const { Title } = Typography;
 
 export const TransactionManagement: React.FC = () => {
+  const { t } = useTranslation();
   const {
     transactions,
     stats,
@@ -174,42 +176,38 @@ export const TransactionManagement: React.FC = () => {
 
   const handleDeleteTransaction = (id: string) => {
     Modal.confirm({
-      title: 'Delete Transaction',
-      content: 'Are you sure you want to delete this transaction? This action cannot be undone.',
-      okText: 'Delete',
+      title: t('transaction.delete'),
+      content: t('transaction.deleteConfirm'),
+      okText: t('buttons.delete'),
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: t('buttons.cancel'),
       onOk: () => {
         deleteTransaction(id);
-        message.success('Transaction deleted successfully');
+        message.success(t('transaction.deleteSuccess'));
       },
     });
   };
 
   const handleSaveTransaction = async (data: TransactionFormData) => {
-    try {
-      if (formMode === 'create') {
-        const newTransaction: Transaction = {
-          id: Date.now().toString(),
-          spaceId: 'space1',
-          userId: 'user1',
-          ...data,
-          date: data.date,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        addTransaction(newTransaction);
-      } else if (formMode === 'edit' && selectedTransaction) {
-        updateTransaction(selectedTransaction.id, {
-          ...data,
-          date: data.date,
-          updatedAt: new Date().toISOString(),
-        });
-      }
-      closeForm();
-    } catch (error) {
-      throw error;
+    if (formMode === 'create') {
+      const newTransaction: Transaction = {
+        id: Date.now().toString(),
+        spaceId: 'space1',
+        userId: 'user1',
+        ...data,
+        date: data.date,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      addTransaction(newTransaction);
+    } else if (formMode === 'edit' && selectedTransaction) {
+      updateTransaction(selectedTransaction.id, {
+        ...data,
+        date: data.date,
+        updatedAt: new Date().toISOString(),
+      });
     }
+    closeForm();
   };
 
   const handleExportData = () => {
@@ -224,7 +222,9 @@ export const TransactionManagement: React.FC = () => {
     if (result.success) {
       message.success(`Successfully imported ${result.imported} transactions`);
     } else {
-      message.error(`Import failed: ${result.errors[0]?.message || 'Unknown error'}`);
+      message.error(
+        t('transaction.importFailed', { error: result.errors[0]?.message || 'Unknown error' })
+      );
     }
   };
 
@@ -257,7 +257,7 @@ export const TransactionManagement: React.FC = () => {
 
   const handleLoadPreset = (filters: TransactionFilters) => {
     setFilters(filters);
-    message.success('Filter preset loaded successfully');
+    message.success(t('transaction.importSuccess'));
   };
 
   const handleDateRangeChange = (dates: [string, string]) => {
@@ -266,7 +266,8 @@ export const TransactionManagement: React.FC = () => {
 
   const handleChartTypeChange = (type: string) => {
     // Handle chart type change
-    console.log('Chart type changed to:', type);
+    // Future implementation: setChartType(type);
+    void type; // Suppress unused variable warning temporarily
   };
 
   if (error) {
@@ -358,10 +359,10 @@ export const TransactionManagement: React.FC = () => {
           <Modal
             title={
               formMode === 'create'
-                ? 'Add Transaction'
+                ? t('transaction.add')
                 : formMode === 'edit'
-                  ? 'Edit Transaction'
-                  : 'View Transaction'
+                  ? t('transaction.edit')
+                  : t('transaction.view')
             }
             open={isFormOpen}
             onCancel={closeForm}
@@ -393,7 +394,7 @@ export const TransactionManagement: React.FC = () => {
 
         {/* Filter Panel Modal */}
         <Modal
-          title='Advanced Filters'
+          title={t('transaction.advancedFilters')}
           open={showFilterPanel}
           onCancel={() => setShowFilterPanel(false)}
           footer={null}

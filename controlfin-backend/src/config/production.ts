@@ -4,13 +4,13 @@ export const productionConfig = {
   // Server configuration
   server: {
     port: env.port || 3001,
-    host: env.host || '0.0.0.0',
+    host: '0.0.0.0',
     trustProxy: true,
   },
 
   // Database configuration
   database: {
-    uri: env.databaseUrl,
+    uri: env.mongodbUri,
     options: {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
@@ -44,7 +44,7 @@ export const productionConfig = {
 
   // Logging configuration
   logging: {
-    level: env.logLevel || 'info',
+    level: 'info',
     format: 'json',
     transports: [
       {
@@ -78,9 +78,9 @@ export const productionConfig = {
   // Google OAuth configuration
   oauth: {
     google: {
-      clientId: env.googleClientId,
-      clientSecret: env.googleClientSecret,
-      callbackUrl: `${env.backendUrl}/api/auth/google/callback`,
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      callbackUrl: `${process.env.BACKEND_URL || 'http://localhost:3001'}/api/auth/google/callback`,
     },
   },
 
@@ -102,12 +102,12 @@ export const productionConfig = {
   email: {
     enabled: false, // Disabled by default
     provider: 'smtp',
-    host: env.smtpHost,
-    port: env.smtpPort || 587,
-    secure: env.smtpSecure || false,
+    host: process.env.SMTP_HOST || 'localhost',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
-      user: env.smtpUser,
-      pass: env.smtpPass,
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
     },
   },
 

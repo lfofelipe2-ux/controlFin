@@ -46,7 +46,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const [presetName, setPresetName] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleFilterChange = (key: keyof TransactionFilters, value: any) => {
+  const handleFilterChange = (
+    key: keyof TransactionFilters,
+    value: string | number | boolean | null | string[] | [number, number]
+  ) => {
     const newFilters = { ...localFilters, [key]: value };
     setLocalFilters(newFilters);
   };

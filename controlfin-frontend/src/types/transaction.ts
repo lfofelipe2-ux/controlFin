@@ -133,13 +133,13 @@ export interface ImportResult {
     row: number;
     field: string;
     message: string;
-    value: any;
+    value: unknown;
   }>;
   warnings: Array<{
     row: number;
     field: string;
     message: string;
-    value: any;
+    value: unknown;
   }>;
 }
 
