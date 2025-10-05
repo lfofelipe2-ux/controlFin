@@ -5,6 +5,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import './App.css';
 import { AuthPage } from './components/auth';
 import BlockAIThemeProvider from './components/BlockAIThemeProvider';
+import { TransactionManagement } from './components/transaction/TransactionManagement';
 import { useBlockAITheme } from './hooks/useBlockAITheme';
 import OAuthCallbackPage from './pages/OAuthCallbackPage';
 
@@ -238,6 +239,7 @@ const App: React.FC = () => {
 
           {/* Protected Routes */}
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/transactions' element={<TransactionManagement />} />
 
           {/* Default Route */}
           <Route path='/' element={<Navigate to='/auth' replace />} />

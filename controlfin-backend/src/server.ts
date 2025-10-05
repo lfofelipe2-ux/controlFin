@@ -3,8 +3,14 @@ import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { connectDatabase } from './config/database';
-import { authRoutes } from './modules/auth/auth.routes';
 import { env } from './config/env';
+import { authRoutes } from './modules/auth/auth.routes';
+import { categoryRoutes } from './modules/categories/category.routes';
+import { paymentMethodRoutes } from './modules/payment-methods/payment-method.routes';
+import { analyticsRoutes } from './modules/transactions/analytics.routes';
+import { bulkRoutes } from './modules/transactions/bulk.routes';
+import { templateRoutes } from './modules/transactions/template.routes';
+import { transactionRoutes } from './modules/transactions/transaction.routes';
 
 const fastify = Fastify({
   logger:
@@ -38,6 +44,12 @@ fastify.register(rateLimit, {
 
 // Register routes
 fastify.register(authRoutes, { prefix: '/api/auth' });
+fastify.register(transactionRoutes, { prefix: '/api/transactions' });
+fastify.register(analyticsRoutes, { prefix: '/api/transactions/analytics' });
+fastify.register(bulkRoutes, { prefix: '/api/transactions/bulk' });
+fastify.register(templateRoutes, { prefix: '/api/transactions/templates' });
+fastify.register(categoryRoutes, { prefix: '/api/categories' });
+fastify.register(paymentMethodRoutes, { prefix: '/api/payment-methods' });
 
 // Health check route
 fastify.get('/health', async () => {

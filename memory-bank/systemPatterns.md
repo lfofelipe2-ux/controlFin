@@ -48,6 +48,44 @@
 
 ### 4. Observer Pattern
 **Pattern**: Event-driven updates
+
+## Transaction Management Patterns
+
+### 1. Data Flow Pattern
+**Pattern**: Unidirectional data flow with centralized state
+**Rationale**: Predictable state updates, debugging ease
+**Implementation**: 
+- Zustand stores for transaction state
+- Service layer for API communication
+- Component-level state for UI interactions
+
+### 2. Container/Presentational Pattern
+**Pattern**: Separation of logic and presentation
+**Rationale**: Reusability, testability, maintainability
+**Implementation**:
+- Container components: TransactionList, TransactionForm
+- Presentational components: TransactionCard, FilterPanel
+
+### 3. Repository Pattern (Backend)
+**Pattern**: Data access abstraction for transactions
+**Rationale**: Database independence, testability
+**Implementation**: TransactionRepository with MongoDB operations
+
+### 4. Validation Pattern
+**Pattern**: Multi-layer validation
+**Rationale**: Data integrity, security, user experience
+**Implementation**:
+- Frontend: Ant Design Form validation
+- Backend: Zod schema validation
+- Database: Mongoose schema validation
+
+### 5. Filtering Pattern
+**Pattern**: Advanced filtering with state persistence
+**Rationale**: User experience, performance
+**Implementation**:
+- URL state for filter persistence
+- Debounced search input
+- Multi-criteria filtering with MongoDB aggregation
 **Rationale**: Loose coupling, real-time updates
 **Implementation**: Zustand subscriptions, React context
 

@@ -9,7 +9,13 @@
     "dev:backend": "cd controlfin-backend && npm run dev",
     "build:frontend": "cd controlfin-frontend && npm run build",
     "build:backend": "cd controlfin-backend && npm run build",
-    "install:all": "npm install && cd controlfin-frontend && npm install && cd ../controlfin-backend && npm install"
+    "install:all": "npm install && cd controlfin-frontend && npm install && cd ../controlfin-backend && npm install",
+    "validate:config": "node scripts/validate-configurations.js",
+    "generate:jwt": "node scripts/generate-jwt-secret.js",
+    "generate:jwt:single": "node scripts/generate-jwt-secret.js single",
+    "setup:env": "cp controlfin-frontend/env.example controlfin-frontend/.env && cp controlfin-backend/env.example controlfin-backend/.env",
+    "test:mongodb": "node scripts/test-mongodb-connection.js",
+    "test:config": "npm run validate:config && npm run test:mongodb"
   },
   "keywords": [
     "finance",
