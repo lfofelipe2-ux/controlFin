@@ -34,6 +34,6 @@ module.exports = [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'tests/**', '**/__tests__/**', '**/*.test.ts'],
+    ignores: ['dist/**', 'node_modules/**', 'tests/**', '**/__tests__/**', '**/*.test.ts', 'vitest.config.ts'],
   },
 ];
