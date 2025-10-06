@@ -28,7 +28,7 @@
     "@fastify/rate-limit": "^10.3.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.6.2",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/winston": "^2.4.4",
