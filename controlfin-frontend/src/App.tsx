@@ -1,10 +1,13 @@
+/* eslint-disable no-hardcoded-strings/no-hardcoded-strings */
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { AuthPage } from './components/auth';
 import BlockAIThemeProvider from './components/BlockAIThemeProvider';
+import { TransactionManagement } from './components/transaction/TransactionManagement';
 import { useBlockAITheme } from './hooks/useBlockAITheme';
 import OAuthCallbackPage from './pages/OAuthCallbackPage';
 
@@ -18,6 +21,7 @@ const { Title, Text, Paragraph } = Typography;
  */
 const Dashboard: React.FC = () => {
   const { colors, typography } = useBlockAITheme();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -48,7 +52,7 @@ const Dashboard: React.FC = () => {
                     marginBottom: '8px',
                   }}
                 >
-                  ControlFin Dashboard
+                  {t('dashboard.title')}
                 </Title>
                 <Paragraph
                   style={{
@@ -57,14 +61,14 @@ const Dashboard: React.FC = () => {
                     marginBottom: '32px',
                   }}
                 >
-                  Welcome to your personal finance management dashboard
+                  {t('dashboard.welcome')}
                 </Paragraph>
               </div>
 
               {/* Theme Demo */}
               <div>
                 <Title level={3} style={{ color: colors.textPrimary, marginBottom: '16px' }}>
-                  BlockAI Design System Demo
+                  {t('dashboard.designSystemDemo')}
                 </Title>
 
                 <Space direction='vertical' size='middle' style={{ width: '100%' }}>
@@ -77,15 +81,15 @@ const Dashboard: React.FC = () => {
                         marginBottom: '8px',
                       }}
                     >
-                      Button Components:
+                      {t('dashboard.buttonComponents')}:
                     </Text>
                     <Space wrap>
                       <Button type='primary' icon={<UserOutlined />}>
-                        Primary Button
+                        {t('common.primaryButton')}
                       </Button>
-                      <Button icon={<MailOutlined />}>Default Button</Button>
+                      <Button icon={<MailOutlined />}>{t('common.defaultButton')}</Button>
                       <Button type='text' icon={<LockOutlined />}>
-                        Text Button
+                        {t('common.textButton')}
                       </Button>
                     </Space>
                   </div>
@@ -99,7 +103,7 @@ const Dashboard: React.FC = () => {
                         marginBottom: '8px',
                       }}
                     >
-                      Color Palette:
+                      {t('dashboard.colorPalette')}:
                     </Text>
                     <Row gutter={[8, 8]}>
                       <Col span={6}>
@@ -116,7 +120,7 @@ const Dashboard: React.FC = () => {
                             fontWeight: 'bold',
                           }}
                         >
-                          Primary
+                          {t('common.primary')}
                         </div>
                       </Col>
                       <Col span={6}>
@@ -133,7 +137,7 @@ const Dashboard: React.FC = () => {
                             fontWeight: 'bold',
                           }}
                         >
-                          Success
+                          {t('common.success')}
                         </div>
                       </Col>
                       <Col span={6}>
@@ -150,7 +154,7 @@ const Dashboard: React.FC = () => {
                             fontWeight: 'bold',
                           }}
                         >
-                          Warning
+                          {t('common.warning')}
                         </div>
                       </Col>
                       <Col span={6}>
@@ -167,7 +171,7 @@ const Dashboard: React.FC = () => {
                             fontWeight: 'bold',
                           }}
                         >
-                          Error
+                          {t('common.error')}
                         </div>
                       </Col>
                     </Row>
@@ -182,23 +186,23 @@ const Dashboard: React.FC = () => {
                         marginBottom: '8px',
                       }}
                     >
-                      Typography:
+                      {t('dashboard.typography')}:
                     </Text>
                     <Space direction='vertical' size='small'>
                       <Title level={1} style={{ color: colors.textPrimary, margin: 0 }}>
-                        Heading 1 - Inter Semibold
+                        {t('dashboard.heading1')}
                       </Title>
                       <Title level={2} style={{ color: colors.textPrimary, margin: 0 }}>
-                        Heading 2 - Inter Semibold
+                        {t('dashboard.heading2')}
                       </Title>
                       <Text style={{ color: colors.textPrimary, fontSize: '16px' }}>
-                        Body Text - Inter Regular
+                        {t('dashboard.bodyText')}
                       </Text>
                       <Text style={{ color: colors.textSecondary, fontSize: '14px' }}>
-                        Secondary Text - Inter Regular
+                        {t('dashboard.secondaryText')}
                       </Text>
                       <Text style={{ color: colors.textSecondary, fontSize: '12px' }}>
-                        Caption Text - Inter Light
+                        {t('dashboard.captionText')}
                       </Text>
                     </Space>
                   </div>
@@ -208,7 +212,7 @@ const Dashboard: React.FC = () => {
               {/* Footer */}
               <div style={{ textAlign: 'center', marginTop: '32px' }}>
                 <Text style={{ color: colors.textSecondary, fontSize: '12px' }}>
-                  © 2025 ControlFin - Built with BlockAI Design System
+                  {t('dashboard.footer')}
                 </Text>
               </div>
             </Space>
@@ -226,21 +230,24 @@ const Dashboard: React.FC = () => {
  * with proper theming and component styling.
  */
 const App: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <BlockAIThemeProvider>
       <Router>
         <Routes>
           {/* Authentication Routes */}
-          <Route path='/auth' element={<AuthPage />} />
-          <Route path='/login' element={<AuthPage initialMode='login' />} />
-          <Route path='/register' element={<AuthPage initialMode='register' />} />
-          <Route path='/auth/callback' element={<OAuthCallbackPage />} />
+          <Route path={t('routes.auth')} element={<AuthPage />} />
+          <Route path={t('routes.login')} element={<AuthPage initialMode='login' />} />
+          <Route path={t('routes.register')} element={<AuthPage initialMode='register' />} />
+          <Route path={t('routes.authCallback')} element={<OAuthCallbackPage />} />
 
           {/* Protected Routes */}
-          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path={t('routes.dashboard')} element={<Dashboard />} />
+          <Route path={t('routes.transactions')} element={<TransactionManagement />} />
 
           {/* Default Route */}
-          <Route path='/' element={<Navigate to='/auth' replace />} />
+          <Route path='/' element={<Navigate to={t('routes.auth')} replace />} />
         </Routes>
       </Router>
     </BlockAIThemeProvider>

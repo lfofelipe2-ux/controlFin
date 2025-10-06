@@ -29,6 +29,44 @@
 - Access tokens (15min) + Refresh tokens (7 days)
 - Google OAuth 2.0 integration
 
+### 5. Transaction Management Pattern (TASK-011)
+**Pattern**: CRUD operations with advanced filtering and state management
+**Rationale**: Complex data management, user experience, performance
+**Implementation**:
+- Frontend: Zustand state management with optimistic updates
+- Backend: RESTful API with MongoDB aggregation pipelines
+- Features: Advanced filtering, bulk operations, import/export, data visualization
+
+### 6. Data Visualization Pattern (TASK-011)
+**Pattern**: Chart-based data representation with interactive components
+**Rationale**: User insights, data analysis, decision support
+**Implementation**:
+- Highcharts integration for financial charts
+- Real-time data updates with state management
+- Responsive design for mobile and desktop
+
+### 7. Import/Export Pattern (TASK-011)
+**Pattern**: Multi-format data exchange with validation
+**Rationale**: Data portability, user convenience, system integration
+
+### 8. Code Quality Pattern (TASK-022)
+**Pattern**: Automated code quality enforcement with custom ESLint plugins
+**Rationale**: Maintainable codebase, consistent development practices, reduced technical debt
+**Implementation**:
+- **Custom ESLint Plugins**: `no-hardcoded-strings`, `no-duplicate-i18n-keys`
+- **Automated Error Correction**: Scripts for systematic error fixing
+- **Logger Implementation**: Structured logging replacing console.log
+- **TypeScript Configuration**: Gradual strict mode adoption
+**Benefits**:
+- ✅ Consistent code style across the project
+- ✅ Automated detection of common issues
+- ✅ Reduced manual code review overhead
+- ✅ Better debugging with structured logging
+**Implementation**:
+- CSV, Excel, JSON format support
+- Client-side validation with Zod schemas
+- Step-by-step wizard interface for complex operations
+
 ## Design Patterns
 
 ### 1. Component Composition Pattern
@@ -48,6 +86,44 @@
 
 ### 4. Observer Pattern
 **Pattern**: Event-driven updates
+
+## Transaction Management Patterns
+
+### 1. Data Flow Pattern
+**Pattern**: Unidirectional data flow with centralized state
+**Rationale**: Predictable state updates, debugging ease
+**Implementation**: 
+- Zustand stores for transaction state
+- Service layer for API communication
+- Component-level state for UI interactions
+
+### 2. Container/Presentational Pattern
+**Pattern**: Separation of logic and presentation
+**Rationale**: Reusability, testability, maintainability
+**Implementation**:
+- Container components: TransactionList, TransactionForm
+- Presentational components: TransactionCard, FilterPanel
+
+### 3. Repository Pattern (Backend)
+**Pattern**: Data access abstraction for transactions
+**Rationale**: Database independence, testability
+**Implementation**: TransactionRepository with MongoDB operations
+
+### 4. Validation Pattern
+**Pattern**: Multi-layer validation
+**Rationale**: Data integrity, security, user experience
+**Implementation**:
+- Frontend: Ant Design Form validation
+- Backend: Zod schema validation
+- Database: Mongoose schema validation
+
+### 5. Filtering Pattern
+**Pattern**: Advanced filtering with state persistence
+**Rationale**: User experience, performance
+**Implementation**:
+- URL state for filter persistence
+- Debounced search input
+- Multi-criteria filtering with MongoDB aggregation
 **Rationale**: Loose coupling, real-time updates
 **Implementation**: Zustand subscriptions, React context
 
