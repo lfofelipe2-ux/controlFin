@@ -214,6 +214,8 @@ module.exports = {
                         if (node.value.length <= 2) return;
 
                         // Skip strings that look like identifiers or technical values
+                        // This regex matches valid JavaScript identifiers (e.g., variable names, keys).
+                        // Such strings are excluded because they are likely technical values, not user-facing text.
                         if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(node.value)) return;
 
                         // Skip strings that are clearly technical (contain special chars)
