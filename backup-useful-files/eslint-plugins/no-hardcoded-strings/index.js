@@ -172,13 +172,16 @@ module.exports = {
                     });
                 };
 
+                const path = require('path');
                 const isInTestFile = (filename) => {
-                    return (
-                        filename.includes('.test.') ||
-                        filename.includes('.spec.') ||
-                        filename.includes('__tests__') ||
-                        filename.includes('tests/')
-                    );
+                    const basename = path.basename(filename);
+                    const dirname = filename.split(path.sep);
+                    // Match files ending with .test.js, .test.ts, .spec.js, .spec.ts, etc.
+                    const testFileRegex = /\.(test|spec)\.[jt]sx?$/;
+                    if (testFileRegex.test(basename)) return true;
+                    // Check if any directory in the path is __tests__ or tests
+                    if (dirname.includes('__tests__') || dirname.includes('tests')) return true;
+                    return false;
                 };
 
                 const isInConfigFile = (filename) => {
