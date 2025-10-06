@@ -53,15 +53,15 @@
         }
     },
     "include": [
-        "src/**/*",
-        "vitest.config.ts"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",
         "dist",
         "tests",
         "**/*.test.ts",
-        "**/*.spec.ts"
+        "**/*.spec.ts",
+        "vitest.config.ts"
     ],
     "ts-node": {
         "esm": false,
