@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { transactionService } from '../transaction.service';
 
-// Mock the entire modules
+// Mock the modules before importing the service
 vi.mock('../transaction.model', () => ({
   TransactionModel: {
     create: vi.fn(),
@@ -29,10 +28,11 @@ vi.mock('../../payment-methods/payment-method.model', () => ({
   },
 }));
 
-// Import the mocked modules
+// Import after mocking
 import { TransactionModel as Transaction } from '../transaction.model';
 import { CategoryModel as Category } from '../../categories/category.model';
 import { PaymentMethodModel as PaymentMethod } from '../../payment-methods/payment-method.model';
+import { transactionService } from '../transaction.service';
 
 const mockTransactionData = {
   _id: '507f1f77bcf86cd799439011',
@@ -179,6 +179,7 @@ describe('TransactionService', () => {
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
+        populate: vi.fn().mockReturnThis(),
         exec: vi.fn().mockResolvedValue([mockTransactionData]),
       };
 
@@ -205,6 +206,7 @@ describe('TransactionService', () => {
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
+        populate: vi.fn().mockReturnThis(),
         exec: vi.fn().mockResolvedValue([]),
       };
 

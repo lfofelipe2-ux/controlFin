@@ -12,44 +12,55 @@ import { bulkRoutes } from './modules/transactions/bulk.routes';
 import { templateRoutes } from './modules/transactions/template.routes';
 import { transactionRoutes } from './modules/transactions/transaction.routes';
 
-const fastify = Fastify({
-  logger:
-    process.env['NODE_ENV'] === 'development'
-      ? {
-          level: process.env['LOG_LEVEL'] || 'info',
-          transport: {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              translateTime: 'HH:MM:ss Z',
-              ignore: 'pid,hostname',
+const buildApp = () => {
+  const fastify = Fastify({
+    logger:
+      process.env['NODE_ENV'] === 'development'
+        ? {
+            level: process.env['LOG_LEVEL'] || 'info',
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                translateTime: 'HH:MM:ss Z',
+                ignore: 'pid,hostname',
+              },
             },
-          },
-        }
-      : true,
-});
+          }
+        : true,
+  });
 
-// Register plugins
-fastify.register(cors, {
-  origin: [env.frontendUrl, 'http://localhost:3000'],
-  credentials: true,
-});
+  // Register plugins
+  fastify.register(cors, {
+    origin: true,
+    credentials: true,
+  });
 
-fastify.register(helmet);
+  fastify.register(helmet, {
+    contentSecurityPolicy: false,
+  });
 
-fastify.register(rateLimit, {
-  max: env.rateLimitMax,
-  timeWindow: `${Math.max(env.rateLimitWindowMs, 1000)} ms`,
-});
+  fastify.register(rateLimit, {
+    max: 100,
+    timeWindow: '1 minute',
+  });
 
-// Register routes
-fastify.register(authRoutes, { prefix: '/api/auth' });
-fastify.register(transactionRoutes, { prefix: '/api/transactions' });
-fastify.register(analyticsRoutes, { prefix: '/api/transactions/analytics' });
-fastify.register(bulkRoutes, { prefix: '/api/transactions/bulk' });
-fastify.register(templateRoutes, { prefix: '/api/transactions/templates' });
-fastify.register(categoryRoutes, { prefix: '/api/categories' });
-fastify.register(paymentMethodRoutes, { prefix: '/api/payment-methods' });
+  // Register routes
+  fastify.register(authRoutes, { prefix: '/api/auth' });
+  fastify.register(categoryRoutes, { prefix: '/api/categories' });
+  fastify.register(paymentMethodRoutes, { prefix: '/api/payment-methods' });
+  fastify.register(transactionRoutes, { prefix: '/api/transactions' });
+  fastify.register(analyticsRoutes, { prefix: '/api/analytics' });
+  fastify.register(bulkRoutes, { prefix: '/api/bulk' });
+  fastify.register(templateRoutes, { prefix: '/api/templates' });
+
+  return fastify;
+};
+
+const fastify = buildApp();
+
+// Export buildApp for testing
+export { buildApp };
 
 // Health check route
 fastify.get('/health', async () => {
