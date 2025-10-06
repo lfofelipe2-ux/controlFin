@@ -149,8 +149,7 @@ const validateI18n = () => {
             'controlfin-frontend/src/locales/pt/common.json',
         ];
 
-        const allKeys = new Map();
-        const duplicates = [];
+        const allDuplicates = [];
 
         for (const filePath of translationFiles) {
             if (!fs.existsSync(filePath)) {
@@ -161,6 +160,7 @@ const validateI18n = () => {
             const content = fs.readFileSync(filePath, 'utf8');
             const parsed = JSON.parse(content);
             const keys = [];
+            const keyCounts = new Map();
 
             const extractKeys = (obj, prefix = '') => {
                 for (const [key, value] of Object.entries(obj)) {
@@ -169,44 +169,36 @@ const validateI18n = () => {
                         extractKeys(value, fullKey);
                     } else {
                         keys.push(fullKey);
+                        keyCounts.set(fullKey, (keyCounts.get(fullKey) || 0) + 1);
                     }
                 }
             };
 
             extractKeys(parsed);
 
-            for (const key of keys) {
-                if (allKeys.has(key)) {
-                    const existing = allKeys.get(key);
-                    existing.count++;
-                    existing.files.push(filePath);
-                    duplicates.push({
-                        key,
-                        files: existing.files,
-                        count: existing.count,
-                    });
-                } else {
-                    allKeys.set(key, {
-                        file: filePath,
-                        count: 1,
-                        files: [filePath],
-                    });
+            // Check for duplicates within the same file
+            const fileDuplicates = [];
+            for (const [key, count] of keyCounts.entries()) {
+                if (count > 1) {
+                    fileDuplicates.push({ key, count, file: filePath });
                 }
+            }
+
+            if (fileDuplicates.length > 0) {
+                allDuplicates.push(...fileDuplicates);
             }
         }
 
-        if (duplicates.length > 0) {
-            logError(`Found ${duplicates.length} duplicate i18n keys:`);
-            duplicates.forEach(({ key, files, count }) => {
+        if (allDuplicates.length > 0) {
+            logError(`Found ${allDuplicates.length} duplicate i18n keys within files:`);
+            allDuplicates.forEach(({ key, count, file }) => {
                 log(`  - "${key}" appears ${count} times in:`, colors.red);
-                files.forEach(file => {
-                    log(`    ${file}`, colors.yellow);
-                });
+                log(`    ${file}`, colors.yellow);
             });
             return false;
         }
 
-        logSuccess('No duplicate i18n keys found');
+        logSuccess('No duplicate i18n keys found within files');
         return true;
     } catch (error) {
         logError(`i18n validation failed: ${error.message}`);
