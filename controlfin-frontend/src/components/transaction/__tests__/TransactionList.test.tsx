@@ -34,28 +34,35 @@ describe('TransactionList', () => {
     renderWithProviders(<TransactionList {...mockProps} />);
 
     // The component should render without crashing
-    expect(screen.getByText('Transaction Management')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search transactions...')).toBeInTheDocument();
   });
 
-  it('renders transaction list component', () => {
+  it('renders search input', () => {
     renderWithProviders(<TransactionList {...mockProps} />);
 
-    // The component should render without crashing
-    expect(screen.getByText('Transaction Management')).toBeInTheDocument();
+    // Check if search input is rendered
+    expect(screen.getByPlaceholderText('Search transactions...')).toBeInTheDocument();
   });
 
-  it('renders transaction list component', () => {
+  it('renders filter button', () => {
     renderWithProviders(<TransactionList {...mockProps} />);
 
-    // The component should render without crashing
-    expect(screen.getByText('Transaction Management')).toBeInTheDocument();
+    // Check if filter button is rendered
+    expect(screen.getByText('Filters')).toBeInTheDocument();
   });
 
-  it('renders transaction list component', () => {
+  it('renders refresh button', () => {
     renderWithProviders(<TransactionList {...mockProps} />);
 
-    // The component should render without crashing
-    expect(screen.getByText('Transaction Management')).toBeInTheDocument();
+    // Check if refresh button is rendered
+    expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+  });
+
+  it('renders charts button', () => {
+    renderWithProviders(<TransactionList {...mockProps} />);
+
+    // Check if charts button is rendered
+    expect(screen.getByText('Charts')).toBeInTheDocument();
   });
 
   it('renders without crashing', () => {
