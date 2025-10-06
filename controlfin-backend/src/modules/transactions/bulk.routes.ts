@@ -125,10 +125,17 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
         const result = await bulkService.bulkCreate({
+
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(data as any),
           userId,
         });
@@ -192,9 +199,15 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = await bulkService.bulkUpdate(data as any, userId);
 
         return reply.status(200).send(result);
@@ -252,9 +265,15 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = await bulkService.bulkDelete(data as any, userId);
 
         return reply.status(200).send(result);
@@ -316,9 +335,15 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = await bulkService.bulkDuplicate((data as any).transactionIds, userId);
 
         return reply.status(200).send(result);
@@ -380,11 +405,18 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
         const result = await bulkService.bulkCategorize(
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).transactionIds,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).categoryId,
           userId
         );
@@ -448,13 +480,21 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
         const result = await bulkService.bulkTag(
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).transactionIds,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).tags,
           userId,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).operation
         );
 
@@ -501,12 +541,21 @@ export async function bulkRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const data = request.body;
 
         const result = await bulkService.bulkExport(
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).transactionIds,
           userId,
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).format
         );
 

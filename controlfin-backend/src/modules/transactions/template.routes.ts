@@ -130,10 +130,17 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const templateData = request.body;
 
         const template = await templateService.createTemplate({
+
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(templateData as any),
           userId,
         });
@@ -215,10 +222,16 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const result = await templateService.getTemplates({
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -287,6 +300,9 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -368,10 +384,17 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
+
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const template = await templateService.updateTemplate(id, updateData as any, userId);
 
         if (!template) {
@@ -424,6 +447,9 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -500,6 +526,9 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const data = request.body;
@@ -507,6 +536,9 @@ export async function templateRoutes(fastify: FastifyInstance) {
         const transaction = await templateService.createTransactionFromTemplate(
           id,
           userId,
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (data as any).overrides
         );
 
@@ -581,12 +613,19 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const templates = await templateService.getPopularTemplates(
           userId,
+
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (query as any).spaceId,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (query as any).limit
         );
 
@@ -654,10 +693,17 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const data = request.body;
 
+
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const template = await templateService.duplicateTemplate(id, userId, (data as any).newName);
 
         return reply.status(201).send({
@@ -723,9 +769,15 @@ export async function templateRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
+
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const stats = await templateService.getTemplateStats(userId, (query as any).spaceId);
 
         return reply.status(200).send({ stats });

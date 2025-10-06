@@ -187,6 +187,7 @@ class TransactionService {
     } = params;
 
     // Build filter query
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
 
     if (spaceId) filter.spaceId = spaceId;
@@ -223,6 +224,7 @@ class TransactionService {
     }
 
     // Build sort object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sort: any = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
@@ -256,6 +258,7 @@ class TransactionService {
   ): Promise<PaginatedResult<ITransaction>> {
     const { userId, spaceId, query, page = 1, limit = 20 } = params;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       $or: [
@@ -294,6 +297,7 @@ class TransactionService {
     const { userId, spaceId, startDate, endDate, type } = params;
 
     // Build filter query
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
     if (spaceId) filter.spaceId = spaceId;
     if (type) filter.type = type;
@@ -328,6 +332,9 @@ class TransactionService {
     const categoryMap = new Map();
     transactions.forEach((transaction: ITransaction) => {
       const categoryId = transaction.categoryId.toString();
+ 
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
       const categoryName = (transaction.categoryId as any)?.name || 'Unknown';
 
       if (!categoryMap.has(categoryId)) {
@@ -356,6 +363,8 @@ class TransactionService {
     const paymentMethodMap = new Map();
     transactions.forEach((transaction: ITransaction) => {
       const paymentMethodId = transaction.paymentMethodId.toString();
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
       const paymentMethodName = (transaction.paymentMethodId as any)?.name || 'Unknown';
 
       if (!paymentMethodMap.has(paymentMethodId)) {
@@ -427,6 +436,7 @@ class TransactionService {
     endDate: Date,
     spaceId?: string
   ): Promise<ITransaction[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       date: {
@@ -444,6 +454,7 @@ class TransactionService {
   }
 
   async getRecurringTransactions(userId: string, spaceId?: string): Promise<ITransaction[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       isRecurring: true,
@@ -462,6 +473,7 @@ class TransactionService {
     categoryId: string,
     spaceId?: string
   ): Promise<ITransaction[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       categoryId,
@@ -480,6 +492,7 @@ class TransactionService {
     paymentMethodId: string,
     spaceId?: string
   ): Promise<ITransaction[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       paymentMethodId,

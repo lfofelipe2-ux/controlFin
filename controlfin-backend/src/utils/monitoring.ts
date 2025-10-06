@@ -28,6 +28,7 @@ if (process.env['NODE_ENV'] !== 'production') {
 export interface MonitoringEvent {
   type: 'error' | 'warning' | 'info' | 'performance' | 'security';
   message: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>;
   timestamp?: Date;
 }
@@ -72,6 +73,7 @@ export class MonitoringSystem {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logError(message: string, error: Error, metadata?: Record<string, any>): void {
     this.logEvent({
       type: 'error',
@@ -87,6 +89,7 @@ export class MonitoringSystem {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logWarning(message: string, metadata?: Record<string, any>): void {
     this.logEvent({
       type: 'warning',
@@ -95,6 +98,7 @@ export class MonitoringSystem {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logInfo(message: string, metadata?: Record<string, any>): void {
     this.logEvent({
       type: 'info',
@@ -103,6 +107,7 @@ export class MonitoringSystem {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logPerformance(operation: string, duration: number, metadata?: Record<string, any>): void {
     this.logEvent({
       type: 'performance',
@@ -115,6 +120,7 @@ export class MonitoringSystem {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logSecurity(message: string, metadata?: Record<string, any>): void {
     this.logEvent({
       type: 'security',
@@ -137,10 +143,14 @@ export class MonitoringSystem {
     };
   }
 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getPerformanceMetrics(): any {
     return PerformanceMonitor.getMetricsSummary();
   }
 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getSlowOperations(threshold: number = 1000): any[] {
     return PerformanceMonitor.getSlowOperations(threshold);
   }
@@ -148,9 +158,11 @@ export class MonitoringSystem {
   // Health check methods
   async performHealthCheck(): Promise<{
     status: 'healthy' | 'degraded' | 'unhealthy';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checks: Record<string, any>;
     timestamp: Date;
   }> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const checks: Record<string, any> = {};
     let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 

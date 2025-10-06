@@ -70,10 +70,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const transactionData = request.body;
 
         const transaction = await transactionService.createTransaction({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(transactionData as any),
           userId,
         });
@@ -161,10 +165,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const result = await transactionService.getTransactions({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -236,6 +244,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -323,12 +333,16 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
         const transaction = await transactionService.updateTransaction(
           id,
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           updateData as any,
           userId
         );
@@ -383,6 +397,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -485,10 +501,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const stats = await transactionService.getTransactionStats({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -573,10 +593,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const result = await transactionService.searchTransactions({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });

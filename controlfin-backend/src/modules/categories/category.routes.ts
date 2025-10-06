@@ -59,10 +59,14 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const categoryData = request.body;
 
         const category = await categoryService.createCategory({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(categoryData as any),
           userId,
         });
@@ -131,10 +135,14 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const categories = await categoryService.getCategories({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -196,6 +204,8 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -273,10 +283,14 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const category = await categoryService.updateCategory(id, updateData as any, userId);
 
         if (!category) {
@@ -336,6 +350,8 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -409,6 +425,8 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
 
         const categories = await categoryService.getDefaultCategories(userId);

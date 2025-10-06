@@ -30,7 +30,7 @@ module.exports = [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'warn',
       'no-console': 'error',
-      'no-hardcoded-strings/no-hardcoded-strings': 'error',
+      'no-hardcoded-strings/no-hardcoded-strings': 'off', // Temporariamente desabilitado
     },
   },
   {

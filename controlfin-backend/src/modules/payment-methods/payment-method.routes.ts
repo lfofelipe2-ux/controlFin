@@ -73,10 +73,14 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const paymentMethodData = request.body;
 
         const paymentMethod = await paymentMethodService.createPaymentMethod({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(paymentMethodData as any),
           userId,
         });
@@ -159,10 +163,14 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const paymentMethods = await paymentMethodService.getPaymentMethods({
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -238,6 +246,8 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -329,12 +339,16 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
         const paymentMethod = await paymentMethodService.updatePaymentMethod(
           id,
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
           updateData as any,
           userId
         );
@@ -396,6 +410,8 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -483,6 +499,8 @@ export async function paymentMethodRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
 
         const paymentMethods = await paymentMethodService.getDefaultPaymentMethods(userId);

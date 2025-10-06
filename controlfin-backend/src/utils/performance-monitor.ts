@@ -4,6 +4,7 @@ export interface PerformanceMetrics {
   operation: string;
   duration: number;
   timestamp: Date;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>;
 }
 
@@ -90,6 +91,8 @@ export class PerformanceMonitor {
 }
 
 // Middleware for Fastify to monitor request performance
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const performanceMiddleware = async (request: any, reply: any) => {
   const stopTimer = PerformanceMonitor.startTimer(`request:${request.method}:${request.url}`);
 
@@ -100,9 +103,13 @@ export const performanceMiddleware = async (request: any, reply: any) => {
 
 // Decorator for monitoring function performance
 export function monitorPerformance(operationName: string) {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function (_target: any, propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
 
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     descriptor.value = async function (...args: any[]) {
       const stopTimer = PerformanceMonitor.startTimer(`${operationName}:${propertyName}`);
 

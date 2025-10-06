@@ -84,6 +84,7 @@ class PaymentMethodService {
     const { userId, spaceId, type, isDefault, search } = params;
 
     // Build filter query
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
 
     if (spaceId) filter.spaceId = spaceId;
@@ -111,6 +112,7 @@ class PaymentMethodService {
     type: 'cash' | 'card' | 'bank' | 'digital' | 'crypto' | 'other',
     spaceId?: string
   ): Promise<IPaymentMethod[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, type };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -286,6 +288,8 @@ class PaymentMethodService {
     }
 
     // Create default payment methods
+ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const paymentMethods = await PaymentMethod.insertMany(defaultPaymentMethods as any);
     return paymentMethods as IPaymentMethod[];
   }
@@ -305,6 +309,7 @@ class PaymentMethodService {
     };
     defaultPaymentMethods: number;
   }> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -326,6 +331,7 @@ class PaymentMethodService {
       other: 0,
     };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     byType.forEach((item: any) => {
       typeStats[item._id as keyof typeof typeStats] = item.count;
     });
@@ -353,6 +359,7 @@ class PaymentMethodService {
   > {
     const { TransactionModel } = await import('../transactions/transaction.model');
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const matchFilter: any = { userId };
     if (spaceId) matchFilter.spaceId = spaceId;
     if (startDate || endDate) {

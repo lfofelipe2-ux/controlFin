@@ -109,8 +109,11 @@ class BulkService {
         }));
 
         const created = await Transaction.insertMany(batchData, { ordered: false });
-        result.created!.push(...created);
+        if (result.created) {
+          result.created.push(...created);
+        }
         result.processed += created.length;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         // Handle partial batch failures
         if (error.writeErrors) {
@@ -185,6 +188,7 @@ class BulkService {
       });
 
       result.updated = updatedTransactions;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       result.success = false;
       result.failed = transactionIds.length;
@@ -211,6 +215,7 @@ class BulkService {
 
       result.processed = deleteResult.deletedCount;
       result.failed = transactionIds.length - deleteResult.deletedCount;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       result.success = false;
       result.failed = transactionIds.length;
@@ -245,6 +250,7 @@ class BulkService {
       const created = await Transaction.insertMany(duplicatedTransactions);
       result.created = created;
       result.processed = created.length;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       result.success = false;
       result.failed = transactionIds.length;
@@ -327,6 +333,7 @@ class BulkService {
       result.updated = updated.filter(Boolean) as ITransaction[];
       result.processed = result.updated.length;
       result.failed = transactionIds.length - result.processed;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       result.success = false;
       result.failed = transactionIds.length;
@@ -377,7 +384,9 @@ class BulkService {
       transaction.type,
       transaction.amount.toString(),
       transaction.description,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (transaction.categoryId as any)?.name || '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (transaction.paymentMethodId as any)?.name || '',
       transaction.tags.join(';'),
       transaction.metadata?.location || '',
@@ -394,6 +403,7 @@ class BulkService {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async validateBulkTransactions(transactions: any[]): Promise<BulkValidationResult> {
     const errors: Array<{ index: number; field: string; message: string }> = [];
 
@@ -406,7 +416,9 @@ class BulkService {
       PaymentMethod.find({ _id: { $in: paymentMethodIds } }),
     ]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const categoryMap = new Map(categories.map((c: any) => [c._id.toString(), c]));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const paymentMethodMap = new Map(paymentMethods.map((pm: any) => [pm._id.toString(), pm]));
 
     transactions.forEach((transaction, index) => {

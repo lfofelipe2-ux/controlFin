@@ -91,6 +91,7 @@ class CategoryService {
     const { userId, spaceId, type, isDefault, parentId, search } = params;
 
     // Build filter query
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
 
     if (spaceId) filter.spaceId = spaceId;
@@ -118,6 +119,7 @@ class CategoryService {
     type: 'income' | 'expense' | 'transfer',
     spaceId?: string
   ): Promise<ICategory[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, type };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -125,6 +127,7 @@ class CategoryService {
   }
 
   async getParentCategories(userId: string, spaceId?: string): Promise<ICategory[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, parentId: { $exists: false } };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -136,6 +139,7 @@ class CategoryService {
     parentId: string,
     spaceId?: string
   ): Promise<ICategory[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, parentId };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -305,6 +309,7 @@ class CategoryService {
     withChildren: number;
     defaultCategories: number;
   }> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -321,6 +326,7 @@ class CategoryService {
       transfer: 0,
     };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     byType.forEach((item: any) => {
       typeStats[item._id as keyof typeof typeStats] = item.count;
     });

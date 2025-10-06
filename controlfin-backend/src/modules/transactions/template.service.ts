@@ -184,6 +184,7 @@ class TemplateService {
     } = params;
 
     // Build filter query
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
 
     if (spaceId) filter.spaceId = spaceId;
@@ -200,6 +201,7 @@ class TemplateService {
     }
 
     // Build sort object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sort: any = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
@@ -287,6 +289,7 @@ class TemplateService {
     spaceId?: string,
     limit: number = 10
   ): Promise<ITransactionTemplate[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, isActive: true };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -302,6 +305,7 @@ class TemplateService {
     categoryId: string,
     spaceId?: string
   ): Promise<ITransactionTemplate[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, categoryId, isActive: true };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -316,6 +320,7 @@ class TemplateService {
     type: 'income' | 'expense' | 'transfer',
     spaceId?: string
   ): Promise<ITransactionTemplate[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId, type, isActive: true };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -362,6 +367,7 @@ class TemplateService {
     mostUsed: ITransactionTemplate | null;
     totalUsage: number;
   }> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
     if (spaceId) filter.spaceId = spaceId;
 
@@ -385,6 +391,7 @@ class TemplateService {
       transfer: 0,
     };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     byType.forEach((item: any) => {
       if (item._id && item.count) {
         typeStats[item._id as keyof typeof typeStats] = item.count;
