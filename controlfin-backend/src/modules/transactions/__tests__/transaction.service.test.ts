@@ -5,9 +5,28 @@ import { Transaction } from '../transaction.model';
 import { transactionService } from '../transaction.service';
 
 // Mock the models
-vi.mock('../transaction.model');
-vi.mock('../../categories/category.model');
-vi.mock('../../payment-methods/payment-method.model');
+vi.mock('../transaction.model', () => ({
+  Transaction: {
+    create: vi.fn(),
+    find: vi.fn(),
+    findById: vi.fn(),
+    findByIdAndUpdate: vi.fn(),
+    findByIdAndDelete: vi.fn(),
+    countDocuments: vi.fn(),
+  },
+}));
+
+vi.mock('../../categories/category.model', () => ({
+  Category: {
+    findById: vi.fn(),
+  },
+}));
+
+vi.mock('../../payment-methods/payment-method.model', () => ({
+  PaymentMethod: {
+    findById: vi.fn(),
+  },
+}));
 
 const mockTransaction = {
   _id: '507f1f77bcf86cd799439011',

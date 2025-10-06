@@ -1,6 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Category } from '../../src/modules/categories/category.model';
 import { PaymentMethod } from '../../src/modules/payment-methods/payment-method.model';
@@ -10,7 +8,6 @@ import { buildApp } from '../../src/server';
 
 describe('Transaction API Integration Tests', () => {
   let app: FastifyInstance;
-  let mongod: MongoMemoryServer;
   let authToken: string;
   let userId: string;
   let spaceId: string;
@@ -18,13 +15,6 @@ describe('Transaction API Integration Tests', () => {
   let paymentMethodId: string;
 
   beforeAll(async () => {
-    // Start in-memory MongoDB
-    mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-
-    // Connect to in-memory database
-    await mongoose.connect(uri);
-
     // Build Fastify app
     app = buildApp();
     await app.ready();
@@ -32,8 +22,6 @@ describe('Transaction API Integration Tests', () => {
 
   afterAll(async () => {
     await app.close();
-    await mongoose.disconnect();
-    await mongod.stop();
   });
 
   beforeEach(async () => {
