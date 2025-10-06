@@ -11,6 +11,7 @@ vi.mock('../transaction.model', () => ({
     findOne: vi.fn(),
     findOneAndUpdate: vi.fn(),
     findOneAndDelete: vi.fn(),
+    deleteOne: vi.fn(),
     aggregate: vi.fn(),
     countDocuments: vi.fn(),
   },
@@ -285,26 +286,26 @@ describe('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(mockTransactionData as any);
+      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 1 } as any);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
-      expect(result).toEqual(mockTransactionData);
-      expect(Transaction.findOneAndDelete).toHaveBeenCalledWith({
+      expect(result).toBe(true);
+      expect(Transaction.deleteOne).toHaveBeenCalledWith({
         _id: transactionId,
         userId,
       });
     });
 
-    it('should throw error if transaction not found', async () => {
+    it('should return false if transaction not found', async () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(null);
+      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 0 } as any);
 
-      await expect(transactionService.deleteTransaction(transactionId, userId)).rejects.toThrow(
-        'Transaction not found'
-      );
+      const result = await transactionService.deleteTransaction(transactionId, userId);
+
+      expect(result).toBe(false);
     });
   });
 
