@@ -1,10 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Category } from '../../categories/category.model';
-import { PaymentMethod } from '../../payment-methods/payment-method.model';
-import { Transaction } from '../transaction.model';
 import { transactionService } from '../transaction.service';
 
-// Mock the models
+// Mock the entire modules
 vi.mock('../transaction.model', () => ({
   TransactionModel: {
     create: vi.fn(),
@@ -31,6 +28,11 @@ vi.mock('../../payment-methods/payment-method.model', () => ({
     findById: vi.fn(),
   },
 }));
+
+// Import the mocked modules
+import { TransactionModel as Transaction } from '../transaction.model';
+import { CategoryModel as Category } from '../../categories/category.model';
+import { PaymentMethodModel as PaymentMethod } from '../../payment-methods/payment-method.model';
 
 const mockTransactionData = {
   _id: '507f1f77bcf86cd799439011',
@@ -74,7 +76,7 @@ const mockPaymentMethod = {
   updatedAt: new Date('2025-01-01'),
 };
 
-describe.skip('TransactionService', () => {
+describe('TransactionService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -99,9 +101,9 @@ describe.skip('TransactionService', () => {
       };
 
       // Mock the model methods
-      (Transaction.create as any).mockResolvedValue(mockTransactionData);
-      (Category.findById as any).mockResolvedValue(mockCategory);
-      (PaymentMethod.findById as any).mockResolvedValue(mockPaymentMethod);
+      vi.mocked(Transaction.create).mockResolvedValue(mockTransactionData as any);
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
+      vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as any);
 
       const result = await transactionService.createTransaction(createData);
 
@@ -129,7 +131,7 @@ describe.skip('TransactionService', () => {
         },
       };
 
-      (Category.findById as any).mockResolvedValue(null);
+      vi.mocked(Category.findById).mockResolvedValue(null);
 
       await expect(transactionService.createTransaction(createData)).rejects.toThrow(
         'Category not found'
@@ -154,8 +156,8 @@ describe.skip('TransactionService', () => {
         },
       };
 
-      (Category.findById as any).mockResolvedValue(mockCategory);
-      (PaymentMethod.findById as any).mockResolvedValue(null);
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
+      vi.mocked(PaymentMethod.findById).mockResolvedValue(null);
 
       await expect(transactionService.createTransaction(createData)).rejects.toThrow(
         'Payment method not found'
@@ -180,8 +182,8 @@ describe.skip('TransactionService', () => {
         exec: vi.fn().mockResolvedValue([mockTransactionData]),
       };
 
-      (Transaction.find as any).mockReturnValue(mockQuery);
-      (Transaction.countDocuments as any).mockResolvedValue(1);
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      vi.mocked(Transaction.countDocuments).mockResolvedValue(1);
 
       const result = await transactionService.getTransactions(filters);
 
@@ -206,8 +208,8 @@ describe.skip('TransactionService', () => {
         exec: vi.fn().mockResolvedValue([]),
       };
 
-      (Transaction.find as any).mockReturnValue(mockQuery);
-      (Transaction.countDocuments as any).mockResolvedValue(0);
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      vi.mocked(Transaction.countDocuments).mockResolvedValue(0);
 
       const result = await transactionService.getTransactions(filters);
 
@@ -221,7 +223,7 @@ describe.skip('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      (Transaction.findOne as any).mockResolvedValue(mockTransactionData);
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransactionData as any);
 
       const result = await transactionService.getTransactionById(transactionId, userId);
 
@@ -236,7 +238,7 @@ describe.skip('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      (Transaction.findOne as any).mockResolvedValue(null);
+      vi.mocked(Transaction.findOne).mockResolvedValue(null);
 
       await expect(transactionService.getTransactionById(transactionId, userId)).rejects.toThrow(
         'Transaction not found'
@@ -251,7 +253,7 @@ describe.skip('TransactionService', () => {
       const updateData = { description: 'Updated Transaction' };
       const updatedTransaction = { ...mockTransactionData, ...updateData };
 
-      (Transaction.findOneAndUpdate as any).mockResolvedValue(updatedTransaction);
+      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as any);
 
       const result = await transactionService.updateTransaction(transactionId, userId, updateData);
 
@@ -268,7 +270,7 @@ describe.skip('TransactionService', () => {
       const userId = '507f1f77bcf86cd799439013';
       const updateData = { description: 'Updated Transaction' };
 
-      (Transaction.findOneAndUpdate as any).mockResolvedValue(null);
+      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(null);
 
       await expect(
         transactionService.updateTransaction(transactionId, userId, updateData)
@@ -281,7 +283,7 @@ describe.skip('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      (Transaction.findOneAndDelete as any).mockResolvedValue(mockTransactionData);
+      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(mockTransactionData as any);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
@@ -296,7 +298,7 @@ describe.skip('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      (Transaction.findOneAndDelete as any).mockResolvedValue(null);
+      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(null);
 
       await expect(transactionService.deleteTransaction(transactionId, userId)).rejects.toThrow(
         'Transaction not found'
@@ -322,7 +324,7 @@ describe.skip('TransactionService', () => {
 
       // Mock aggregation pipeline
       const mockAggregate = vi.fn().mockResolvedValue([mockStats]);
-      (Transaction.aggregate as any).mockImplementation(mockAggregate);
+      vi.mocked(Transaction.aggregate).mockImplementation(mockAggregate);
 
       const result = await transactionService.getTransactionStats(filters);
 

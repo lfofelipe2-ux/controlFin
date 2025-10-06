@@ -6,7 +6,7 @@ import { Transaction } from '../../src/modules/transactions/transaction.model';
 import { User } from '../../src/modules/users/user.model';
 import { buildApp } from '../../src/server';
 
-describe.skip('Transaction Performance Tests', () => {
+describe('Transaction Performance Tests', () => {
   let app: FastifyInstance;
   let authToken: string;
   let userId: string;
