@@ -57,6 +57,7 @@
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
+    "@types/mongo-sanitize": "^1.0.3",
     "@types/mongodb-memory-server": "^1.8.0",
     "@types/pino-pretty": "^4.7.5",
     "@typescript-eslint/eslint-plugin": "^8.45.0",

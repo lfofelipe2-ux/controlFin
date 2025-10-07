@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { createErrorResponse } from '../../utils/route-helpers';
 import { zodToFastifySchema } from '../../utils/schema-converter';
+import { CreateTransactionData } from '../../types/service.types';
 import {
   TransactionQuerySchema
 } from './transaction.schemas';

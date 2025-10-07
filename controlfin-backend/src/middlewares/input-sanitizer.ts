@@ -4,7 +4,7 @@ import xss from 'xss';
 
 export async function inputSanitizationMiddleware(
     request: FastifyRequest,
-    reply: FastifyReply
+    _reply: FastifyReply
 ): Promise<void> {
     // Sanitize request body
     if (request.body) {

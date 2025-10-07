@@ -1,15 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
-
-interface AuthenticatedUser {
-  _id: string;
-  email: string;
-  role?: string;
-}
-
-interface AuthenticatedRequest extends FastifyRequest {
-  user?: AuthenticatedUser;
-}
+import { AuthenticatedRequest } from '../types/request.types';
 
 export async function authMiddleware(
   request: AuthenticatedRequest,
@@ -28,7 +19,7 @@ export async function authMiddleware(
       return;
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    const decoded = jwt.verify(token, process.env['JWT_SECRET'] || 'fallback-secret') as any;
 
     if (!decoded || !decoded.userId) {
       reply.code(401).send({
@@ -44,7 +35,11 @@ export async function authMiddleware(
     request.user = {
       _id: decoded.userId,
       email: decoded.email || '',
-      role: decoded.role || 'user'
+      firstName: decoded.firstName || '',
+      lastName: decoded.lastName || '',
+      isEmailVerified: decoded.isEmailVerified || false,
+      avatar: decoded.avatar,
+      spaceId: decoded.spaceId
     };
 
 

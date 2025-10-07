@@ -1,14 +1,5 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-
-interface AuthenticatedUser {
-    _id: string;
-    email: string;
-    role?: string;
-}
-
-interface AuthenticatedRequest extends FastifyRequest {
-    user?: AuthenticatedUser;
-}
+import { FastifyReply } from 'fastify';
+import { AuthenticatedRequest } from '../types/request.types';
 
 export async function authorizationMiddleware(
     request: AuthenticatedRequest,

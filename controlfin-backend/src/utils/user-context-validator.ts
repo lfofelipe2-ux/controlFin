@@ -1,14 +1,4 @@
-import { FastifyRequest } from 'fastify';
-
-interface AuthenticatedUser {
-    _id: string;
-    email: string;
-    role?: string;
-}
-
-interface AuthenticatedRequest extends FastifyRequest {
-    user?: AuthenticatedUser;
-}
+import { AuthenticatedRequest } from '../types/request.types';
 
 export function validateUserContext(request: AuthenticatedRequest): boolean {
     return !!(request.user && request.user._id && isValidObjectId(request.user._id));
