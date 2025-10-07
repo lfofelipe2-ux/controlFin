@@ -46,7 +46,7 @@ const logWarning = (message) => {
 // Validation functions
 const validateBackend = () => {
     logStep('1', 'Validating Backend...');
-    
+
     try {
         // Check if backend directory exists
         if (!fs.existsSync('controlfin-backend')) {
@@ -55,7 +55,7 @@ const validateBackend = () => {
 
         // Run backend lint
         log('Running backend ESLint...', colors.cyan);
-        execSync('cd controlfin-backend && npm run lint', { 
+        execSync('cd controlfin-backend && npm run lint', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -72,7 +72,7 @@ const validateBackend = () => {
 
         // Run backend build
         log('Running backend build...', colors.cyan);
-        execSync('cd controlfin-backend && npm run build', { 
+        execSync('cd controlfin-backend && npm run build', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -95,7 +95,7 @@ const validateBackend = () => {
 
 const validateFrontend = () => {
     logStep('2', 'Validating Frontend...');
-    
+
     try {
         // Check if frontend directory exists
         if (!fs.existsSync('controlfin-frontend')) {
@@ -104,7 +104,7 @@ const validateFrontend = () => {
 
         // Run frontend lint
         log('Running frontend ESLint...', colors.cyan);
-        execSync('cd controlfin-frontend && npm run lint', { 
+        execSync('cd controlfin-frontend && npm run lint', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -112,7 +112,7 @@ const validateFrontend = () => {
 
         // Run frontend tests
         log('Running frontend tests...', colors.cyan);
-        execSync('cd controlfin-frontend && npm test', { 
+        execSync('cd controlfin-frontend && npm test', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -120,7 +120,7 @@ const validateFrontend = () => {
 
         // Run frontend build
         log('Running frontend build...', colors.cyan);
-        execSync('cd controlfin-frontend && npm run build', { 
+        execSync('cd controlfin-frontend && npm run build', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -143,7 +143,7 @@ const validateFrontend = () => {
 
 const validateI18n = () => {
     logStep('3', 'Validating i18n Translation Files...');
-    
+
     try {
         const translationFiles = [
             'controlfin-frontend/src/locales/en/common.json',
@@ -209,11 +209,11 @@ const validateI18n = () => {
 
 const validateGitStatus = () => {
     logStep('4', 'Validating Git Status...');
-    
+
     try {
         // Check if we're in a git repository
         execSync('git status', { stdio: 'pipe' });
-        
+
         // Check if there are uncommitted changes
         const status = execSync('git status --porcelain', { encoding: 'utf8' });
         if (status.trim()) {
@@ -240,12 +240,12 @@ const validateGitStatus = () => {
 
 const validateDependencies = () => {
     logStep('5', 'Validating Dependencies...');
-    
+
     try {
         // Check backend dependencies
         if (fs.existsSync('controlfin-backend/package.json')) {
             log('Checking backend dependencies...', colors.cyan);
-            execSync('cd controlfin-backend && npm audit --audit-level=high', { 
+            execSync('cd controlfin-backend && npm audit --audit-level=high', {
                 stdio: 'pipe',
                 encoding: 'utf8'
             });
@@ -255,7 +255,7 @@ const validateDependencies = () => {
         // Check frontend dependencies
         if (fs.existsSync('controlfin-frontend/package.json')) {
             log('Checking frontend dependencies...', colors.cyan);
-            execSync('cd controlfin-frontend && npm audit --audit-level=high', { 
+            execSync('cd controlfin-frontend && npm audit --audit-level=high', {
                 stdio: 'pipe',
                 encoding: 'utf8'
             });
@@ -287,7 +287,7 @@ const runValidation = async () => {
     ];
 
     const results = [];
-    
+
     for (const validation of validations) {
         try {
             const result = validation.fn();
@@ -300,10 +300,10 @@ const runValidation = async () => {
 
     // Summary
     logSection('📊 VALIDATION SUMMARY');
-    
+
     const passed = results.filter(r => r.passed).length;
     const total = results.length;
-    
+
     results.forEach(({ name, passed }) => {
         if (passed) {
             logSuccess(`${name}: PASSED`);
