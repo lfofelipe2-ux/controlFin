@@ -1,15 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { z } from 'zod';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { analyticsService } from './analytics.service';
-
-const AnalyticsQuerySchema = z.object({
-  spaceId: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  type: z.enum(['income', 'expense', 'transfer']).optional(),
-  groupBy: z.enum(['day', 'week', 'month', 'year']).optional().default('month'),
-});
+import { AnalyticsQuerySchema, MonthlyComparisonQuerySchema, FinancialHealthQuerySchema } from './analytics.schemas.json';
 
 export async function analyticsRoutes(fastify: FastifyInstance) {
   // Apply authentication middleware to all routes
@@ -221,9 +213,7 @@ export async function analyticsRoutes(fastify: FastifyInstance) {
     '/monthly-comparison',
     {
       schema: {
-        querystring: z.object({
-          spaceId: z.string().optional(),
-        }),
+        querystring: MonthlyComparisonQuerySchema,
         response: {
           200: {
             type: 'object',
@@ -308,11 +298,7 @@ export async function analyticsRoutes(fastify: FastifyInstance) {
     '/financial-health',
     {
       schema: {
-        querystring: z.object({
-          spaceId: z.string().optional(),
-          startDate: z.string().optional(),
-          endDate: z.string().optional(),
-        }),
+        querystring: FinancialHealthQuerySchema,
         response: {
           200: {
             type: 'object',

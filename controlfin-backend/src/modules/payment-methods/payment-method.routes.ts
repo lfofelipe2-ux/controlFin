@@ -4,7 +4,7 @@ import {
   CreatePaymentMethodSchema,
   PaymentMethodQuerySchema,
   UpdatePaymentMethodSchema,
-} from './payment-method.schemas';
+} from './payment-method.schemas.json';
 import { paymentMethodService } from './payment-method.service';
 
 export async function paymentMethodRoutes(fastify: FastifyInstance) {

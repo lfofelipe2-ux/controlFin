@@ -103,13 +103,11 @@ export interface TransactionStats {
 }
 
 export interface PaginatedResult<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
+  transactions: T[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 class TransactionService {
@@ -130,8 +128,12 @@ class TransactionService {
     return await transaction.save();
   }
 
-  async getTransactionById(id: string, userId: string): Promise<ITransaction | null> {
-    return await Transaction.findOne({ _id: id, userId });
+  async getTransactionById(id: string, userId: string): Promise<ITransaction> {
+    const transaction = await Transaction.findOne({ _id: id, userId });
+    if (!transaction) {
+      throw new Error('Transaction not found');
+    }
+    return transaction;
   }
 
   async updateTransaction(
@@ -155,11 +157,17 @@ class TransactionService {
       }
     }
 
-    return await Transaction.findOneAndUpdate(
+    const updatedTransaction = await Transaction.findOneAndUpdate(
       { _id: id, userId },
       { ...updateData, updatedAt: new Date() },
       { new: true }
     );
+
+    if (!updatedTransaction) {
+      throw new Error('Transaction not found');
+    }
+
+    return updatedTransaction;
   }
 
   async deleteTransaction(id: string, userId: string): Promise<boolean> {
@@ -243,13 +251,11 @@ class TransactionService {
     ]);
 
     return {
-      data: transactions,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      transactions,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
     };
   }
 
@@ -283,13 +289,11 @@ class TransactionService {
     ]);
 
     return {
-      data: transactions,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      transactions,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
     };
   }
 

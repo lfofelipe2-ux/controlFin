@@ -6,10 +6,9 @@
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import logger from '../../utils/logger';
+import { accountConflictCheckSchema, accountLinkingSchema } from './auth.schemas';
 import {
-  accountConflictCheckSchema,
   AccountLinkingRequest,
-  accountLinkingSchema,
   checkAccountConflict,
   createAccountWithGoogle,
   linkGoogleAccount,

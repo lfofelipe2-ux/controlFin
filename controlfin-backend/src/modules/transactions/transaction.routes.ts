@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import { zodToFastifySchema } from '../../utils/schema-converter';
 import {
   CreateTransactionSchema,
   TransactionQuerySchema,
@@ -17,7 +18,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/',
     {
       schema: {
-        body: CreateTransactionSchema,
+        body: zodToFastifySchema(CreateTransactionSchema),
         response: {
           201: {
             type: 'object',
@@ -70,14 +71,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const transactionData = request.body;
 
         const transaction = await transactionService.createTransaction({
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(transactionData as any),
           userId,
         });
@@ -101,7 +102,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/',
     {
       schema: {
-        querystring: TransactionQuerySchema,
+        querystring: zodToFastifySchema(TransactionQuerySchema),
         response: {
           200: {
             type: 'object',
@@ -165,14 +166,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const result = await transactionService.getTransactions({
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -244,8 +245,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -274,7 +275,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     {
       schema: {
         params: { type: 'object', properties: { id: { type: 'string' } } },
-        body: UpdateTransactionSchema,
+        body: zodToFastifySchema(UpdateTransactionSchema),
         response: {
           200: {
             type: 'object',
@@ -333,16 +334,16 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
         const transaction = await transactionService.updateTransaction(
           id,
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           updateData as any,
           userId
         );
@@ -397,8 +398,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const { id } = request.params as { id: string };
 
@@ -428,7 +429,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/stats/summary',
     {
       schema: {
-        querystring: TransactionStatsSchema,
+        querystring: zodToFastifySchema(TransactionStatsSchema),
         response: {
           200: {
             type: 'object',
@@ -501,14 +502,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const stats = await transactionService.getTransactionStats({
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });
@@ -529,7 +530,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/search',
     {
       schema: {
-        querystring: TransactionQuerySchema,
+        querystring: zodToFastifySchema(TransactionQuerySchema),
         response: {
           200: {
             type: 'object',
@@ -593,14 +594,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?.id;
         const query = request.query;
 
         const result = await transactionService.searchTransactions({
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(query as any),
           userId,
         });

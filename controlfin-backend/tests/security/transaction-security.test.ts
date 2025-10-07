@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { Category } from '../../src/modules/categories/category.model';
-import { PaymentMethod } from '../../src/modules/payment-methods/payment-method.model';
-import { Transaction } from '../../src/modules/transactions/transaction.model';
+import { CategoryModel as Category } from '../../src/modules/categories/category.model';
+import { PaymentMethodModel as PaymentMethod } from '../../src/modules/payment-methods/payment-method.model';
+import { TransactionModel as Transaction } from '../../src/modules/transactions/transaction.model';
 import { User } from '../../src/modules/users/user.model';
 import { buildApp } from '../../src/server';
 

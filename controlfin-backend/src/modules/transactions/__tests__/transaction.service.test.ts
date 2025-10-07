@@ -1,21 +1,38 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the modules before importing the service
-vi.mock('../transaction.model', () => ({
-  TransactionModel: {
-    create: vi.fn(),
-    find: vi.fn(),
-    findById: vi.fn(),
-    findByIdAndUpdate: vi.fn(),
-    findByIdAndDelete: vi.fn(),
-    findOne: vi.fn(),
-    findOneAndUpdate: vi.fn(),
-    findOneAndDelete: vi.fn(),
-    deleteOne: vi.fn(),
-    aggregate: vi.fn(),
-    countDocuments: vi.fn(),
-  },
-}));
+vi.mock('../transaction.model', () => {
+  const mockTransaction = vi.fn().mockImplementation((data) => ({
+    ...data,
+    _id: '507f1f77bcf86cd799439011',
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    save: vi.fn().mockResolvedValue({
+      ...data,
+      _id: '507f1f77bcf86cd799439011',
+      createdAt: new Date('2025-01-01'),
+      updatedAt: new Date('2025-01-01'),
+    }),
+  }));
+
+  // Add static methods to the constructor
+  mockTransaction.create = vi.fn();
+  mockTransaction.find = vi.fn();
+  mockTransaction.findById = vi.fn();
+  mockTransaction.findByIdAndUpdate = vi.fn();
+  mockTransaction.findByIdAndDelete = vi.fn();
+  mockTransaction.findOne = vi.fn();
+  mockTransaction.findOneAndUpdate = vi.fn();
+  mockTransaction.findOneAndDelete = vi.fn();
+  mockTransaction.deleteOne = vi.fn();
+  mockTransaction.aggregate = vi.fn();
+  mockTransaction.countDocuments = vi.fn();
+
+  return {
+    TransactionModel: mockTransaction, // This is the constructor
+    ITransaction: {},
+  };
+});
 
 vi.mock('../../categories/category.model', () => ({
   CategoryModel: {
@@ -102,14 +119,12 @@ describe('TransactionService', () => {
       };
 
       // Mock the model methods
-      vi.mocked(Transaction.create).mockResolvedValue(mockTransactionData as any);
       vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
       vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as any);
 
       const result = await transactionService.createTransaction(createData);
 
       expect(result).toEqual(mockTransactionData);
-      expect(Transaction.create).toHaveBeenCalledWith(createData);
       expect(Category.findById).toHaveBeenCalledWith(createData.categoryId);
       expect(PaymentMethod.findById).toHaveBeenCalledWith(createData.paymentMethodId);
     });
@@ -181,9 +196,16 @@ describe('TransactionService', () => {
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
         populate: vi.fn().mockReturnThis(),
-        exec: vi.fn().mockResolvedValue([mockTransactionData]),
       };
 
+      // Mock the chained query to return the data on the final populate call
+      mockQuery.populate.mockImplementation((field, select) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve([mockTransactionData]);
+        }
+        return mockQuery;
+      });
+      
       vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(1);
 
@@ -208,9 +230,16 @@ describe('TransactionService', () => {
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
         populate: vi.fn().mockReturnThis(),
-        exec: vi.fn().mockResolvedValue([]),
       };
 
+      // Mock the chained query to return empty array on the final populate call
+      mockQuery.populate.mockImplementation((field, select) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve([]);
+        }
+        return mockQuery;
+      });
+      
       vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(0);
 
@@ -258,12 +287,12 @@ describe('TransactionService', () => {
 
       vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as any);
 
-      const result = await transactionService.updateTransaction(transactionId, userId, updateData);
+      const result = await transactionService.updateTransaction(transactionId, updateData, userId);
 
       expect(result).toEqual(updatedTransaction);
       expect(Transaction.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: transactionId, userId },
-        updateData,
+        { ...updateData, updatedAt: expect.any(Date) },
         { new: true }
       );
     });
@@ -276,7 +305,7 @@ describe('TransactionService', () => {
       vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(null);
 
       await expect(
-        transactionService.updateTransaction(transactionId, userId, updateData)
+        transactionService.updateTransaction(transactionId, updateData, userId)
       ).rejects.toThrow('Transaction not found');
     });
   });
@@ -318,21 +347,45 @@ describe('TransactionService', () => {
         endDate: new Date('2025-01-31'),
       };
 
-      const mockStats = {
-        totalIncome: 5000,
-        totalExpense: 3000,
-        netAmount: 2000,
-        transactionCount: 25,
-      };
+      const mockTransactions = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          type: 'income',
+          amount: 5000,
+          categoryId: { name: 'Salary' },
+          paymentMethodId: { name: 'Bank' },
+          date: new Date('2025-01-15'),
+        },
+        {
+          _id: '507f1f77bcf86cd799439012',
+          type: 'expense',
+          amount: 3000,
+          categoryId: { name: 'Rent' },
+          paymentMethodId: { name: 'Credit Card' },
+          date: new Date('2025-01-20'),
+        },
+      ];
 
-      // Mock aggregation pipeline
-      const mockAggregate = vi.fn().mockResolvedValue([mockStats]);
-      vi.mocked(Transaction.aggregate).mockImplementation(mockAggregate);
+      // Mock find method to return transactions with proper chaining
+      const mockQuery = {
+        populate: vi.fn().mockReturnThis(),
+      };
+      mockQuery.populate.mockImplementation((field, select) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve(mockTransactions);
+        }
+        return mockQuery;
+      });
+      
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
 
       const result = await transactionService.getTransactionStats(filters);
 
-      expect(result).toEqual(mockStats);
-      expect(Transaction.aggregate).toHaveBeenCalled();
+      expect(result.summary.totalIncome).toBe(5000);
+      expect(result.summary.totalExpenses).toBe(3000);
+      expect(result.summary.netAmount).toBe(2000);
+      expect(result.summary.transactionCount).toBe(2);
+      expect(Transaction.find).toHaveBeenCalled();
     });
   });
 });

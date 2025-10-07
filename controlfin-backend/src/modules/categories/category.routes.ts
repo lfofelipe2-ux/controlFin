@@ -4,7 +4,7 @@ import {
   CategoryQuerySchema,
   CreateCategorySchema,
   UpdateCategorySchema,
-} from './category.schemas';
+} from './category.schemas.json';
 import { categoryService } from './category.service';
 
 export async function categoryRoutes(fastify: FastifyInstance) {
