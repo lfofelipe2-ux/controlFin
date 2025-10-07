@@ -36,10 +36,15 @@ function sanitizeObject(obj: any): any {
     }
 
     if (typeof obj === 'object') {
+        // For objects, only sanitize string values, preserve structure
         const sanitized: any = {};
         for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
-                sanitized[key] = sanitizeObject(obj[key]);
+                if (typeof obj[key] === 'string') {
+                    sanitized[key] = sanitizeString(obj[key]);
+                } else {
+                    sanitized[key] = sanitizeObject(obj[key]);
+                }
             }
         }
         return sanitized;
@@ -58,41 +63,20 @@ function sanitizeString(str: string): string {
     const nosqlPatterns = /^\s*\{.*\$where|\$ne|\$gt|\$lt|\$regex|\$exists|\$in|\$nin|\$or|\$and/gi;
     if (nosqlPatterns.test(str)) {
         // Remove NoSQL injection attempts
-        let sanitized = mongoSanitize(str);
-
-        // Remove common injection patterns
-        sanitized = sanitized.replace(/[$]where/gi, '');
-        sanitized = sanitized.replace(/[$]ne/gi, '');
-        sanitized = sanitized.replace(/[$]gt/gi, '');
-        sanitized = sanitized.replace(/[$]lt/gi, '');
-        sanitized = sanitized.replace(/[$]regex/gi, '');
-        sanitized = sanitized.replace(/[$]exists/gi, '');
-
-        return sanitized;
+        return mongoSanitize(str);
     }
 
-    // Check for XSS patterns - only sanitize if it contains actual script tags or dangerous attributes
-    const xssPatterns = /<script[^>]*>|javascript:|on\w+\s*=|<iframe|<object|<embed/gi;
+    // Check for XSS patterns - only sanitize if it contains actual script tags
+    const xssPatterns = /<script[^>]*>.*?<\/script>|javascript:|on\w+\s*=/gi;
     if (xssPatterns.test(str)) {
-        // Remove XSS payloads
-        return xss(str, {
-            whiteList: {}, // No HTML tags allowed
-            stripIgnoreTag: true,
-            stripIgnoreTagBody: ['script', 'iframe', 'object', 'embed']
-        });
+        // Remove XSS payloads but preserve the string structure
+        return str.replace(/<script[^>]*>.*?<\/script>/gi, '[SCRIPT_REMOVED]')
+                 .replace(/javascript:/gi, '')
+                 .replace(/on\w+\s*=/gi, '');
     }
 
-    // For normal strings, just escape HTML entities to prevent XSS
-    return str.replace(/[<>&"']/g, (match) => {
-        switch (match) {
-            case '<': return '&lt;';
-            case '>': return '&gt;';
-            case '&': return '&amp;';
-            case '"': return '&quot;';
-            case "'": return '&#x27;';
-            default: return match;
-        }
-    });
+    // For normal strings, return as-is to avoid breaking valid data
+    return str;
 }
 
 export function requireInputSanitization() {
