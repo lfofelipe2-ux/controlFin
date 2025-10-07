@@ -51,10 +51,21 @@ Verificar e corrigir problemas críticos identificados na Task 011, onde funcion
 - **Authentication**: ✅ Working correctly
 - **API Endpoints**: ✅ All functional
 - **Database Operations**: ✅ Working with proper constraints
+- **Schema Conversion**: ✅ Automatic Zod to JSON Schema conversion implemented
+  - ✅ `zod-to-json-schema` dependency added
+  - ✅ `schema-converter.ts` utility created
+  - ✅ Transaction routes updated to use automatic conversion
+  - ✅ Model imports fixed in test files
+  - 🔄 **PENDING**: Standardize all other route files
 
 ### **Next Steps**
 - Fix remaining 5 performance tests (validation issues)
 - Address underlying mocking issues in service tests
+- **🔄 NEW: Standardize automatic Zod to JSON Schema conversion**
+  - Replace manual JSON Schema files with automatic conversion
+  - Update all route files to use `zodToFastifySchema()` utility
+  - Remove duplicate `.schemas.json.ts` files
+  - Apply to: analytics, bulk, template, auth, categories, payment-methods routes
 - Create Pull Request for feature branch
 
 ### **Reflection Highlights**
