@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify';
+import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { CategoryModel as Category } from '../../src/modules/categories/category.model';
 import { PaymentMethodModel as PaymentMethod } from '../../src/modules/payment-methods/payment-method.model';
@@ -59,18 +60,31 @@ describe('Transaction API Integration Tests', () => {
       spaceId,
       userId,
       name: 'Credit Card',
-      type: 'credit_card',
+      type: 'card',
+      color: '#FF6B6B',
+      icon: 'card',
       isActive: true,
       metadata: {
-        last4: '1234',
-        bank: 'Test Bank',
+        lastFourDigits: '1234',
+        bankName: 'Test Bank',
       },
     });
     await paymentMethod.save();
     paymentMethodId = paymentMethod._id.toString();
 
-    // Create auth token (simplified for testing)
-    authToken = 'test-token';
+    // Generate valid JWT token for testing
+    authToken = jwt.sign(
+      {
+        userId,
+        type: 'access',
+      },
+      process.env.JWT_SECRET || 'test-jwt-secret',
+      {
+        expiresIn: '1h',
+        issuer: 'controlfin-api',
+        audience: 'controlfin-client',
+      }
+    );
   });
 
   describe('POST /api/transactions', () => {
@@ -91,7 +105,7 @@ describe('Transaction API Integration Tests', () => {
 
       const response = await app.inject({
         method: 'POST',
-        url: '/api/transactions',
+        url: `/api/transactions?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -101,9 +115,9 @@ describe('Transaction API Integration Tests', () => {
       expect(response.statusCode).toBe(201);
       const result = JSON.parse(response.payload);
       expect(result.success).toBe(true);
-      expect(result.data.description).toBe('Test Transaction');
-      expect(result.data.amount).toBe(100.5);
-      expect(result.data.type).toBe('expense');
+      expect(result.data.transaction.description).toBe('Test Transaction');
+      expect(result.data.transaction.amount).toBe(100.5);
+      expect(result.data.transaction.type).toBe('expense');
     });
 
     it('should return 400 for invalid transaction data', async () => {
@@ -115,7 +129,7 @@ describe('Transaction API Integration Tests', () => {
 
       const response = await app.inject({
         method: 'POST',
-        url: '/api/transactions',
+        url: `/api/transactions?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -125,7 +139,7 @@ describe('Transaction API Integration Tests', () => {
       expect(response.statusCode).toBe(400);
       const result = JSON.parse(response.payload);
       expect(result.success).toBe(false);
-      expect(result.error).toContain('validation');
+      expect(result.error).toContain('required property');
     });
 
     it('should return 404 for non-existent category', async () => {
@@ -140,7 +154,7 @@ describe('Transaction API Integration Tests', () => {
 
       const response = await app.inject({
         method: 'POST',
-        url: '/api/transactions',
+        url: `/api/transactions?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -188,7 +202,7 @@ describe('Transaction API Integration Tests', () => {
     it('should get transactions with default pagination', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions',
+        url: `/api/transactions?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -205,7 +219,7 @@ describe('Transaction API Integration Tests', () => {
     it('should filter transactions by type', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?type=expense',
+        url: `/api/transactions?spaceId=${spaceId}&type=expense`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -221,7 +235,7 @@ describe('Transaction API Integration Tests', () => {
     it('should search transactions by description', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?search=Grocery',
+        url: `/api/transactions?spaceId=${spaceId}&search=Grocery`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -237,7 +251,7 @@ describe('Transaction API Integration Tests', () => {
     it('should filter transactions by date range', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?startDate=2025-01-01&endDate=2025-01-31',
+        url: `/api/transactions?spaceId=${spaceId}&startDate=2025-01-01&endDate=2025-01-31`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -296,6 +310,7 @@ describe('Transaction API Integration Tests', () => {
 
       expect(response.statusCode).toBe(404);
       const result = JSON.parse(response.payload);
+      console.log('404 response:', JSON.stringify(result, null, 2));
       expect(result.success).toBe(false);
       expect(result.error).toContain('Transaction not found');
     });
@@ -412,6 +427,7 @@ describe('Transaction API Integration Tests', () => {
 
       expect(response.statusCode).toBe(404);
       const result = JSON.parse(response.payload);
+      console.log('DELETE 404 response:', JSON.stringify(result, null, 2));
       expect(result.success).toBe(false);
       expect(result.error).toContain('Transaction not found');
     });
@@ -459,7 +475,7 @@ describe('Transaction API Integration Tests', () => {
     it('should get transaction statistics', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions/stats/summary',
+        url: `/api/transactions/stats/summary?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },

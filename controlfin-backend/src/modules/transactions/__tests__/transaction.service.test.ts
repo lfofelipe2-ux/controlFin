@@ -205,16 +205,16 @@ describe('TransactionService', () => {
         }
         return mockQuery;
       });
-      
+
       vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(1);
 
       const result = await transactionService.getTransactions(filters);
 
       expect(result.transactions).toEqual([mockTransactionData]);
-      expect(result.total).toBe(1);
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(10);
+      expect(result.pagination.total).toBe(1);
+      expect(result.pagination.page).toBe(1);
+      expect(result.pagination.limit).toBe(10);
     });
 
     it('should handle empty results', async () => {
@@ -239,14 +239,14 @@ describe('TransactionService', () => {
         }
         return mockQuery;
       });
-      
+
       vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(0);
 
       const result = await transactionService.getTransactions(filters);
 
       expect(result.transactions).toEqual([]);
-      expect(result.total).toBe(0);
+      expect(result.pagination.total).toBe(0);
     });
   });
 
@@ -314,27 +314,37 @@ describe('TransactionService', () => {
     it('should delete transaction successfully', async () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
+      const mockTransaction = { _id: transactionId, userId, description: 'Test Transaction' };
 
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransaction as any);
       vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 1 } as any);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
-      expect(result).toBe(true);
+      expect(result).toEqual(mockTransaction);
+      expect(Transaction.findOne).toHaveBeenCalledWith({
+        _id: transactionId,
+        userId,
+      });
       expect(Transaction.deleteOne).toHaveBeenCalledWith({
         _id: transactionId,
         userId,
       });
     });
 
-    it('should return false if transaction not found', async () => {
+    it('should return null if transaction not found', async () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 0 } as any);
+      vi.mocked(Transaction.findOne).mockResolvedValue(null);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
-      expect(result).toBe(false);
+      expect(result).toBe(null);
+      expect(Transaction.findOne).toHaveBeenCalledWith({
+        _id: transactionId,
+        userId,
+      });
     });
   });
 
@@ -376,15 +386,15 @@ describe('TransactionService', () => {
         }
         return mockQuery;
       });
-      
+
       vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
 
       const result = await transactionService.getTransactionStats(filters);
 
-      expect(result.summary.totalIncome).toBe(5000);
-      expect(result.summary.totalExpenses).toBe(3000);
-      expect(result.summary.netAmount).toBe(2000);
-      expect(result.summary.transactionCount).toBe(2);
+      expect(result.totalIncome).toBe(5000);
+      expect(result.totalExpense).toBe(3000);
+      expect(result.netAmount).toBe(2000);
+      expect(result.transactionCount).toBe(2);
       expect(Transaction.find).toHaveBeenCalled();
     });
   });

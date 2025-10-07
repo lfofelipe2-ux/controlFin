@@ -22,14 +22,12 @@ export function createErrorResponse(
     statusCode: number,
     details?: Record<string, unknown>
 ) {
-    return reply.status(statusCode).send({
+    reply.code(statusCode).send({
         success: false,
-        error: {
-            code,
-            message,
-            statusCode,
-            ...(details && { details }),
-        },
+        error: message,
+        code,
+        statusCode,
+        ...(details && { details }),
     });
 }
 
@@ -40,11 +38,13 @@ export function createSuccessResponse<T>(
     message?: string,
     statusCode: number = 200
 ) {
-    return reply.status(statusCode).send({
+    const response = {
         success: true,
         data,
         ...(message && { message }),
-    });
+    };
+    reply.statusCode = statusCode;
+    return reply.send(response);
 }
 
 // Helper function to handle route errors

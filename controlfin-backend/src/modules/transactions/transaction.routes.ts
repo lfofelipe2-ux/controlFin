@@ -1,63 +1,96 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { authMiddleware } from '../../middlewares/auth.middleware';
+import { createErrorResponse } from '../../utils/route-helpers';
 import { zodToFastifySchema } from '../../utils/schema-converter';
 import {
-  CreateTransactionSchema,
-  TransactionQuerySchema,
-  TransactionStatsSchema,
-  UpdateTransactionSchema,
+  TransactionQuerySchema
 } from './transaction.schemas';
 import { transactionService } from './transaction.service';
 
 export async function transactionRoutes(fastify: FastifyInstance) {
-  // Apply authentication middleware to all routes
-  fastify.addHook('preHandler', authMiddleware);
+  // Security middleware is applied globally in server.ts
 
   // Create transaction
   fastify.post(
     '/',
     {
       schema: {
-        body: zodToFastifySchema(CreateTransactionSchema),
+        body: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
+            amount: { type: 'number' },
+            description: { type: 'string' },
+            categoryId: { type: 'string' },
+            paymentMethodId: { type: 'string' },
+            date: { type: 'string' },
+            tags: { type: 'array', items: { type: 'string' } },
+            isRecurring: { type: 'boolean' },
+            recurringId: { type: 'string' },
+            metadata: {
+              type: 'object',
+              properties: {
+                location: { type: 'string' },
+                notes: { type: 'string' },
+                attachments: { type: 'array', items: { type: 'string' } },
+              },
+            },
+          },
+          required: ['type', 'amount', 'description', 'categoryId', 'paymentMethodId', 'date'],
+        },
+        querystring: {
+          type: 'object',
+          properties: {
+            spaceId: { type: 'string' },
+          },
+          required: ['spaceId'],
+        },
         response: {
           201: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
-              transaction: {
+              success: { type: 'boolean' },
+              data: {
                 type: 'object',
                 properties: {
-                  _id: { type: 'string' },
-                  spaceId: { type: 'string' },
-                  userId: { type: 'string' },
-                  type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
-                  amount: { type: 'number' },
-                  description: { type: 'string' },
-                  categoryId: { type: 'string' },
-                  paymentMethodId: { type: 'string' },
-                  date: { type: 'string', format: 'date-time' },
-                  tags: { type: 'array', items: { type: 'string' } },
-                  isRecurring: { type: 'boolean' },
-                  recurringId: { type: 'string', nullable: true },
-                  metadata: {
+                  transaction: {
                     type: 'object',
                     properties: {
-                      location: { type: 'string', nullable: true },
-                      notes: { type: 'string', nullable: true },
-                      attachments: { type: 'array', items: { type: 'string' } },
+                      _id: { type: 'string' },
+                      spaceId: { type: 'string' },
+                      userId: { type: 'string' },
+                      type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
+                      amount: { type: 'number' },
+                      description: { type: 'string' },
+                      categoryId: { type: 'string' },
+                      paymentMethodId: { type: 'string' },
+                      date: { type: 'string', format: 'date-time' },
+                      tags: { type: 'array', items: { type: 'string' } },
+                      isRecurring: { type: 'boolean' },
+                      recurringId: { type: 'string', nullable: true },
+                      metadata: {
+                        type: 'object',
+                        properties: {
+                          location: { type: 'string', nullable: true },
+                          notes: { type: 'string', nullable: true },
+                          attachments: { type: 'array', items: { type: 'string' } },
+                        },
+                      },
+                      createdAt: { type: 'string', format: 'date-time' },
+                      updatedAt: { type: 'string', format: 'date-time' },
                     },
                   },
-                  createdAt: { type: 'string', format: 'date-time' },
-                  updatedAt: { type: 'string', format: 'date-time' },
                 },
               },
+              message: { type: 'string' },
             },
           },
           400: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
+              success: { type: 'boolean' },
               error: { type: 'string' },
+              code: { type: 'string' },
+              statusCode: { type: 'number' },
             },
           },
           401: {
@@ -71,28 +104,34 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?._id;
         const transactionData = request.body;
+        const { spaceId } = request.query as { spaceId: string };
+
+
 
         const transaction = await transactionService.createTransaction({
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(transactionData as any),
+          ...(transactionData as Record<string, unknown>),
           userId,
-        });
+          spaceId,
+        } as CreateTransactionData);
 
-        return reply.status(201).send({
+        reply.code(201).send({
+          success: true,
+          data: { transaction },
           message: 'Transaction created successfully',
-          transaction,
         });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
-          message: 'Failed to create transaction',
-          error: (error as Error)?.message || 'Unknown error',
-        });
+        const errorMessage = (error as Error)?.message || 'Failed to create transaction';
+        const statusCode = errorMessage.includes('not found') ? 404 : 400;
+        createErrorResponse(
+          reply,
+          'TRANSACTION_CREATE_FAILED',
+          errorMessage,
+          statusCode
+        );
       }
     }
   );
@@ -102,48 +141,75 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/',
     {
       schema: {
-        querystring: zodToFastifySchema(TransactionQuerySchema),
+        querystring: {
+          type: 'object',
+          properties: {
+            spaceId: { type: 'string' },
+            userId: { type: 'string' },
+            type: { type: 'string', enum: ['income', 'expense', 'transfer', 'all'] },
+            categoryId: { type: 'string' },
+            paymentMethodId: { type: 'string' },
+            startDate: { type: 'string' },
+            endDate: { type: 'string' },
+            minAmount: { type: 'number' },
+            maxAmount: { type: 'number' },
+            tags: { type: 'array', items: { type: 'string' } },
+            isRecurring: { type: 'boolean' },
+            search: { type: 'string' },
+            sortBy: { type: 'string', enum: ['date', 'amount', 'description', 'createdAt'] },
+            sortOrder: { type: 'string', enum: ['asc', 'desc'] },
+            page: { type: 'number' },
+            limit: { type: 'number' },
+          },
+          // Remove required validation to allow middleware to handle authentication first
+        },
         response: {
           200: {
             type: 'object',
             properties: {
-              transactions: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    _id: { type: 'string' },
-                    spaceId: { type: 'string' },
-                    userId: { type: 'string' },
-                    type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
-                    amount: { type: 'number' },
-                    description: { type: 'string' },
-                    categoryId: { type: 'string' },
-                    paymentMethodId: { type: 'string' },
-                    date: { type: 'string', format: 'date-time' },
-                    tags: { type: 'array', items: { type: 'string' } },
-                    isRecurring: { type: 'boolean' },
-                    recurringId: { type: 'string', nullable: true },
-                    metadata: {
-                      type: 'object',
-                      properties: {
-                        location: { type: 'string', nullable: true },
-                        notes: { type: 'string', nullable: true },
-                        attachments: { type: 'array', items: { type: 'string' } },
-                      },
-                    },
-                    createdAt: { type: 'string', format: 'date-time' },
-                    updatedAt: { type: 'string', format: 'date-time' },
-                  },
-                },
-              },
-              pagination: {
+              success: { type: 'boolean' },
+              data: {
                 type: 'object',
                 properties: {
-                  page: { type: 'number' },
-                  limit: { type: 'number' },
-                  total: { type: 'number' },
-                  pages: { type: 'number' },
+                  transactions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        _id: { type: 'string' },
+                        spaceId: { type: 'string' },
+                        userId: { type: 'string' },
+                        type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
+                        amount: { type: 'number' },
+                        description: { type: 'string' },
+                        categoryId: { type: 'string' },
+                        paymentMethodId: { type: 'string' },
+                        date: { type: 'string', format: 'date-time' },
+                        tags: { type: 'array', items: { type: 'string' } },
+                        isRecurring: { type: 'boolean' },
+                        recurringId: { type: 'string', nullable: true },
+                        metadata: {
+                          type: 'object',
+                          properties: {
+                            location: { type: 'string', nullable: true },
+                            notes: { type: 'string', nullable: true },
+                            attachments: { type: 'array', items: { type: 'string' } },
+                          },
+                        },
+                        createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  },
+                  pagination: {
+                    type: 'object',
+                    properties: {
+                      page: { type: 'number' },
+                      limit: { type: 'number' },
+                      total: { type: 'number' },
+                      pages: { type: 'number' },
+                    },
+                  },
                 },
               },
             },
@@ -151,8 +217,10 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           400: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
+              success: { type: 'boolean' },
               error: { type: 'string' },
+              code: { type: 'string' },
+              statusCode: { type: 'number' },
             },
           },
           401: {
@@ -166,22 +234,23 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?._id;
         const query = request.query;
 
         const result = await transactionService.getTransactions({
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(query as any),
+          ...(query as Record<string, unknown>),
           userId,
         });
 
-        return reply.status(200).send(result);
+        reply.code(200).send({
+          success: true,
+          data: result,
+          message: 'Transactions retrieved successfully',
+        });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
+        reply.code(400).send({
           message: 'Failed to fetch transactions',
           error: (error as Error)?.message || 'Unknown error',
         });
@@ -199,7 +268,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           200: {
             type: 'object',
             properties: {
-              transaction: {
+              success: { type: 'boolean' },
+              data: {
                 type: 'object',
                 properties: {
                   _id: { type: 'string' },
@@ -231,7 +301,9 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           404: {
             type: 'object',
             properties: {
+              success: { type: 'boolean' },
               message: { type: 'string' },
+              error: { type: 'string' },
             },
           },
           401: {
@@ -253,17 +325,26 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         const transaction = await transactionService.getTransactionById(id, userId);
 
         if (!transaction) {
-          return reply.status(404).send({
+          reply.code(404).send({
+            success: false,
             message: 'Transaction not found',
           });
+          return;
         }
 
-        return reply.status(200).send({ transaction });
+        reply.code(200).send({
+          success: true,
+          data: transaction,
+          message: 'Transaction retrieved successfully',
+        });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
-          message: 'Failed to fetch transaction',
-          error: (error as Error)?.message || 'Unknown error',
+        const errorMessage = (error as Error)?.message || 'Unknown error';
+        const statusCode = errorMessage.includes('not found') ? 404 : 400;
+        reply.code(statusCode).send({
+          success: false,
+          message: errorMessage,
+          error: errorMessage,
         });
       }
     }
@@ -275,13 +356,34 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     {
       schema: {
         params: { type: 'object', properties: { id: { type: 'string' } } },
-        body: zodToFastifySchema(UpdateTransactionSchema),
+        body: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
+            amount: { type: 'number' },
+            description: { type: 'string' },
+            categoryId: { type: 'string' },
+            paymentMethodId: { type: 'string' },
+            date: { type: 'string' },
+            tags: { type: 'array', items: { type: 'string' } },
+            isRecurring: { type: 'boolean' },
+            recurringId: { type: 'string' },
+            metadata: {
+              type: 'object',
+              properties: {
+                location: { type: 'string' },
+                notes: { type: 'string' },
+                attachments: { type: 'array', items: { type: 'string' } },
+              },
+            },
+          },
+        },
         response: {
           200: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
-              transaction: {
+              success: { type: 'boolean' },
+              data: {
                 type: 'object',
                 properties: {
                   _id: { type: 'string' },
@@ -308,19 +410,24 @@ export async function transactionRoutes(fastify: FastifyInstance) {
                   updatedAt: { type: 'string', format: 'date-time' },
                 },
               },
+              message: { type: 'string' },
             },
           },
           404: {
             type: 'object',
             properties: {
+              success: { type: 'boolean' },
               message: { type: 'string' },
+              error: { type: 'string' },
             },
           },
           400: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
+              success: { type: 'boolean' },
               error: { type: 'string' },
+              code: { type: 'string' },
+              statusCode: { type: 'number' },
             },
           },
           401: {
@@ -334,7 +441,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?._id;
         const { id } = request.params as { id: string };
@@ -349,20 +455,26 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         );
 
         if (!transaction) {
-          return reply.status(404).send({
+          reply.code(404).send({
+            success: false,
             message: 'Transaction not found',
           });
+          return;
         }
 
-        return reply.status(200).send({
+        reply.code(200).send({
+          success: true,
+          data: transaction,
           message: 'Transaction updated successfully',
-          transaction,
         });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
-          message: 'Failed to update transaction',
-          error: (error as Error)?.message || 'Unknown error',
+        const errorMessage = (error as Error)?.message || 'Unknown error';
+        const statusCode = errorMessage.includes('not found') ? 404 : 400;
+        reply.code(statusCode).send({
+          success: false,
+          message: errorMessage,
+          error: errorMessage,
         });
       }
     }
@@ -378,13 +490,43 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           200: {
             type: 'object',
             properties: {
+              success: { type: 'boolean' },
+              data: {
+                type: 'object',
+                properties: {
+                  _id: { type: 'string' },
+                  spaceId: { type: 'string' },
+                  userId: { type: 'string' },
+                  type: { type: 'string', enum: ['income', 'expense', 'transfer'] },
+                  amount: { type: 'number' },
+                  description: { type: 'string' },
+                  categoryId: { type: 'string' },
+                  paymentMethodId: { type: 'string' },
+                  date: { type: 'string', format: 'date-time' },
+                  tags: { type: 'array', items: { type: 'string' } },
+                  isRecurring: { type: 'boolean' },
+                  recurringId: { type: 'string', nullable: true },
+                  metadata: {
+                    type: 'object',
+                    properties: {
+                      location: { type: 'string', nullable: true },
+                      notes: { type: 'string', nullable: true },
+                      attachments: { type: 'array', items: { type: 'string' } },
+                    },
+                  },
+                  createdAt: { type: 'string', format: 'date-time' },
+                  updatedAt: { type: 'string', format: 'date-time' },
+                },
+              },
               message: { type: 'string' },
             },
           },
           404: {
             type: 'object',
             properties: {
+              success: { type: 'boolean' },
               message: { type: 'string' },
+              error: { type: 'string' },
             },
           },
           401: {
@@ -406,19 +548,27 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         const deleted = await transactionService.deleteTransaction(id, userId);
 
         if (!deleted) {
-          return reply.status(404).send({
+          reply.code(404).send({
+            success: false,
             message: 'Transaction not found',
+            error: 'Transaction not found',
           });
+          return;
         }
 
-        return reply.status(200).send({
+        reply.code(200).send({
+          success: true,
+          data: deleted,
           message: 'Transaction deleted successfully',
         });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
-          message: 'Failed to delete transaction',
-          error: (error as Error)?.message || 'Unknown error',
+        const errorMessage = (error as Error)?.message || 'Unknown error';
+        const statusCode = errorMessage.includes('not found') ? 404 : 400;
+        reply.code(statusCode).send({
+          success: false,
+          message: errorMessage,
+          error: errorMessage,
         });
       }
     }
@@ -429,66 +579,76 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/stats/summary',
     {
       schema: {
-        querystring: zodToFastifySchema(TransactionStatsSchema),
+        querystring: {
+          type: 'object',
+          properties: {
+            spaceId: { type: 'string' },
+          },
+          required: ['spaceId'],
+        },
         response: {
           200: {
             type: 'object',
             properties: {
-              summary: {
+              success: { type: 'boolean' },
+              data: {
                 type: 'object',
                 properties: {
                   totalIncome: { type: 'number' },
-                  totalExpenses: { type: 'number' },
+                  totalExpense: { type: 'number' },
                   netAmount: { type: 'number' },
                   transactionCount: { type: 'number' },
                   averageTransaction: { type: 'number' },
-                },
-              },
-              byCategory: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    categoryId: { type: 'string' },
-                    categoryName: { type: 'string' },
-                    amount: { type: 'number' },
-                    count: { type: 'number' },
-                    percentage: { type: 'number' },
+                  byCategory: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        categoryId: { type: 'string' },
+                        categoryName: { type: 'string' },
+                        amount: { type: 'number' },
+                        count: { type: 'number' },
+                        percentage: { type: 'number' },
+                      },
+                    },
+                  },
+                  byPaymentMethod: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        paymentMethodId: { type: 'string' },
+                        paymentMethodName: { type: 'string' },
+                        amount: { type: 'number' },
+                        count: { type: 'number' },
+                        percentage: { type: 'number' },
+                      },
+                    },
+                  },
+                  monthlyTrend: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        month: { type: 'string' },
+                        income: { type: 'number' },
+                        expenses: { type: 'number' },
+                        net: { type: 'number' },
+                      },
+                    },
                   },
                 },
               },
-              byPaymentMethod: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    paymentMethodId: { type: 'string' },
-                    paymentMethodName: { type: 'string' },
-                    amount: { type: 'number' },
-                    count: { type: 'number' },
-                    percentage: { type: 'number' },
-                  },
-                },
-              },
-              monthlyTrend: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    month: { type: 'string' },
-                    income: { type: 'number' },
-                    expenses: { type: 'number' },
-                    net: { type: 'number' },
-                  },
-                },
-              },
+              message: { type: 'string' },
             },
           },
           400: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
+              success: { type: 'boolean' },
               error: { type: 'string' },
+              code: { type: 'string' },
+              statusCode: { type: 'number' },
             },
           },
           401: {
@@ -514,10 +674,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           userId,
         });
 
-        return reply.status(200).send(stats);
+        reply.code(200).send({
+          success: true,
+          data: stats,
+          message: 'Transaction statistics retrieved successfully',
+        });
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
+        reply.code(400).send({
           message: 'Failed to fetch transaction statistics',
           error: (error as Error)?.message || 'Unknown error',
         });
@@ -579,8 +743,10 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           400: {
             type: 'object',
             properties: {
-              message: { type: 'string' },
+              success: { type: 'boolean' },
               error: { type: 'string' },
+              code: { type: 'string' },
+              statusCode: { type: 'number' },
             },
           },
           401: {
@@ -606,10 +772,10 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           userId,
         });
 
-        return reply.status(200).send(result);
+        reply.code(200).send(result);
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(400).send({
+        reply.code(400).send({
           message: 'Failed to search transactions',
           error: (error as Error)?.message || 'Unknown error',
         });

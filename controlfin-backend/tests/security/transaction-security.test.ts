@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify';
+import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { CategoryModel as Category } from '../../src/modules/categories/category.model';
 import { PaymentMethodModel as PaymentMethod } from '../../src/modules/payment-methods/payment-method.model';
@@ -9,12 +10,13 @@ import { buildApp } from '../../src/server';
 describe('Transaction Security Tests', () => {
   let app: FastifyInstance;
   let authToken: string;
+  let otherAuthToken: string;
   let userId: string;
   let spaceId: string;
   let categoryId: string;
   let paymentMethodId: string;
-  // let otherUserId: string;
-  // let otherSpaceId: string;
+  let otherUserId: string;
+  let otherSpaceId: string;
 
   beforeAll(async () => {
     // Build Fastify app
@@ -72,17 +74,45 @@ describe('Transaction Security Tests', () => {
       spaceId,
       userId,
       name: 'Credit Card',
-      type: 'credit_card',
+      type: 'card',
+      color: '#FF6B6B',
+      icon: 'card',
       isActive: true,
       metadata: {
-        last4: '1234',
-        bank: 'Test Bank',
+        lastFourDigits: '1234',
+        bankName: 'Test Bank',
       },
     });
     await paymentMethod.save();
     paymentMethodId = paymentMethod._id.toString();
 
-    authToken = 'test-token';
+    // Generate valid JWT token for testing
+    authToken = jwt.sign(
+      {
+        userId,
+        type: 'access',
+      },
+      process.env.JWT_SECRET || 'test-jwt-secret',
+      {
+        expiresIn: '1h',
+        issuer: 'controlfin-api',
+        audience: 'controlfin-client',
+      }
+    );
+
+    // Generate valid JWT token for other user
+    otherAuthToken = jwt.sign(
+      {
+        userId: otherUserId,
+        type: 'access',
+      },
+      process.env.JWT_SECRET || 'test-jwt-secret',
+      {
+        expiresIn: '1h',
+        issuer: 'controlfin-api',
+        audience: 'controlfin-client',
+      }
+    );
   });
 
   describe('Authentication Security', () => {
@@ -143,7 +173,7 @@ describe('Transaction Security Tests', () => {
         method: 'GET',
         url: '/api/transactions',
         headers: {
-          authorization: `Bearer other-user-token`,
+          authorization: `Bearer ${otherAuthToken}`,
         },
       });
 
@@ -174,7 +204,7 @@ describe('Transaction Security Tests', () => {
         method: 'GET',
         url: `/api/transactions/${transactionId}`,
         headers: {
-          authorization: `Bearer other-user-token`,
+          authorization: `Bearer ${otherAuthToken}`,
         },
       });
 
@@ -202,7 +232,7 @@ describe('Transaction Security Tests', () => {
         method: 'PUT',
         url: `/api/transactions/${transactionId}`,
         headers: {
-          authorization: `Bearer other-user-token`,
+          authorization: `Bearer ${otherAuthToken}`,
         },
         payload: {
           description: 'Hacked Transaction',
@@ -233,7 +263,7 @@ describe('Transaction Security Tests', () => {
         method: 'DELETE',
         url: `/api/transactions/${transactionId}`,
         headers: {
-          authorization: `Bearer other-user-token`,
+          authorization: `Bearer ${otherAuthToken}`,
         },
       });
 

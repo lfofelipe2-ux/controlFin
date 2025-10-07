@@ -4,6 +4,9 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { connectDatabase } from './config/database';
 import { env } from './config/env';
+import { authMiddleware } from './middlewares/auth.middleware';
+import { authorizationMiddleware } from './middlewares/authorization.middleware';
+import { inputSanitizationMiddleware } from './middlewares/input-sanitizer';
 import { authRoutes } from './modules/auth/auth.routes';
 import { categoryRoutes } from './modules/categories/category.routes';
 import { paymentMethodRoutes } from './modules/payment-methods/payment-method.routes';
@@ -17,16 +20,16 @@ const buildApp = () => {
     logger:
       process.env['NODE_ENV'] === 'development'
         ? {
-            level: process.env['LOG_LEVEL'] || 'info',
-            transport: {
-              target: 'pino-pretty',
-              options: {
-                colorize: true,
-                translateTime: 'HH:MM:ss Z',
-                ignore: 'pid,hostname',
-              },
+          level: process.env['LOG_LEVEL'] || 'info',
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              colorize: true,
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname',
             },
-          }
+          },
+        }
         : true,
   });
 
@@ -45,6 +48,37 @@ const buildApp = () => {
     timeWindow: '1 minute',
   });
 
+  // Apply global security middleware to all routes except auth
+  fastify.addHook('preHandler', async (request, reply) => {
+    // Skip auth middleware for auth routes
+    if (request.url.startsWith('/api/auth')) {
+      return;
+    }
+
+    // Apply auth middleware
+    await authMiddleware(request, reply);
+  });
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    // Skip authorization middleware for auth routes
+    if (request.url.startsWith('/api/auth')) {
+      return;
+    }
+
+    // Apply authorization middleware
+    await authorizationMiddleware(request, reply);
+  });
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    // Skip input sanitization for auth routes
+    if (request.url.startsWith('/api/auth')) {
+      return;
+    }
+
+    // Apply input sanitization middleware
+    await inputSanitizationMiddleware(request, reply);
+  });
+
   // Register routes
   fastify.register(authRoutes, { prefix: '/api/auth' });
   fastify.register(categoryRoutes, { prefix: '/api/categories' });
@@ -53,6 +87,30 @@ const buildApp = () => {
   fastify.register(analyticsRoutes, { prefix: '/api/analytics' });
   fastify.register(bulkRoutes, { prefix: '/api/bulk' });
   fastify.register(templateRoutes, { prefix: '/api/templates' });
+
+  // Global error handler
+  fastify.setErrorHandler((error, _request, reply) => {
+    // Handle validation errors
+    if (error.validation) {
+      return reply.status(400).send({
+        success: false,
+        error: error.message,
+        code: 'VALIDATION_ERROR',
+        statusCode: 400,
+        details: error.validation,
+      });
+    }
+
+    // Handle other errors
+    return reply.status(500).send({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error.message || 'Internal server error',
+        statusCode: 500,
+      },
+    });
+  });
 
   return fastify;
 };

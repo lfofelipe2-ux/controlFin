@@ -112,7 +112,7 @@ describe('Transaction Performance Tests', () => {
       const queryStartTime = Date.now();
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?limit=50',
+        url: `/api/transactions?spaceId=${spaceId}&limit=50`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -126,7 +126,7 @@ describe('Transaction Performance Tests', () => {
 
       const result = JSON.parse(response.payload);
       console.log('Response structure:', JSON.stringify(result, null, 2));
-      expect(result.transactions).toHaveLength(50);
+      expect(result.data.transactions).toHaveLength(50);
       // Note: pagination might not be present in this response format
     });
 
@@ -150,7 +150,7 @@ describe('Transaction Performance Tests', () => {
       const filterStartTime = Date.now();
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?type=expense&minAmount=100&maxAmount=1000&search=Transaction&startDate=2025-01-01&endDate=2025-01-31',
+        url: `/api/transactions?spaceId=${spaceId}&type=expense&minAmount=100&maxAmount=1000&search=Transaction&startDate=2025-01-01&endDate=2025-01-31`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -183,7 +183,7 @@ describe('Transaction Performance Tests', () => {
       const statsStartTime = Date.now();
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions/stats/summary',
+        url: `/api/transactions/stats/summary?spaceId=${spaceId}`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -220,7 +220,7 @@ describe('Transaction Performance Tests', () => {
       const requests = Array.from({ length: concurrentRequests }, () =>
         app.inject({
           method: 'GET',
-          url: '/api/transactions',
+          url: `/api/transactions?spaceId=${spaceId}`,
           headers: {
             authorization: `Bearer ${authToken}`,
           },
@@ -247,7 +247,7 @@ describe('Transaction Performance Tests', () => {
       const requests = Array.from({ length: concurrentRequests }, (_, i) =>
         app.inject({
           method: 'POST',
-          url: '/api/transactions',
+          url: `/api/transactions?spaceId=${spaceId}`,
           headers: {
             authorization: `Bearer ${authToken}`,
           },
@@ -307,7 +307,7 @@ describe('Transaction Performance Tests', () => {
       const startTime = Date.now();
       const response = await app.inject({
         method: 'GET',
-        url: '/api/transactions?limit=1000',
+        url: `/api/transactions?spaceId=${spaceId}&limit=1000`,
         headers: {
           authorization: `Bearer ${authToken}`,
         },
@@ -320,7 +320,7 @@ describe('Transaction Performance Tests', () => {
       expect(queryTime).toBeLessThan(2000); // Should complete within 2 seconds
 
       const result = JSON.parse(response.payload);
-      expect(result.transactions).toHaveLength(1000);
+      expect(result.data.transactions).toHaveLength(1000);
     });
   });
 

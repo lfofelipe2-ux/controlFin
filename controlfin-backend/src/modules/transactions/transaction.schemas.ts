@@ -22,8 +22,8 @@ const BaseTransactionSchema = z.object({
     .default(() => ({ attachments: [] })),
 });
 
-// Create transaction schema
-export const CreateTransactionSchema = BaseTransactionSchema;
+// Create transaction schema (without spaceId, comes from query)
+export const CreateTransactionSchema = BaseTransactionSchema.omit({ spaceId: true });
 
 // Update transaction schema (all fields optional except spaceId)
 export const UpdateTransactionSchema = BaseTransactionSchema.partial().extend({
