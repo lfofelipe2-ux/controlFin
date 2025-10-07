@@ -77,7 +77,7 @@ const mockPaymentMethod = {
   updatedAt: new Date('2025-01-01'),
 };
 
-describe.skip('TransactionService', () => {
+describe('TransactionService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
