@@ -111,6 +111,6 @@ process.on('SIGTERM', async () => {
 });
 
 // Only start server if not in test mode
-if (process.env.NODE_ENV !== 'test') {
+if (process.env['NODE_ENV'] !== 'test') {
   start();
 }
