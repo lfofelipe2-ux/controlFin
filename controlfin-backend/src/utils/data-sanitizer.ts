@@ -28,11 +28,23 @@ export function sanitizeTransactionData(data: any): any {
 }
 
 function sanitizeString(str: string): string {
-    return xss(str, {
-        whiteList: {},
-        stripIgnoreTag: true,
-        stripIgnoreTagBody: ['script']
-    });
+    // Only sanitize if the string contains potentially malicious content
+    if (!str || typeof str !== 'string') {
+        return str;
+    }
+
+    // Check for XSS patterns - only sanitize if it contains actual script tags
+    const xssPatterns = /<script[^>]*>|javascript:|on\w+\s*=/gi;
+    if (xssPatterns.test(str)) {
+        return xss(str, {
+            whiteList: {},
+            stripIgnoreTag: true,
+            stripIgnoreTagBody: ['script']
+        });
+    }
+
+    // If no malicious patterns detected, return original string
+    return str;
 }
 
 function sanitizeObject(obj: any): any {

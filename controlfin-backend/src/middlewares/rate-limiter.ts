@@ -62,6 +62,9 @@ export const transactionRateLimit = rateLimit(transactionRateLimit);
 export const queryRateLimit = rateLimit(queryRateLimit);
 export const authRateLimit = rateLimit(authRateLimit);
 
+// In-memory store for rate limiting
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
 // Custom rate limiting middleware for Fastify
 export async function rateLimitMiddleware(
     request: FastifyRequest,
@@ -71,17 +74,29 @@ export async function rateLimitMiddleware(
     try {
         // Get client IP
         const clientIP = request.ip || request.socket.remoteAddress || 'unknown';
-
-        // For now, we'll use a simple in-memory store
-        // In production, use Redis or similar
         const key = `rate_limit:${clientIP}`;
         const now = Date.now();
         const windowMs = rateLimitInstance.windowMs;
         const max = rateLimitInstance.max;
 
-        // This is a simplified implementation
-        // In production, use a proper rate limiting library with Fastify
-        return; // Allow request for now
+        // Get current rate limit data
+        const currentData = rateLimitStore.get(key);
+
+        if (!currentData || now > currentData.resetTime) {
+            // First request or window expired, reset counter
+            rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+            return; // Allow request
+        }
+
+        if (currentData.count >= max) {
+            // Rate limit exceeded
+            reply.code(429).send(rateLimitInstance.message);
+            return;
+        }
+
+        // Increment counter
+        currentData.count++;
+        rateLimitStore.set(key, currentData);
 
     } catch (error) {
         // If rate limiting fails, allow the request but log the error

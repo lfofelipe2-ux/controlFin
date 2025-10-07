@@ -43,6 +43,7 @@ const buildApp = () => {
     contentSecurityPolicy: false,
   });
 
+  // Apply different rate limits to different routes
   fastify.register(rateLimit, {
     max: 100,
     timeWindow: '1 minute',
@@ -79,6 +80,42 @@ const buildApp = () => {
     await inputSanitizationMiddleware(request, reply);
   });
 
+  // Apply stricter rate limits to transaction routes (after authentication)
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (request.url.startsWith('/api/transactions')) {
+      // Apply transaction-specific rate limiting
+      const clientIP = request.ip || request.socket.remoteAddress || 'unknown';
+      const key = `transaction_rate_limit:${clientIP}`;
+      const now = Date.now();
+      const windowMs = 15 * 60 * 1000; // 15 minutes
+      const max = 10; // 10 requests per 15 minutes for transactions
+
+      // Simple in-memory rate limiting for transactions
+      const rateLimitStore = (fastify as any).rateLimitStore || new Map();
+      (fastify as any).rateLimitStore = rateLimitStore;
+
+      const currentData = rateLimitStore.get(key);
+
+      if (!currentData || now > currentData.resetTime) {
+        rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+        return; // Allow request
+      }
+
+      if (currentData.count >= max) {
+        reply.code(429).send({
+          success: false,
+          error: 'Too many transaction requests, please try again later',
+          code: 'TRANSACTION_RATE_LIMIT_EXCEEDED',
+          statusCode: 429
+        });
+        return;
+      }
+
+      currentData.count++;
+      rateLimitStore.set(key, currentData);
+    }
+  });
+
   // Register routes
   fastify.register(authRoutes, { prefix: '/api/auth' });
   fastify.register(categoryRoutes, { prefix: '/api/categories' });
@@ -98,6 +135,16 @@ const buildApp = () => {
         code: 'VALIDATION_ERROR',
         statusCode: 400,
         details: error.validation,
+      });
+    }
+
+    // Handle "not found" errors
+    if (error.message && error.message.includes('not found')) {
+      return reply.status(404).send({
+        success: false,
+        error: error.message,
+        code: 'NOT_FOUND',
+        statusCode: 404,
       });
     }
 

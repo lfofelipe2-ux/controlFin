@@ -6,29 +6,19 @@ export async function inputSanitizationMiddleware(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    try {
-        // Sanitize request body
-        if (request.body) {
-            request.body = sanitizeObject(request.body);
-        }
+    // Sanitize request body
+    if (request.body) {
+        request.body = sanitizeObject(request.body);
+    }
 
-        // Sanitize query parameters
-        if (request.query) {
-            request.query = sanitizeObject(request.query);
-        }
+    // Sanitize query parameters
+    if (request.query) {
+        request.query = sanitizeObject(request.query);
+    }
 
-        // Sanitize URL parameters
-        if (request.params) {
-            request.params = sanitizeObject(request.params);
-        }
-
-    } catch (error) {
-        return reply.code(400).send({
-            success: false,
-            error: 'Input sanitization failed',
-            code: 'INPUT_SANITIZATION_FAILED',
-            statusCode: 400
-        });
+    // Sanitize URL parameters
+    if (request.params) {
+        request.params = sanitizeObject(request.params);
     }
 }
 
@@ -59,25 +49,41 @@ function sanitizeObject(obj: any): any {
 }
 
 function sanitizeString(str: string): string {
-    // Remove NoSQL injection attempts
-    let sanitized = mongoSanitize(str);
+    // Only sanitize if the string contains potentially malicious content
+    if (!str || typeof str !== 'string') {
+        return str;
+    }
 
-    // Remove XSS payloads
-    sanitized = xss(sanitized, {
-        whiteList: {}, // No HTML tags allowed
-        stripIgnoreTag: true,
-        stripIgnoreTagBody: ['script']
-    });
+    // Check for NoSQL injection patterns - only sanitize if it looks like a query object
+    const nosqlPatterns = /^\s*\{.*\$where|\$ne|\$gt|\$lt|\$regex|\$exists|\$in|\$nin|\$or|\$and/gi;
+    if (nosqlPatterns.test(str)) {
+        // Remove NoSQL injection attempts
+        let sanitized = mongoSanitize(str);
 
-    // Remove common injection patterns
-    sanitized = sanitized.replace(/[$]where/gi, '');
-    sanitized = sanitized.replace(/[$]ne/gi, '');
-    sanitized = sanitized.replace(/[$]gt/gi, '');
-    sanitized = sanitized.replace(/[$]lt/gi, '');
-    sanitized = sanitized.replace(/[$]regex/gi, '');
-    sanitized = sanitized.replace(/[$]exists/gi, '');
+        // Remove common injection patterns
+        sanitized = sanitized.replace(/[$]where/gi, '');
+        sanitized = sanitized.replace(/[$]ne/gi, '');
+        sanitized = sanitized.replace(/[$]gt/gi, '');
+        sanitized = sanitized.replace(/[$]lt/gi, '');
+        sanitized = sanitized.replace(/[$]regex/gi, '');
+        sanitized = sanitized.replace(/[$]exists/gi, '');
 
-    return sanitized;
+        return sanitized;
+    }
+
+    // Check for XSS patterns - only sanitize if it contains actual script tags
+    const xssPatterns = /<script[^>]*>|javascript:|on\w+\s*=/gi;
+    if (xssPatterns.test(str)) {
+        // Remove XSS payloads
+        return xss(str, {
+            whiteList: {}, // No HTML tags allowed
+            stripIgnoreTag: true,
+            stripIgnoreTagBody: ['script']
+        });
+    }
+
+    // If no malicious patterns detected, return original string
+    return str;
 }
 
 export function requireInputSanitization() {

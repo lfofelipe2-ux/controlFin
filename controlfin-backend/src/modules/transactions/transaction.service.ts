@@ -174,10 +174,10 @@ class TransactionService {
     return updatedTransaction;
   }
 
-  async deleteTransaction(id: string, userId: string): Promise<ITransaction | null> {
+  async deleteTransaction(id: string, userId: string): Promise<ITransaction> {
     const transaction = await Transaction.findOne({ _id: id, userId });
     if (!transaction) {
-      return null;
+      throw new Error('Transaction not found');
     }
 
     await Transaction.deleteOne({ _id: id, userId });

@@ -324,14 +324,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
 
         const transaction = await transactionService.getTransactionById(id, userId);
 
-        if (!transaction) {
-          reply.code(404).send({
-            success: false,
-            message: 'Transaction not found',
-          });
-          return;
-        }
-
         reply.code(200).send({
           success: true,
           data: transaction,
@@ -454,14 +446,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           userId
         );
 
-        if (!transaction) {
-          reply.code(404).send({
-            success: false,
-            message: 'Transaction not found',
-          });
-          return;
-        }
-
         reply.code(200).send({
           success: true,
           data: transaction,
@@ -546,15 +530,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         const { id } = request.params as { id: string };
 
         const deleted = await transactionService.deleteTransaction(id, userId);
-
-        if (!deleted) {
-          reply.code(404).send({
-            success: false,
-            message: 'Transaction not found',
-            error: 'Transaction not found',
-          });
-          return;
-        }
 
         reply.code(200).send({
           success: true,
