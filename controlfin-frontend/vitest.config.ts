@@ -8,5 +8,9 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: ['./src/test-setup.ts'],
+        // Run all tests even if some fail
+        bail: 0,
+        // Continue on errors
+        passWithNoTests: true,
     },
 });

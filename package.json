@@ -16,6 +16,13 @@
     "setup:env": "cp controlfin-frontend/env.example controlfin-frontend/.env && cp controlfin-backend/env.example controlfin-backend/.env",
     "test:mongodb": "node scripts/test-mongodb-connection.js",
     "test:config": "npm run validate:config && npm run test:mongodb",
+    "test:all": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd controlfin-backend && npm run test:all",
+    "test:frontend": "cd controlfin-frontend && npm run test:all",
+    "validate:all": "npm run validate:backend && npm run validate:frontend",
+    "validate:comprehensive": "node scripts/validate-comprehensive.js",
+    "validate:backend": "cd controlfin-backend && npm run validate:all",
+    "validate:frontend": "cd controlfin-frontend && npm run validate:all",
     "start:production": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd controlfin-backend && npm run start:production",
     "start:frontend": "cd controlfin-frontend && npm run preview"

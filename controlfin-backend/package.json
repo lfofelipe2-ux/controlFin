@@ -9,12 +9,15 @@
     "start": "node dist/server.js",
     "start:production": "NODE_ENV=production node dist/server.js",
     "lint": "eslint . --ext .ts --max-warnings 0",
+    "lint:all": "eslint . --ext .ts --max-warnings 0 --max-warnings 0 --format=compact",
     "lint:fix": "eslint . --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,md}\"",
     "test": "vitest",
+    "test:all": "vitest run --reporter=verbose --bail=0",
     "test:coverage": "vitest run --coverage",
+    "validate:all": "npm run type-check && npm run lint && npm run test:all",
     "db:seed": "tsx scripts/seed.ts",
     "openapi:generate": "tsx scripts/generate-openapi.ts"
   },
@@ -45,7 +48,8 @@
     "typescript": "^5.9.2",
     "winston": "^3.18.3",
     "xlsx": "^0.18.5",
-    "zod": "^4.1.11"
+    "zod": "^4.1.11",
+    "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
     "@types/mongodb-memory-server": "^1.8.0",

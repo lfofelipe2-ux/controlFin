@@ -73,7 +73,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const transactionData = request.body;
 
         const transaction = await transactionService.createTransaction({
@@ -168,7 +168,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const query = request.query;
 
         const result = await transactionService.getTransactions({
@@ -247,7 +247,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const { id } = request.params as { id: string };
 
         const transaction = await transactionService.getTransactionById(id, userId);
@@ -336,7 +336,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const { id } = request.params as { id: string };
         const updateData = request.body;
 
@@ -400,7 +400,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const { id } = request.params as { id: string };
 
         const deleted = await transactionService.deleteTransaction(id, userId);
@@ -504,7 +504,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const query = request.query;
 
         const stats = await transactionService.getTransactionStats({
@@ -596,7 +596,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       try {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userId = (request as any).user?.id;
+        const userId = (request as any).user?._id;
         const query = request.query;
 
         const result = await transactionService.searchTransactions({
