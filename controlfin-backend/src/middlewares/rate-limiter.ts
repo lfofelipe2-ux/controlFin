@@ -58,9 +58,9 @@ const authRateLimit = {
 };
 
 export const generalRateLimit = rateLimit(rateLimitConfig);
-export const transactionRateLimitInstance = rateLimit(transactionRateLimit);
-export const queryRateLimitInstance = rateLimit(queryRateLimit);
-export const authRateLimitInstance = rateLimit(authRateLimit);
+export const transactionRateLimitInstance = createRateLimitMiddleware(transactionRateLimit);
+export const queryRateLimitInstance = createRateLimitMiddleware(queryRateLimit);
+export const authRateLimitInstance = createRateLimitMiddleware(authRateLimit);
 
 // In-memory store for rate limiting
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();

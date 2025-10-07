@@ -6,6 +6,7 @@ import {
   TransactionQuerySchema
 } from './transaction.schemas';
 import { transactionService } from './transaction.service';
+import { transactionRateLimitInstance } from '../../middlewares/rate-limiter';
 
 export async function transactionRoutes(fastify: FastifyInstance) {
   // Security middleware is applied globally in server.ts
@@ -14,6 +15,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/',
     {
+      preHandler: [transactionRateLimitInstance],
       schema: {
         body: {
           type: 'object',

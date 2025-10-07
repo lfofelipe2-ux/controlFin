@@ -116,16 +116,7 @@ const buildApp = () => {
     }
   });
 
-  // Register routes
-  fastify.register(authRoutes, { prefix: '/api/auth' });
-  fastify.register(categoryRoutes, { prefix: '/api/categories' });
-  fastify.register(paymentMethodRoutes, { prefix: '/api/payment-methods' });
-  fastify.register(transactionRoutes, { prefix: '/api/transactions' });
-  fastify.register(analyticsRoutes, { prefix: '/api/analytics' });
-  fastify.register(bulkRoutes, { prefix: '/api/bulk' });
-  fastify.register(templateRoutes, { prefix: '/api/templates' });
-
-  // Global error handler
+  // Global error handler - register before routes
   fastify.setErrorHandler((error, _request, reply) => {
     // Handle validation errors
     if (error.validation) {
@@ -158,6 +149,15 @@ const buildApp = () => {
       },
     });
   });
+
+  // Register routes
+  fastify.register(authRoutes, { prefix: '/api/auth' });
+  fastify.register(categoryRoutes, { prefix: '/api/categories' });
+  fastify.register(paymentMethodRoutes, { prefix: '/api/payment-methods' });
+  fastify.register(transactionRoutes, { prefix: '/api/transactions' });
+  fastify.register(analyticsRoutes, { prefix: '/api/analytics' });
+  fastify.register(bulkRoutes, { prefix: '/api/bulk' });
+  fastify.register(templateRoutes, { prefix: '/api/templates' });
 
   return fastify;
 };

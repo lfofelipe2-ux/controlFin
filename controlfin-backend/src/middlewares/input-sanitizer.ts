@@ -71,19 +71,28 @@ function sanitizeString(str: string): string {
         return sanitized;
     }
 
-    // Check for XSS patterns - only sanitize if it contains actual script tags
-    const xssPatterns = /<script[^>]*>|javascript:|on\w+\s*=/gi;
+    // Check for XSS patterns - only sanitize if it contains actual script tags or dangerous attributes
+    const xssPatterns = /<script[^>]*>|javascript:|on\w+\s*=|<iframe|<object|<embed/gi;
     if (xssPatterns.test(str)) {
         // Remove XSS payloads
         return xss(str, {
             whiteList: {}, // No HTML tags allowed
             stripIgnoreTag: true,
-            stripIgnoreTagBody: ['script']
+            stripIgnoreTagBody: ['script', 'iframe', 'object', 'embed']
         });
     }
 
-    // If no malicious patterns detected, return original string
-    return str;
+    // For normal strings, just escape HTML entities to prevent XSS
+    return str.replace(/[<>&"']/g, (match) => {
+        switch (match) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '"': return '&quot;';
+            case "'": return '&#x27;';
+            default: return match;
+        }
+    });
 }
 
 export function requireInputSanitization() {
