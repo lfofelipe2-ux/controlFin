@@ -505,13 +505,25 @@ describe('Transaction Security Tests', () => {
 
   describe('Authorization Bypass Security', () => {
     it('should not allow access to transactions with invalid user context', async () => {
-      // Try to access with malformed user ID
+      // Try to access with malformed user ID in JWT
+      const invalidToken = jwt.sign(
+        {
+          userId: 'invalid-id',
+          type: 'access',
+        },
+        process.env.JWT_SECRET || 'test-jwt-secret',
+        {
+          expiresIn: '1h',
+          issuer: 'controlfin-api',
+          audience: 'controlfin-client',
+        }
+      );
+
       const response = await app.inject({
         method: 'GET',
         url: '/api/transactions',
         headers: {
-          authorization: `Bearer ${authToken}`,
-          'x-user-id': 'invalid-user-id',
+          authorization: `Bearer ${invalidToken}`,
         },
       });
 
@@ -519,12 +531,25 @@ describe('Transaction Security Tests', () => {
     });
 
     it('should not allow access to transactions with empty user context', async () => {
+      // Try to access with empty user ID in JWT
+      const emptyToken = jwt.sign(
+        {
+          userId: '',
+          type: 'access',
+        },
+        process.env.JWT_SECRET || 'test-jwt-secret',
+        {
+          expiresIn: '1h',
+          issuer: 'controlfin-api',
+          audience: 'controlfin-client',
+        }
+      );
+
       const response = await app.inject({
         method: 'GET',
         url: '/api/transactions',
         headers: {
-          authorization: `Bearer ${authToken}`,
-          'x-user-id': '',
+          authorization: `Bearer ${emptyToken}`,
         },
       });
 
