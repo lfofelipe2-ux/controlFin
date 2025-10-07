@@ -15,6 +15,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/',
     {
+      preHandler: [transactionRateLimitInstance],
       schema: {
         body: {
           type: 'object',

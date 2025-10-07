@@ -415,8 +415,12 @@ describe('Transaction Security Tests', () => {
 
       const responses = await Promise.all(requests);
 
+      // Debug: log response status codes
+      console.log('Response status codes:', responses.map(r => r.statusCode));
+      
       // Some requests should be rate limited
       const rateLimitedResponses = responses.filter((r) => r.statusCode === 429);
+      console.log('Rate limited responses:', rateLimitedResponses.length);
       expect(rateLimitedResponses.length).toBeGreaterThan(0);
     });
 

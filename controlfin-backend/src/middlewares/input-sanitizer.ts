@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import mongoSanitize from 'mongo-sanitize';
-import xss from 'xss';
 
 export async function inputSanitizationMiddleware(
     request: FastifyRequest,
@@ -71,8 +70,8 @@ function sanitizeString(str: string): string {
     if (xssPatterns.test(str)) {
         // Remove XSS payloads but preserve the string structure
         return str.replace(/<script[^>]*>.*?<\/script>/gi, '[SCRIPT_REMOVED]')
-                 .replace(/javascript:/gi, '')
-                 .replace(/on\w+\s*=/gi, '');
+            .replace(/javascript:/gi, '')
+            .replace(/on\w+\s*=/gi, '');
     }
 
     // For normal strings, return as-is to avoid breaking valid data
