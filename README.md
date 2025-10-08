@@ -178,3 +178,5 @@ Para mais detalhes sobre a arquitetura e padrões, consulte o **PROJECT_BRIEF.md
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 <!-- Test comment for docs changes -->
+
+<!-- Test comment for docs changes -->
