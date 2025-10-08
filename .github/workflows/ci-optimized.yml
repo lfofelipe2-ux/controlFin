@@ -1,0 +1,348 @@
+---
+# Optimized CI - Continuous Integration with Performance Optimization
+# Implements change detection, parallel execution, and intelligent caching
+# Target: 60-70% reduction in CI execution time
+
+name: CI - Optimized
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Change Detection - Determines what needs to be validated
+  change-detection:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.detect.outputs.frontend }}
+      backend: ${{ steps.detect.outputs.backend }}
+      docs: ${{ steps.detect.outputs.docs }}
+      config: ${{ steps.detect.outputs.config }}
+      quality_gates: ${{ steps.detect.outputs.quality_gates }}
+      code_quality: ${{ steps.detect.outputs.code_quality }}
+      build_matrix: ${{ steps.detect.outputs.build_matrix }}
+      node_versions: ${{ steps.detect.outputs.node_versions }}
+      frontend_cache: ${{ steps.detect.outputs.frontend_cache }}
+      backend_cache: ${{ steps.detect.outputs.backend_cache }}
+      node_modules_cache: ${{ steps.detect.outputs.node_modules_cache }}
+      build_cache: ${{ steps.detect.outputs.build_cache }}
+      change_type: ${{ steps.detect.outputs.change_type }}
+      estimated_time: ${{ steps.detect.outputs.estimated_time }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for change detection
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Run Change Detection
+        id: detect
+        run: |
+          node scripts/ci-change-detector.js
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+
+      - name: Display Change Detection Results
+        run: |
+          echo "🔍 Change Detection Results:"
+          echo "  Frontend: ${{ steps.detect.outputs.frontend }}"
+          echo "  Backend: ${{ steps.detect.outputs.backend }}"
+          echo "  Docs: ${{ steps.detect.outputs.docs }}"
+          echo "  Config: ${{ steps.detect.outputs.config }}"
+          echo "  Change Type: ${{ steps.detect.outputs.change_type }}"
+          echo "  Estimated Time: ${{ steps.detect.outputs.estimated_time }} minutes"
+
+  # Frontend CI - Only runs if frontend changes detected
+  frontend-ci:
+    needs: change-detection
+    if: needs.change-detection.outputs.frontend == 'true'
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./controlfin-frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: ${{ needs.change-detection.outputs.frontend_cache == 'true' && 'npm' || 'false' }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm run test:coverage
+
+      - name: Build Application
+        run: npm run build
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./controlfin-frontend/coverage/lcov.info
+          flags: frontend
+
+  # Backend CI - Only runs if backend changes detected
+  backend-ci:
+    needs: change-detection
+    if: needs.change-detection.outputs.backend == 'true'
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./controlfin-backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: ${{ needs.change-detection.outputs.backend_cache == 'true' && 'npm' || 'false' }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Run Lint
+        run: ESLINT_USE_FLAT_CONFIG=false npm run lint
+
+      - name: Run Tests
+        run: npm run test:coverage
+
+      - name: Build Application
+        run: npm run build
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./controlfin-backend/coverage/lcov.info
+          flags: backend
+
+  # Docs CI - Only runs if docs changes detected
+  docs-ci:
+    needs: change-detection
+    if: needs.change-detection.outputs.docs == 'true'
+    name: Docs CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Markdown Syntax
+        run: |
+          # Check for broken markdown links
+          if command -v markdown-link-check >/dev/null 2>&1; then
+            find docs/ memory-bank/ -name "*.md" -exec markdown-link-check {} \; || true
+          else
+            echo "markdown-link-check not available, skipping link check"
+          fi
+
+      - name: Check YAML Syntax
+        run: |
+          find . -name "*.yml" -o -name "*.yaml" | while read file; do
+            if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+              echo "❌ YAML syntax error in $file"
+              exit 1
+            fi
+          done
+
+      - name: Check JSON Syntax
+        run: |
+          find . -name "*.json" | while read file; do
+            if ! python3 -c "import json; json.load(open('$file'))" 2>/dev/null; then
+              echo "❌ JSON syntax error in $file"
+              exit 1
+            fi
+          done
+
+  # Config CI - Only runs if config changes detected
+  config-ci:
+    needs: change-detection
+    if: needs.change-detection.outputs.config == 'true'
+    name: Config CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate GitHub Workflows
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            
+            // Validate workflow files
+            const workflowFiles = fs.readdirSync('.github/workflows/')
+              .filter(file => file.endsWith('.yml') || file.endsWith('.yaml'));
+            
+            for (const file of workflowFiles) {
+              try {
+                const content = fs.readFileSync(`.github/workflows/${file}`, 'utf8');
+                yaml.load(content);
+                console.log(`✅ ${file} is valid`);
+              } catch (error) {
+                console.log(`❌ ${file} has syntax error: ${error.message}`);
+                throw error;
+              }
+            }
+
+      - name: Validate CI Config
+        run: |
+          python3 -c "
+          import yaml
+          with open('.github/config/ci-config.yml', 'r') as f:
+              yaml.safe_load(f)
+          print('✅ CI config is valid')
+          "
+
+  # Quality Gates - Only runs if frontend or backend changes detected
+  quality-gates:
+    needs: change-detection
+    if: needs.change-detection.outputs.quality_gates == 'true'
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: i18n Compliance Check
+        run: |
+          cd controlfin-frontend
+          # Check for hardcoded strings in components (excluding comments and tests)
+          if grep -r "name: '[A-Z][a-zA-Z ]*'" src/components/ --include="*.tsx" --include="*.ts" --exclude="*test*" | grep -v "t(" | grep -v "i18n" | grep -v "//"; then
+            echo "❌ Hardcoded strings found! Use i18n keys instead."
+            exit 1
+          fi
+          echo "✅ i18n compliance check passed"
+
+      - name: CSS Architecture Check
+        run: |
+          cd controlfin-frontend
+          # Check for global CSS fixes
+          if grep -r "!important" src/index.css; then
+            echo "❌ Global !important found! Use design tokens instead."
+            exit 1
+          fi
+          echo "✅ CSS architecture check passed"
+
+      - name: Commit Size Check
+        run: |
+          # Check commit size
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | wc -l)
+          if [ "$CHANGED_FILES" -gt 10 ]; then
+            echo "❌ Too many files changed ($CHANGED_FILES). Consider smaller commits."
+            exit 1
+          fi
+          echo "✅ Commit size check passed"
+
+  # Code Quality - Only runs if frontend or backend changes detected
+  code-quality:
+    needs: change-detection
+    if: needs.change-detection.outputs.code_quality == 'true'
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Check for hardcoded strings
+        run: |
+          cd controlfin-frontend
+          # Check for hardcoded strings in components (i18n compliance) - excluding comments and tests
+          if grep -r "name: '[A-Z][a-zA-Z ]*'" src/components/ --include="*.tsx" --include="*.ts" --exclude="*test*" | grep -v "t(" | grep -v "i18n" | grep -v "//"; then
+            echo "❌ Hardcoded strings found! Use i18n keys instead."
+            exit 1
+          fi
+          echo "✅ i18n compliance check passed"
+
+  # Build Matrix - Only runs if frontend or backend changes detected
+  build-matrix:
+    needs: change-detection
+    if: needs.change-detection.outputs.build_matrix == 'true'
+    name: Build Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.change-detection.outputs.node_versions) }}
+        project: ['frontend', 'backend']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          cd controlfin-${{ matrix.project }}
+          npm ci
+
+      - name: Build Application
+        run: |
+          cd controlfin-${{ matrix.project }}
+          npm run build
+
+  # Performance Summary
+  performance-summary:
+    needs: [change-detection, frontend-ci, backend-ci, docs-ci, config-ci, quality-gates, code-quality, build-matrix]
+    if: always()
+    name: Performance Summary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display Performance Summary
+        run: |
+          echo "📊 CI Performance Summary"
+          echo "========================="
+          echo "Change Type: ${{ needs.change-detection.outputs.change_type }}"
+          echo "Estimated Time: ${{ needs.change-detection.outputs.estimated_time }} minutes"
+          echo ""
+          echo "Jobs Executed:"
+          echo "  Frontend CI: ${{ needs.frontend-ci.result || 'skipped' }}"
+          echo "  Backend CI: ${{ needs.backend-ci.result || 'skipped' }}"
+          echo "  Docs CI: ${{ needs.docs-ci.result || 'skipped' }}"
+          echo "  Config CI: ${{ needs.config-ci.result || 'skipped' }}"
+          echo "  Quality Gates: ${{ needs.quality-gates.result || 'skipped' }}"
+          echo "  Code Quality: ${{ needs.code-quality.result || 'skipped' }}"
+          echo "  Build Matrix: ${{ needs.build-matrix.result || 'skipped' }}"
+          echo ""
+          echo "✅ Optimized CI execution complete"
