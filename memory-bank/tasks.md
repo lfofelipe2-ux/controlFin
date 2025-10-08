@@ -75,11 +75,12 @@
 
 ### **📋 PENDING TASKS IDENTIFIED**
 
-#### **High Priority Tasks** 🔴 (4 tasks)
+#### **High Priority Tasks** 🔴 (5 tasks)
 - **TASK-008**: Automated Testing Implementation (Level 2)
 - **TASK-012**: Financial Spaces & Collaboration (Level 4)
 - **TASK-018**: Production Deployment & Monitoring (Level 3)
 - **TASK-021**: UI/UX Theme Consistency Fix (Level 2)
+- **TASK-033**: XLSX Library Security Vulnerability Fix (Level 2)
 
 #### **Medium Priority Tasks** 🟡
 - **TASK-009**: Component Documentation & Storybook (Level 2)
@@ -96,7 +97,7 @@
 - **TASK-015**: Savings Goals System (Level 2)
 - **TASK-032**: Receipt Attachments (Post-MVP) (Level 3)
 
-**Total Pending Tasks**: 14 tasks identified and ready for implementation
+**Total Pending Tasks**: 15 tasks identified and ready for implementation
 
 ### **📋 DETAILED TASK DESCRIPTIONS**
 
@@ -283,6 +284,23 @@
   - Loading states and empty states
   - Final testing and bug fixes
   - Production deployment validation
+- **Status**: ⏳ **PENDING** - Ready for implementation
+
+#### **TASK-033: XLSX Library Security Vulnerability Fix** ⏳ **PENDING**
+- **Type**: Security Enhancement
+- **Complexity**: Level 2 (Simple Enhancement)
+- **Priority**: 🔴 **HIGH** - Security vulnerability
+- **Description**: Fix high severity security vulnerabilities in xlsx library
+- **Requirements**:
+  - Research alternative libraries to xlsx (e.g., exceljs, xlsx-populate)
+  - Evaluate security and functionality of alternatives
+  - Replace xlsx library with secure alternative
+  - Update all code that uses xlsx functionality
+  - Test file import/export functionality
+  - Update documentation
+- **Security Issues**:
+  - Prototype Pollution in sheetJS (GHSA-4r6h-8v6p-xvw6)
+  - Regular Expression Denial of Service (ReDoS) (GHSA-5pgg-2g8v-p4x9)
 - **Status**: ⏳ **PENDING** - Ready for implementation
 
 #### **TASK-032: Receipt Attachments (Post-MVP)** ⏳ **PENDING**
