@@ -63,7 +63,7 @@ const validateBackend = () => {
 
         // Run backend tests
         log('Running backend tests...', colors.cyan);
-        execSync('cd controlfin-backend && npm test', { 
+        execSync('cd controlfin-backend && npm test', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -244,7 +244,7 @@ const validateDependencies = () => {
         // Check backend dependencies
         if (fs.existsSync('controlfin-backend/package.json')) {
             log('Checking backend dependencies...', colors.cyan);
-            
+
             // Run audit and capture output
             let auditOutput = '';
             try {
