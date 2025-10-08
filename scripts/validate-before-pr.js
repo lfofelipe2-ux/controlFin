@@ -267,7 +267,7 @@ const validateDependencies = () => {
         // Check frontend dependencies
         if (fs.existsSync('controlfin-frontend/package.json')) {
             log('Checking frontend dependencies...', colors.cyan);
-            
+
             // Run audit and capture output
             let frontendAuditOutput = '';
             try {
