@@ -8,7 +8,7 @@ import noHardcodedStrings from '../eslint-plugins/no-hardcoded-strings/index.js'
 import noDuplicateI18nKeys from '../eslint-plugins/no-duplicate-i18n-keys/index.js';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
