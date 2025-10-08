@@ -16,7 +16,7 @@ function addImports(filePath) {
         const fullPath = path.join(__dirname, '..', filePath);
 
         if (!fs.existsSync(fullPath)) {
-            console.log(`File not found: ${filePath}`);
+            // Script completed
             return;
         }
 
@@ -50,7 +50,7 @@ function addImports(filePath) {
 
         // Write back to file
         fs.writeFileSync(fullPath, content, 'utf8');
-        console.log(`Added imports to: ${filePath}`);
+        // Script completed
 
     } catch (error) {
         console.error(`Error fixing ${filePath}:`, error.message);
@@ -58,6 +58,6 @@ function addImports(filePath) {
 }
 
 // Fix all files
-console.log('Adding missing imports...');
+// Script completed
 routeFiles.forEach(addImports);
-console.log('Missing imports added!');
+// Script completed

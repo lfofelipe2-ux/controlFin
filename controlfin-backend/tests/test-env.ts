@@ -18,6 +18,7 @@ process.env.LOG_LEVEL = 'error';
 
 // Disable console.log during tests to reduce noise
 const originalConsoleLog = console.log;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 console.log = (...args: any[]) => {
   if (!args[0]?.includes?.('Connected to MongoDB') && 
       !args[0]?.includes?.('🛑 Shutting down server')) {

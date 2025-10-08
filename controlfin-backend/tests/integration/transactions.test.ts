@@ -310,7 +310,7 @@ describe('Transaction API Integration Tests', () => {
 
       expect(response.statusCode).toBe(404);
       const result = JSON.parse(response.payload);
-      console.log('404 response:', JSON.stringify(result, null, 2));
+      // Performance test completed
       expect(result.success).toBe(false);
       expect(result.error).toContain('Transaction not found');
     });
@@ -427,7 +427,7 @@ describe('Transaction API Integration Tests', () => {
 
       expect(response.statusCode).toBe(404);
       const result = JSON.parse(response.payload);
-      console.log('DELETE 404 response:', JSON.stringify(result, null, 2));
+      // Performance test completed
       expect(result.success).toBe(false);
       expect(result.error).toContain('Transaction not found');
     });

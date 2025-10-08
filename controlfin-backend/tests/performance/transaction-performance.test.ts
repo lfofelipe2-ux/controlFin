@@ -106,7 +106,7 @@ describe('Transaction Performance Tests', () => {
       await Transaction.insertMany(transactions);
       const insertTime = Date.now() - startTime;
 
-      console.log(`Inserted 1000 transactions in ${insertTime}ms`);
+      // Performance test completed
 
       // Test query performance
       const queryStartTime = Date.now();
@@ -119,13 +119,13 @@ describe('Transaction Performance Tests', () => {
       });
       const queryTime = Date.now() - queryStartTime;
 
-      console.log(`Queried transactions in ${queryTime}ms`);
+      // Query performance test completed
 
       expect(response.statusCode).toBe(200);
       expect(queryTime).toBeLessThan(1000); // Should complete within 1 second
 
       const result = JSON.parse(response.payload);
-      console.log('Response structure:', JSON.stringify(result, null, 2));
+      // Performance test completed
       expect(result.data.transactions).toHaveLength(50);
       // Note: pagination might not be present in this response format
     });
@@ -157,7 +157,7 @@ describe('Transaction Performance Tests', () => {
       });
       const filterTime = Date.now() - filterStartTime;
 
-      console.log(`Complex filtering completed in ${filterTime}ms`);
+      // Performance test completed
 
       expect(response.statusCode).toBe(200);
       expect(filterTime).toBeLessThan(500); // Should complete within 500ms
@@ -190,7 +190,7 @@ describe('Transaction Performance Tests', () => {
       });
       const statsTime = Date.now() - statsStartTime;
 
-      console.log(`Statistics calculation completed in ${statsTime}ms`);
+      // Performance test completed
 
       expect(response.statusCode).toBe(200);
       expect(statsTime).toBeLessThan(2000); // Should complete within 2 seconds
@@ -231,7 +231,7 @@ describe('Transaction Performance Tests', () => {
       const responses = await Promise.all(requests);
       const totalTime = Date.now() - startTime;
 
-      console.log(`Handled ${concurrentRequests} concurrent requests in ${totalTime}ms`);
+      // Performance test completed
 
       // All requests should succeed
       responses.forEach((response) => {
@@ -269,7 +269,7 @@ describe('Transaction Performance Tests', () => {
       const responses = await Promise.all(requests);
       const totalTime = Date.now() - startTime;
 
-      console.log(`Handled ${concurrentRequests} concurrent POST requests in ${totalTime}ms`);
+      // Performance test completed
 
       // All requests should succeed
       responses.forEach((response) => {
@@ -314,7 +314,7 @@ describe('Transaction Performance Tests', () => {
       });
       const queryTime = Date.now() - startTime;
 
-      console.log(`Queried 1000 transactions in ${queryTime}ms`);
+      // Performance test completed
 
       expect(response.statusCode).toBe(200);
       expect(queryTime).toBeLessThan(2000); // Should complete within 2 seconds
@@ -360,7 +360,7 @@ describe('Transaction Performance Tests', () => {
         });
         const queryTime = Date.now() - startTime;
 
-        console.log(`Query ${query} completed in ${queryTime}ms`);
+        // Performance test completed
 
         expect(response.statusCode).toBe(200);
         expect(queryTime).toBeLessThan(500); // Should complete within 500ms
