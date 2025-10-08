@@ -16,7 +16,6 @@ describe('Transaction Security Tests', () => {
   let categoryId: string;
   let paymentMethodId: string;
   let otherUserId: string;
-  let otherSpaceId: string;
 
   beforeAll(async () => {
     // Build Fastify app
@@ -55,7 +54,6 @@ describe('Transaction Security Tests', () => {
     });
     await otherUser.save();
     otherUserId = otherUser._id.toString();
-    otherSpaceId = otherUser._id.toString();
 
     // Create test category
     const category = new Category({

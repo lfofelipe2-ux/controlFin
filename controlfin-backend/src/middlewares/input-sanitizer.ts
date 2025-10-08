@@ -4,23 +4,19 @@ import mongoSanitize from 'mongo-sanitize';
 export async function inputSanitizationMiddleware(
     request: FastifyRequest
 ): Promise<void> {
-    try {
-        // Sanitize request body
-        if (request.body) {
-            request.body = sanitizeObject(request.body);
-        }
+    // Sanitize request body
+    if (request.body) {
+        request.body = sanitizeObject(request.body);
+    }
 
-        // Sanitize query parameters
-        if (request.query) {
-            request.query = sanitizeObject(request.query);
-        }
+    // Sanitize query parameters
+    if (request.query) {
+        request.query = sanitizeObject(request.query);
+    }
 
-        // Sanitize URL parameters
-        if (request.params) {
-            request.params = sanitizeObject(request.params);
-        }
-    } catch (error) {
-        throw error;
+    // Sanitize URL parameters
+    if (request.params) {
+        request.params = sanitizeObject(request.params);
     }
 }
 

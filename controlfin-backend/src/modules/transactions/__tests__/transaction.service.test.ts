@@ -199,7 +199,7 @@ describe('TransactionService', () => {
       };
 
       // Mock the chained query to return the data on the final populate call
-      mockQuery.populate.mockImplementation((field, select) => {
+      mockQuery.populate.mockImplementation((field) => {
         if (field === 'paymentMethodId') {
           return Promise.resolve([mockTransactionData]);
         }
@@ -233,7 +233,7 @@ describe('TransactionService', () => {
       };
 
       // Mock the chained query to return empty array on the final populate call
-      mockQuery.populate.mockImplementation((field, select) => {
+      mockQuery.populate.mockImplementation((field) => {
         if (field === 'paymentMethodId') {
           return Promise.resolve([]);
         }
@@ -380,7 +380,7 @@ describe('TransactionService', () => {
       const mockQuery = {
         populate: vi.fn().mockReturnThis(),
       };
-      mockQuery.populate.mockImplementation((field, select) => {
+      mockQuery.populate.mockImplementation((field) => {
         if (field === 'paymentMethodId') {
           return Promise.resolve(mockTransactions);
         }
