@@ -167,14 +167,18 @@ function getChangeType(changedFiles) {
  * Generate CI job matrix
  */
 function generateJobMatrix(changedFiles) {
+    const hasCodeChanges = needsValidation('frontend', changedFiles) || needsValidation('backend', changedFiles);
+    const hasConfigChanges = needsValidation('config', changedFiles);
+    
     const matrix = {
         frontend: needsValidation('frontend', changedFiles),
         backend: needsValidation('backend', changedFiles),
         docs: needsValidation('docs', changedFiles),
-        config: needsValidation('config', changedFiles),
-        quality_gates: needsValidation('frontend', changedFiles) || needsValidation('backend', changedFiles),
-        code_quality: needsValidation('frontend', changedFiles) || needsValidation('backend', changedFiles),
-        build_matrix: needsValidation('frontend', changedFiles) || needsValidation('backend', changedFiles)
+        // Config job should run for any code changes OR actual config changes
+        config: hasCodeChanges || hasConfigChanges,
+        quality_gates: hasCodeChanges,
+        code_quality: hasCodeChanges,
+        build_matrix: hasCodeChanges
     };
     
     return matrix;
