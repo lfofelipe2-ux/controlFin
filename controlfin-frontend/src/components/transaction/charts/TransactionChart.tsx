@@ -33,7 +33,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'pie',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -89,7 +89,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'column',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -154,7 +154,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'line',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -229,7 +229,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'bar',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {

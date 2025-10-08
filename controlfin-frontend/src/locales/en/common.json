@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "ControlFin",
-    "tagline": "Smart Personal Finance Management"
+    "tagline": "Smart Personal Finance Management",
+    "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
   },
   "buttons": {
     "submit": "Submit",
