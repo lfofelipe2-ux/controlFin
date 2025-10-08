@@ -10,6 +10,31 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * Set GitHub Actions output with fallback for local testing
+ * @param {string} name - Output name
+ * @param {string} value - Output value
+ */
+function setGitHubOutput(name, value) {
+    try {
+        // Check if running in GitHub Actions environment
+        if (process.env.GITHUB_OUTPUT) {
+            // Modern GitHub Actions syntax
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
+            console.log(`✅ Set output: ${name}=${value}`);
+        } else {
+            // Fallback for local testing
+            console.log(`🔧 [LOCAL] Would set output: ${name}=${value}`);
+            // Also write to a local file for testing
+            const localOutputFile = '.github-output-test.txt';
+            fs.appendFileSync(localOutputFile, `${name}=${value}\n`);
+        }
+    } catch (error) {
+        console.error(`❌ Error setting output ${name}:`, error.message);
+        // Don't fail the script for output errors
+    }
+}
+
 // Configuration
 const COMPONENTS = {
     frontend: {
@@ -228,30 +253,25 @@ function main() {
         .filter(([, shouldRun]) => shouldRun)
         .map(([job]) => job);
     
-    console.log(`::set-output name=jobs::${JSON.stringify(jobsToRun)}`);
-    console.log(`::set-output name=frontend::${jobMatrix.frontend}`);
-    console.log(`::set-output name=backend::${jobMatrix.backend}`);
-    console.log(`::set-output name=docs::${jobMatrix.docs}`);
-    console.log(`::set-output name=config::${jobMatrix.config}`);
-    console.log(`::set-output name=quality_gates::${jobMatrix.quality_gates}`);
-    console.log(`::set-output name=code_quality::${jobMatrix.code_quality}`);
-    console.log(`::set-output name=build_matrix::${jobMatrix.build_matrix}`);
-    
-    // Node matrix
-    console.log(`::set-output name=node_versions::${JSON.stringify(nodeMatrix)}`);
-    
-    // Caching strategy
-    console.log(`::set-output name=frontend_cache::${cachingStrategy.frontend_cache}`);
-    console.log(`::set-output name=backend_cache::${cachingStrategy.backend_cache}`);
-    console.log(`::set-output name=node_modules_cache::${cachingStrategy.node_modules_cache}`);
-    console.log(`::set-output name=build_cache::${cachingStrategy.build_cache}`);
-    
-    // Change type
-    console.log(`::set-output name=change_type::${changeType}`);
-    
     // Performance estimation
     const estimatedTime = estimateExecutionTime(jobMatrix, changeType);
-    console.log(`::set-output name=estimated_time::${estimatedTime}`);
+    
+    // Set outputs using modern GitHub Actions syntax
+    setGitHubOutput('jobs', JSON.stringify(jobsToRun));
+    setGitHubOutput('frontend', jobMatrix.frontend);
+    setGitHubOutput('backend', jobMatrix.backend);
+    setGitHubOutput('docs', jobMatrix.docs);
+    setGitHubOutput('config', jobMatrix.config);
+    setGitHubOutput('quality_gates', jobMatrix.quality_gates);
+    setGitHubOutput('code_quality', jobMatrix.code_quality);
+    setGitHubOutput('build_matrix', jobMatrix.build_matrix);
+    setGitHubOutput('node_versions', JSON.stringify(nodeMatrix));
+    setGitHubOutput('frontend_cache', cachingStrategy.frontend_cache);
+    setGitHubOutput('backend_cache', cachingStrategy.backend_cache);
+    setGitHubOutput('node_modules_cache', cachingStrategy.node_modules_cache);
+    setGitHubOutput('build_cache', cachingStrategy.build_cache);
+    setGitHubOutput('change_type', changeType);
+    setGitHubOutput('estimated_time', estimatedTime);
     
     console.log(`\n⏱️  Estimated execution time: ${estimatedTime} minutes`);
     console.log('✅ CI Change Detection Complete');
