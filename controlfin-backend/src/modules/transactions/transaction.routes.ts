@@ -106,7 +106,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         fastify.log.info('POST /api/transactions - Starting transaction creation');
-        
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?._id;
         const transactionData = request.body;
@@ -121,7 +121,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         } as CreateTransactionData);
 
         fastify.log.info({ transactionId: transaction._id }, 'Transaction created successfully');
-        
+
         reply.code(201).send({
           success: true,
           data: { transaction },
@@ -134,7 +134,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           name: (error as Error)?.name,
           stack: (error as Error)?.stack,
         }, 'Error details');
-        
+
         const errorMessage = (error as Error)?.message || 'Failed to create transaction';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;
         createErrorResponse(
