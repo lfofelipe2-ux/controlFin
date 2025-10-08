@@ -3,8 +3,6 @@
 # Script de validação otimizada para mudanças apenas de documentação
 # Executa apenas verificações essenciais quando não há mudanças de código
 
-set -e
-
 echo "🔍 Verificando tipo de mudanças..."
 
 # Executar o script de verificação de mudanças
@@ -43,23 +41,23 @@ if [ $CHANGE_TYPE_EXIT_CODE -eq 0 ]; then
     echo "📁 Verificando estrutura de pastas..."
     
     echo "✅ 5. Verificando sintaxe básica de arquivos..."
-        # Verificar sintaxe YAML apenas dos arquivos modificados
-        MODIFIED_YAML_FILES=$(git diff --cached --name-only | grep -E '\.(yml|yaml)$' || true)
-        if [ -n "$MODIFIED_YAML_FILES" ]; then
-            echo "🔍 Verificando sintaxe YAML dos arquivos modificados..."
-            if command -v yamllint >/dev/null 2>&1; then
-                echo "$MODIFIED_YAML_FILES" | while read -r file; do
-                    if [ -f "$file" ] && ! yamllint "$file" >/dev/null 2>&1; then
-                        echo "❌ Erro de sintaxe YAML em: $file"
-                        exit 1
-                    fi
-                done
-            else
-                echo "⚠️  yamllint não encontrado, pulando verificação YAML"
-            fi
+    # Verificar sintaxe YAML apenas dos arquivos modificados
+    MODIFIED_YAML_FILES=$(git diff --cached --name-only | grep -E '\.(yml|yaml)$' || true)
+    if [ -n "$MODIFIED_YAML_FILES" ]; then
+        echo "🔍 Verificando sintaxe YAML dos arquivos modificados..."
+        if command -v yamllint >/dev/null 2>&1; then
+            echo "$MODIFIED_YAML_FILES" | while read -r file; do
+                if [ -f "$file" ] && ! yamllint "$file" >/dev/null 2>&1; then
+                    echo "❌ Erro de sintaxe YAML em: $file"
+                    exit 1
+                fi
+            done
         else
-            echo "✅ Nenhum arquivo YAML modificado para verificar"
+            echo "⚠️  yamllint não encontrado, pulando verificação YAML"
         fi
+    else
+        echo "✅ Nenhum arquivo YAML modificado para verificar"
+    fi
     
     echo ""
     echo "🎉 Validação de documentação concluída com sucesso!"
@@ -75,6 +73,19 @@ elif [ $CHANGE_TYPE_EXIT_CODE -eq 2 ]; then
     # Executar validação completa
     if [ -f "scripts/validate-complete.sh" ]; then
         ./scripts/validate-complete.sh
+        if [ $? -ne 0 ]; then
+            echo ""
+            echo "❌ VALIDAÇÃO COMPLETA FALHOU!"
+            echo "🚫 Commit bloqueado devido a problemas de validação"
+            echo ""
+            echo "💡 Para corrigir:"
+            echo "   1. Corrija os problemas acima"
+            echo "   2. Execute: ./scripts/validate-complete.sh"
+            echo "   3. Tente commitar novamente"
+            echo ""
+            exit 1
+        fi
+        echo "✅ Validação completa passou!"
     else
         echo "❌ Script de validação completa não encontrado"
         exit 1
