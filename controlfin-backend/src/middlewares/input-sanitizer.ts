@@ -3,25 +3,29 @@ import mongoSanitize from 'mongo-sanitize';
 
 export async function inputSanitizationMiddleware(
     request: FastifyRequest,
-    _reply: FastifyReply
+    _: FastifyReply
 ): Promise<void> {
-    // Sanitize request body
-    if (request.body) {
-        request.body = sanitizeObject(request.body);
-    }
+    try {
+        // Sanitize request body
+        if (request.body) {
+            request.body = sanitizeObject(request.body);
+        }
 
-    // Sanitize query parameters
-    if (request.query) {
-        request.query = sanitizeObject(request.query);
-    }
+        // Sanitize query parameters
+        if (request.query) {
+            request.query = sanitizeObject(request.query);
+        }
 
-    // Sanitize URL parameters
-    if (request.params) {
-        request.params = sanitizeObject(request.params);
+        // Sanitize URL parameters
+        if (request.params) {
+            request.params = sanitizeObject(request.params);
+        }
+    } catch (error) {
+        throw error;
     }
 }
 
-function sanitizeObject(obj: any): any {
+function sanitizeObject(obj: unknown): unknown {
     if (obj === null || obj === undefined) {
         return obj;
     }
@@ -36,13 +40,14 @@ function sanitizeObject(obj: any): any {
 
     if (typeof obj === 'object') {
         // For objects, only sanitize string values, preserve structure
-        const sanitized: any = {};
+        const sanitized: Record<string, unknown> = {};
         for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                if (typeof obj[key] === 'string') {
-                    sanitized[key] = sanitizeString(obj[key]);
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = (obj as Record<string, unknown>)[key];
+                if (typeof value === 'string') {
+                    sanitized[key] = sanitizeString(value);
                 } else {
-                    sanitized[key] = sanitizeObject(obj[key]);
+                    sanitized[key] = sanitizeObject(value);
                 }
             }
         }
@@ -72,6 +77,13 @@ function sanitizeString(str: string): string {
         return str.replace(/<script[^>]*>.*?<\/script>/gi, '[SCRIPT_REMOVED]')
             .replace(/javascript:/gi, '')
             .replace(/on\w+\s*=/gi, '');
+    }
+
+    // Check for template literal injection patterns
+    const templateLiteralPatterns = /\$\{[^}]*\}/g;
+    if (templateLiteralPatterns.test(str)) {
+        // Replace template literal expressions with safe text
+        return str.replace(/\$\{[^}]*\}/g, '[TEMPLATE_LITERAL_REMOVED]');
     }
 
     // For normal strings, return as-is to avoid breaking valid data

@@ -133,11 +133,19 @@ class TransactionService {
   }
 
   async getTransactionById(id: string, userId: string): Promise<ITransaction> {
-    const transaction = await Transaction.findOne({ _id: id, userId });
-    if (!transaction) {
-      throw new Error('Transaction not found');
+    try {
+      const transaction = await Transaction.findOne({ _id: id, userId });
+      if (!transaction) {
+        throw new Error('Transaction not found');
+      }
+      return transaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        throw new Error('Transaction not found');
+      }
+      throw error;
     }
-    return transaction;
   }
 
   async updateTransaction(
@@ -145,43 +153,59 @@ class TransactionService {
     updateData: UpdateTransactionData,
     userId: string
   ): Promise<ITransaction | null> {
-    // Validate category if provided
-    if (updateData.categoryId) {
-      const category = await Category.findById(updateData.categoryId);
-      if (!category) {
-        throw new Error('Category not found');
+    try {
+      // Validate category if provided
+      if (updateData.categoryId) {
+        const category = await Category.findById(updateData.categoryId);
+        if (!category) {
+          throw new Error('Category not found');
+        }
       }
-    }
 
-    // Validate payment method if provided
-    if (updateData.paymentMethodId) {
-      const paymentMethod = await PaymentMethod.findById(updateData.paymentMethodId);
-      if (!paymentMethod) {
-        throw new Error('Payment method not found');
+      // Validate payment method if provided
+      if (updateData.paymentMethodId) {
+        const paymentMethod = await PaymentMethod.findById(updateData.paymentMethodId);
+        if (!paymentMethod) {
+          throw new Error('Payment method not found');
+        }
       }
+
+      const updatedTransaction = await Transaction.findOneAndUpdate(
+        { _id: id, userId },
+        { ...updateData, updatedAt: new Date() },
+        { new: true }
+      );
+
+      if (!updatedTransaction) {
+        throw new Error('Transaction not found');
+      }
+
+      return updatedTransaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        throw new Error('Transaction not found');
+      }
+      throw error;
     }
-
-    const updatedTransaction = await Transaction.findOneAndUpdate(
-      { _id: id, userId },
-      { ...updateData, updatedAt: new Date() },
-      { new: true }
-    );
-
-    if (!updatedTransaction) {
-      throw new Error('Transaction not found');
-    }
-
-    return updatedTransaction;
   }
 
   async deleteTransaction(id: string, userId: string): Promise<ITransaction | null> {
-    const transaction = await Transaction.findOne({ _id: id, userId });
-    if (!transaction) {
-      return null;
-    }
+    try {
+      const transaction = await Transaction.findOne({ _id: id, userId });
+      if (!transaction) {
+        return null;
+      }
 
-    await Transaction.deleteOne({ _id: id, userId });
-    return transaction;
+      await Transaction.deleteOne({ _id: id, userId });
+      return transaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   async getTransactions(params: GetTransactionsParams): Promise<PaginatedResult<ITransaction>> {

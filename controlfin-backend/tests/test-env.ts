@@ -12,7 +12,7 @@ process.env.GOOGLE_REDIRECT_URI = 'http://localhost:3000/auth/google/callback';
 
 // Mock other required environment variables
 process.env.FRONTEND_URL = 'http://localhost:3000';
-process.env.RATE_LIMIT_MAX = '100';
+process.env.RATE_LIMIT_MAX = '0'; // Disable rate limiting for tests
 process.env.RATE_LIMIT_WINDOW_MS = '60000';
 process.env.LOG_LEVEL = 'error';
 

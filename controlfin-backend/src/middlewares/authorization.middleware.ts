@@ -50,7 +50,7 @@ export async function authorizationMiddleware(
             return;
         }
 
-    } catch (error) {
+    } catch {
         reply.code(401).send({
             success: false,
             error: 'Authorization failed',

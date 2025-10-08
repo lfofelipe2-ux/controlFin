@@ -19,7 +19,15 @@ export async function authMiddleware(
       return;
     }
 
-    const decoded = jwt.verify(token, process.env['JWT_SECRET'] || 'fallback-secret') as any;
+    const decoded = jwt.verify(token, process.env['JWT_SECRET'] || 'fallback-secret') as {
+      userId: string;
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      isEmailVerified?: boolean;
+      avatar?: string;
+      spaceId?: string
+    };
 
     if (!decoded || !decoded.userId) {
       reply.code(401).send({
@@ -42,8 +50,7 @@ export async function authMiddleware(
       spaceId: decoded.spaceId
     };
 
-
-  } catch (error) {
+  } catch {
     reply.code(401).send({
       success: false,
       error: 'Authentication failed',

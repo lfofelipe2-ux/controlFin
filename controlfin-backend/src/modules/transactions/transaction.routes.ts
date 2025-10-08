@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { transactionRateLimitInstance } from '../../middlewares/rate-limiter';
 import { CreateTransactionData } from '../../types/service.types';
 import { createErrorResponse } from '../../utils/route-helpers';
 import { zodToFastifySchema } from '../../utils/schema-converter';
@@ -15,7 +14,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/',
     {
-      preHandler: [transactionRateLimitInstance],
       schema: {
         body: {
           type: 'object',
@@ -107,12 +105,14 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
+        fastify.log.info('POST /api/transactions - Starting transaction creation');
+        
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (request as any).user?._id;
         const transactionData = request.body;
         const { spaceId } = request.query as { spaceId: string };
 
-
+        fastify.log.info('Transaction data:', { userId, spaceId, transactionData });
 
         const transaction = await transactionService.createTransaction({
           ...(transactionData as Record<string, unknown>),
@@ -120,13 +120,21 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           spaceId,
         } as CreateTransactionData);
 
+        fastify.log.info('Transaction created successfully:', transaction._id);
+        
         reply.code(201).send({
           success: true,
           data: { transaction },
           message: 'Transaction created successfully',
         });
       } catch (error) {
-        fastify.log.error(error);
+        fastify.log.error('Error in POST /api/transactions:', error);
+        fastify.log.error('Error details:', {
+          message: (error as Error)?.message,
+          name: (error as Error)?.name,
+          stack: (error as Error)?.stack,
+        });
+        
         const errorMessage = (error as Error)?.message || 'Failed to create transaction';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;
         createErrorResponse(
@@ -336,11 +344,12 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         fastify.log.error(error);
         const errorMessage = (error as Error)?.message || 'Unknown error';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;
-        reply.code(statusCode).send({
-          success: false,
-          message: errorMessage,
-          error: errorMessage,
-        });
+        createErrorResponse(
+          reply,
+          'TRANSACTION_GET_FAILED',
+          errorMessage,
+          statusCode
+        );
       }
     }
   );
@@ -458,11 +467,12 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         fastify.log.error(error);
         const errorMessage = (error as Error)?.message || 'Unknown error';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;
-        reply.code(statusCode).send({
-          success: false,
-          message: errorMessage,
-          error: errorMessage,
-        });
+        createErrorResponse(
+          reply,
+          'TRANSACTION_UPDATE_FAILED',
+          errorMessage,
+          statusCode
+        );
       }
     }
   );
@@ -534,6 +544,16 @@ export async function transactionRoutes(fastify: FastifyInstance) {
 
         const deleted = await transactionService.deleteTransaction(id, userId);
 
+        if (!deleted) {
+          createErrorResponse(
+            reply,
+            'TRANSACTION_DELETE_FAILED',
+            'Transaction not found',
+            404
+          );
+          return;
+        }
+
         reply.code(200).send({
           success: true,
           data: deleted,
@@ -543,11 +563,12 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         fastify.log.error(error);
         const errorMessage = (error as Error)?.message || 'Unknown error';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;
-        reply.code(statusCode).send({
-          success: false,
-          message: errorMessage,
-          error: errorMessage,
-        });
+        createErrorResponse(
+          reply,
+          'TRANSACTION_DELETE_FAILED',
+          errorMessage,
+          statusCode
+        );
       }
     }
   );
