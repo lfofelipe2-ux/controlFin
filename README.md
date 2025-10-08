@@ -182,3 +182,5 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 <!-- Test comment for docs changes -->
 
 <!-- Test comment for docs changes -->
+
+<!-- Test comment for docs changes -->
