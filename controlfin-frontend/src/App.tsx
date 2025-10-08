@@ -279,3 +279,5 @@ export default App;
 // Test comment for full-stack changes
 
 // Test comment for frontend changes
+
+// Test comment for full-stack changes
