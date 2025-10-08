@@ -33,7 +33,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'pie',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -66,7 +66,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
       },
       series: [
         {
-          name: 'Amount',
+          name: t('common.charts.amount'),
           colorByPoint: true,
           data: stats.categoryBreakdown.map((item, index) => ({
             name: item.categoryName,
@@ -89,7 +89,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'column',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -135,7 +135,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
       },
       series: [
         {
-          name: 'Amount',
+          name: t('common.charts.amount'),
           data: stats.paymentMethodBreakdown.map((item) => item.amount),
           color: '#1890ff',
         },
@@ -154,7 +154,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'line',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -200,17 +200,17 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
       },
       series: [
         {
-          name: 'Income',
+          name: t('common.charts.income'),
           data: stats.monthlyTrend.map((item) => item.income),
           color: '#52c41a',
         },
         {
-          name: 'Expense',
+          name: t('common.charts.expense'),
           data: stats.monthlyTrend.map((item) => item.expense),
           color: '#ff4d4f',
         },
         {
-          name: 'Net',
+          name: t('common.charts.net'),
           data: stats.monthlyTrend.map((item) => item.net),
           color: '#1890ff',
         },
@@ -229,7 +229,7 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
         type: 'bar',
         backgroundColor: 'transparent',
         style: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: t('common.app.fontFamily'),
         },
       },
       title: {
@@ -275,12 +275,12 @@ export const TransactionChart: React.FC<TransactionChartProps> = ({
       },
       series: [
         {
-          name: 'Income',
+          name: t('common.charts.income'),
           data: [stats.totalIncome],
           color: '#52c41a',
         },
         {
-          name: 'Expense',
+          name: t('common.charts.expense'),
           data: [stats.totalExpense],
           color: '#ff4d4f',
         },

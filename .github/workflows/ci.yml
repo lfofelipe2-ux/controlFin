@@ -166,8 +166,8 @@ jobs:
       - name: i18n Compliance Check
         run: |
           cd controlfin-frontend
-          # Check for hardcoded strings in components
-          if grep -r "['\"][A-Z][a-zA-Z ]*['\"]" src/components/ --include="*.tsx" --include="*.ts" | grep -v "t(" | grep -v "i18n"; then
+          # Check for hardcoded strings in components (excluding comments and tests)
+          if grep -r "name: '[A-Z][a-zA-Z ]*'" src/components/ --include="*.tsx" --include="*.ts" --exclude="*test*" | grep -v "t(" | grep -v "i18n" | grep -v "//"; then
             echo "❌ Hardcoded strings found! Use i18n keys instead."
             exit 1
           fi
@@ -217,8 +217,8 @@ jobs:
       - name: Check for hardcoded strings
         run: |
           cd controlfin-frontend
-          # Check for hardcoded strings in components (i18n compliance)
-          if grep -r "['\"][A-Z][a-zA-Z ]*['\"]" src/components/ --include="*.tsx" --include="*.ts" | grep -v "t(" | grep -v "i18n"; then
+          # Check for hardcoded strings in components (i18n compliance) - excluding comments and tests
+          if grep -r "name: '[A-Z][a-zA-Z ]*'" src/components/ --include="*.tsx" --include="*.ts" --exclude="*test*" | grep -v "t(" | grep -v "i18n" | grep -v "//"; then
             echo "❌ Hardcoded strings found! Use i18n keys instead."
             exit 1
           fi

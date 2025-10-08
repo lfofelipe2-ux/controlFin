@@ -8,9 +8,10 @@ The validation system includes:
 - **ESLint Rules**: Enforce code quality standards
 - **i18n Validation**: Detect duplicate translation keys
 - **Build Validation**: Ensure code compiles successfully
-- **Test Validation**: Ensure all tests pass
+- **Test Validation**: Ensure all tests pass (comprehensive execution)
 - **Git Validation**: Ensure proper git workflow
 - **Dependency Validation**: Check for security vulnerabilities
+- **TypeScript Validation**: Type checking with proper types
 
 ## 🚀 Quick Start
 
@@ -157,10 +158,34 @@ cd controlfin-backend && npm run build
 
 #### 3. Test Failures
 ```bash
-# Run tests to see failures
-cd controlfin-frontend && npm test
-cd controlfin-backend && npm test
+# Run all tests (comprehensive execution - no stopping on first error)
+cd controlfin-frontend && npm run test:all
+cd controlfin-backend && npm run test:all
+
+# Or run comprehensive validation across both projects
+npm run validate:comprehensive
 ```
+
+### Comprehensive Test Execution (TASK-011)
+
+The test system has been optimized to run all tests without stopping on the first error:
+
+```bash
+# Backend comprehensive validation
+cd controlfin-backend && npm run validate:all
+
+# Frontend comprehensive validation  
+cd controlfin-frontend && npm run validate:all
+
+# Cross-project validation with colored output
+npm run validate:comprehensive
+```
+
+**Benefits**:
+- See all test failures in one execution
+- No need to run tests multiple times
+- Colored output for better visibility
+- Complete error overview
 
 #### 4. i18n Duplicate Keys
 ```bash

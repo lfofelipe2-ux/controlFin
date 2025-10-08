@@ -21,7 +21,7 @@ module.exports = [
     },
     plugins: {
       '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
-      'no-hardcoded-strings': require('./eslint-plugins/no-hardcoded-strings'),
+      'no-hardcoded-strings': require('../eslint-plugins/no-hardcoded-strings'),
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
@@ -34,6 +34,6 @@ module.exports = [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'tests/**', '**/__tests__/**', '**/*.test.ts'],
+    ignores: ['dist/**', 'node_modules/**', 'tests/**', '**/__tests__/**', '**/*.test.ts', 'vitest.config.ts'],
   },
 ];

@@ -14,7 +14,7 @@ function fixFile(filePath) {
         const fullPath = path.join(__dirname, '..', filePath);
 
         if (!fs.existsSync(fullPath)) {
-            console.log(`File not found: ${filePath}`);
+            // Script completed
             return;
         }
 
@@ -34,7 +34,7 @@ function fixFile(filePath) {
 
         // Write back to file
         fs.writeFileSync(fullPath, content, 'utf8');
-        console.log(`Fixed: ${filePath}`);
+        // Script completed
 
     } catch (error) {
         console.error(`Error fixing ${filePath}:`, error.message);
@@ -42,6 +42,6 @@ function fixFile(filePath) {
 }
 
 // Fix all files
-console.log('Starting spread operator fixes...');
+// Script completed
 files.forEach(fixFile);
-console.log('Spread operator fixes completed!');
+// Script completed

@@ -1,7 +1,14 @@
 {
   "app": {
     "name": "ControlFin",
-    "tagline": "Gestão Inteligente de Finanças Pessoais"
+    "tagline": "Gestão Inteligente de Finanças Pessoais",
+    "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+  },
+  "charts": {
+    "amount": "Valor",
+    "income": "Receita",
+    "expense": "Despesa",
+    "net": "Líquido"
   },
   "buttons": {
     "submit": "Enviar",

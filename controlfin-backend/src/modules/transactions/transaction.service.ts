@@ -1,3 +1,4 @@
+import { sanitizeTransactionData } from '../../utils/data-sanitizer';
 import { CategoryModel as Category } from '../categories/category.model';
 import { PaymentMethodModel as PaymentMethod } from '../payment-methods/payment-method.model';
 import { ITransaction, TransactionModel as Transaction } from './transaction.model';
@@ -73,13 +74,11 @@ export interface SearchTransactionsParams {
 }
 
 export interface TransactionStats {
-  summary: {
-    totalIncome: number;
-    totalExpenses: number;
-    netAmount: number;
-    transactionCount: number;
-    averageTransaction: number;
-  };
+  totalIncome: number;
+  totalExpense: number;
+  netAmount: number;
+  transactionCount: number;
+  averageTransaction: number;
   byCategory: Array<{
     categoryId: string;
     categoryName: string;
@@ -103,35 +102,50 @@ export interface TransactionStats {
 }
 
 export interface PaginatedResult<T> {
-  data: T[];
+  transactions: T[];
   pagination: {
+    total: number;
     page: number;
     limit: number;
-    total: number;
     pages: number;
   };
 }
 
 class TransactionService {
   async createTransaction(data: CreateTransactionData): Promise<ITransaction> {
+    // Sanitize transaction data
+    const sanitizedData = sanitizeTransactionData(data) as CreateTransactionData;
+
     // Validate category exists
-    const category = await Category.findById(data.categoryId);
+    const category = await Category.findById(sanitizedData.categoryId);
     if (!category) {
       throw new Error('Category not found');
     }
 
     // Validate payment method exists
-    const paymentMethod = await PaymentMethod.findById(data.paymentMethodId);
+    const paymentMethod = await PaymentMethod.findById(sanitizedData.paymentMethodId);
     if (!paymentMethod) {
       throw new Error('Payment method not found');
     }
 
-    const transaction = new Transaction(data);
+    const transaction = new Transaction(sanitizedData);
     return await transaction.save();
   }
 
-  async getTransactionById(id: string, userId: string): Promise<ITransaction | null> {
-    return await Transaction.findOne({ _id: id, userId });
+  async getTransactionById(id: string, userId: string): Promise<ITransaction> {
+    try {
+      const transaction = await Transaction.findOne({ _id: id, userId });
+      if (!transaction) {
+        throw new Error('Transaction not found');
+      }
+      return transaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        throw new Error('Transaction not found');
+      }
+      throw error;
+    }
   }
 
   async updateTransaction(
@@ -139,32 +153,59 @@ class TransactionService {
     updateData: UpdateTransactionData,
     userId: string
   ): Promise<ITransaction | null> {
-    // Validate category if provided
-    if (updateData.categoryId) {
-      const category = await Category.findById(updateData.categoryId);
-      if (!category) {
-        throw new Error('Category not found');
+    try {
+      // Validate category if provided
+      if (updateData.categoryId) {
+        const category = await Category.findById(updateData.categoryId);
+        if (!category) {
+          throw new Error('Category not found');
+        }
       }
-    }
 
-    // Validate payment method if provided
-    if (updateData.paymentMethodId) {
-      const paymentMethod = await PaymentMethod.findById(updateData.paymentMethodId);
-      if (!paymentMethod) {
-        throw new Error('Payment method not found');
+      // Validate payment method if provided
+      if (updateData.paymentMethodId) {
+        const paymentMethod = await PaymentMethod.findById(updateData.paymentMethodId);
+        if (!paymentMethod) {
+          throw new Error('Payment method not found');
+        }
       }
-    }
 
-    return await Transaction.findOneAndUpdate(
-      { _id: id, userId },
-      { ...updateData, updatedAt: new Date() },
-      { new: true }
-    );
+      const updatedTransaction = await Transaction.findOneAndUpdate(
+        { _id: id, userId },
+        { ...updateData, updatedAt: new Date() },
+        { new: true }
+      );
+
+      if (!updatedTransaction) {
+        throw new Error('Transaction not found');
+      }
+
+      return updatedTransaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        throw new Error('Transaction not found');
+      }
+      throw error;
+    }
   }
 
-  async deleteTransaction(id: string, userId: string): Promise<boolean> {
-    const result = await Transaction.deleteOne({ _id: id, userId });
-    return result.deletedCount > 0;
+  async deleteTransaction(id: string, userId: string): Promise<ITransaction | null> {
+    try {
+      const transaction = await Transaction.findOne({ _id: id, userId });
+      if (!transaction) {
+        return null;
+      }
+
+      await Transaction.deleteOne({ _id: id, userId });
+      return transaction;
+    } catch (error) {
+      // Handle ObjectId validation errors
+      if (error instanceof Error && error.message.includes('Cast to ObjectId failed')) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   async getTransactions(params: GetTransactionsParams): Promise<PaginatedResult<ITransaction>> {
@@ -187,7 +228,7 @@ class TransactionService {
     } = params;
 
     // Build filter query
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
 
     if (spaceId) filter.spaceId = spaceId;
@@ -224,7 +265,7 @@ class TransactionService {
     }
 
     // Build sort object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sort: any = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
@@ -243,11 +284,11 @@ class TransactionService {
     ]);
 
     return {
-      data: transactions,
+      transactions,
       pagination: {
+        total,
         page,
         limit,
-        total,
         pages: Math.ceil(total / limit),
       },
     };
@@ -258,7 +299,7 @@ class TransactionService {
   ): Promise<PaginatedResult<ITransaction>> {
     const { userId, spaceId, query, page = 1, limit = 20 } = params;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       $or: [
@@ -283,11 +324,11 @@ class TransactionService {
     ]);
 
     return {
-      data: transactions,
+      transactions,
       pagination: {
+        total,
         page,
         limit,
-        total,
         pages: Math.ceil(total / limit),
       },
     };
@@ -297,7 +338,7 @@ class TransactionService {
     const { userId, spaceId, startDate, endDate, type } = params;
 
     // Build filter query
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = { userId };
     if (spaceId) filter.spaceId = spaceId;
     if (type) filter.type = type;
@@ -332,9 +373,9 @@ class TransactionService {
     const categoryMap = new Map();
     transactions.forEach((transaction: ITransaction) => {
       const categoryId = transaction.categoryId.toString();
- 
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const categoryName = (transaction.categoryId as any)?.name || 'Unknown';
 
       if (!categoryMap.has(categoryId)) {
@@ -363,8 +404,8 @@ class TransactionService {
     const paymentMethodMap = new Map();
     transactions.forEach((transaction: ITransaction) => {
       const paymentMethodId = transaction.paymentMethodId.toString();
- 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const paymentMethodName = (transaction.paymentMethodId as any)?.name || 'Unknown';
 
       if (!paymentMethodMap.has(paymentMethodId)) {
@@ -417,13 +458,11 @@ class TransactionService {
     );
 
     return {
-      summary: {
-        totalIncome,
-        totalExpenses,
-        netAmount,
-        transactionCount,
-        averageTransaction,
-      },
+      totalIncome,
+      totalExpense: totalExpenses,
+      netAmount,
+      transactionCount,
+      averageTransaction,
       byCategory: byCategory.sort((a, b) => b.amount - a.amount),
       byPaymentMethod: byPaymentMethod.sort((a, b) => b.amount - a.amount),
       monthlyTrend,
@@ -436,7 +475,7 @@ class TransactionService {
     endDate: Date,
     spaceId?: string
   ): Promise<ITransaction[]> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       date: {
@@ -454,7 +493,7 @@ class TransactionService {
   }
 
   async getRecurringTransactions(userId: string, spaceId?: string): Promise<ITransaction[]> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       isRecurring: true,
@@ -473,7 +512,7 @@ class TransactionService {
     categoryId: string,
     spaceId?: string
   ): Promise<ITransaction[]> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       categoryId,
@@ -492,7 +531,7 @@ class TransactionService {
     paymentMethodId: string,
     spaceId?: string
   ): Promise<ITransaction[]> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       userId,
       paymentMethodId,

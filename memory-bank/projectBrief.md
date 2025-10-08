@@ -2180,7 +2180,7 @@ git clone https://github.com/seu-usuario/controlfin-backend.git
 ## 📊 **PROJECT STATUS UPDATE**
 
 ### **Completed Features** ✅
-- **TASK-011: Transaction Management System** - ✅ **ARCHIVED** (2025-10-05)
+- **TASK-011: Transaction Management System** - ❌ **PENDING RE-ARCHIVE** (2025-10-05)
   - Complete transaction CRUD operations
   - Advanced filtering and search capabilities
   - Data visualization with Highcharts

@@ -1,77 +1,15 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { z } from 'zod';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { bulkService } from './bulk.service';
-
-const BulkCreateSchema = z.object({
-  spaceId: z.string(),
-  transactions: z.array(
-    z.object({
-      type: z.enum(['income', 'expense', 'transfer']),
-      amount: z.number().positive(),
-      description: z.string().min(1),
-      categoryId: z.string(),
-      paymentMethodId: z.string(),
-      date: z.string().datetime(),
-      tags: z.array(z.string()).optional(),
-      isRecurring: z.boolean().optional(),
-      recurringId: z.string().optional(),
-      metadata: z
-        .object({
-          location: z.string().optional(),
-          notes: z.string().optional(),
-          attachments: z.array(z.string()).optional(),
-        })
-        .optional(),
-    })
-  ),
-});
-
-const BulkUpdateSchema = z.object({
-  transactionIds: z.array(z.string()),
-  updates: z.object({
-    type: z.enum(['income', 'expense', 'transfer']).optional(),
-    amount: z.number().positive().optional(),
-    description: z.string().min(1).optional(),
-    categoryId: z.string().optional(),
-    paymentMethodId: z.string().optional(),
-    date: z.string().datetime().optional(),
-    tags: z.array(z.string()).optional(),
-    isRecurring: z.boolean().optional(),
-    recurringId: z.string().optional(),
-    metadata: z
-      .object({
-        location: z.string().optional(),
-        notes: z.string().optional(),
-        attachments: z.array(z.string()).optional(),
-      })
-      .optional(),
-  }),
-});
-
-const BulkDeleteSchema = z.object({
-  transactionIds: z.array(z.string()),
-});
-
-const BulkDuplicateSchema = z.object({
-  transactionIds: z.array(z.string()),
-});
-
-const BulkCategorizeSchema = z.object({
-  transactionIds: z.array(z.string()),
-  categoryId: z.string(),
-});
-
-const BulkTagSchema = z.object({
-  transactionIds: z.array(z.string()),
-  tags: z.array(z.string()),
-  operation: z.enum(['add', 'remove', 'replace']).optional().default('add'),
-});
-
-const BulkExportSchema = z.object({
-  transactionIds: z.array(z.string()),
-  format: z.enum(['csv', 'json']).optional().default('csv'),
-});
+import {
+  BulkCreateSchema,
+  BulkUpdateSchema,
+  BulkDeleteSchema,
+  BulkDuplicateSchema,
+  BulkCategorizeSchema,
+  BulkTagSchema,
+  BulkExportSchema,
+} from './bulk.schemas.json';
 
 export async function bulkRoutes(fastify: FastifyInstance) {
   // Apply authentication middleware to all routes

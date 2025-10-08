@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { z } from 'zod';
+import { googleCallbackSchema, oauthResponseSchema } from './auth.schemas';
 import { GoogleProfile, handleOAuthCallback, validateGoogleProfile } from './auth.oauth.service';
 import rateLimit from '@fastify/rate-limit';
 
@@ -29,31 +29,7 @@ const rateLimitConfig = {
   },
 };
 
-// Google OAuth callback schema
-const googleCallbackSchema = z.object({
-  code: z.string().min(1, 'Authorization code is required'),
-  state: z.string().min(1, 'State parameter is required for security'),
-});
-
-// OAuth response schema
-const oauthResponseSchema = z.object({
-  message: z.string(),
-  user: z.object({
-    _id: z.string(),
-    email: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    avatar: z.string().optional(),
-    isEmailVerified: z.boolean(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  }),
-  tokens: z.object({
-    accessToken: z.string(),
-    refreshToken: z.string(),
-  }),
-  isNewUser: z.boolean(),
-});
+// Schemas are now imported from auth.schemas.ts
 
 /**
  * Configure Google OAuth strategy

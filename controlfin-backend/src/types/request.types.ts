@@ -13,7 +13,7 @@ export interface AuthenticatedUser {
 
 // Base request interface with authentication
 export interface AuthenticatedRequest extends FastifyRequest {
-    user: AuthenticatedUser;
+    user?: AuthenticatedUser;
 }
 
 // Request interfaces for different operations

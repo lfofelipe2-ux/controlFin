@@ -35,16 +35,16 @@ body {
 
 /* Fix spacing between form inputs and error messages */
 .ant-form-item-explain-error {
-  margin-top: 8px !important;
+  margin-top: 8px;
 }
 
 /* Remove focus outlines from link buttons */
 .ant-btn-link:focus,
 .ant-btn-link:hover,
 .ant-btn-link:active {
-  outline: none !important;
-  box-shadow: none !important;
-  border: none !important;
+  outline: none;
+  box-shadow: none;
+  border: none;
 }
 
 h1 {

@@ -1,15 +1,58 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Category } from '../../categories/category.model';
-import { PaymentMethod } from '../../payment-methods/payment-method.model';
-import { Transaction } from '../transaction.model';
+
+// Mock the modules before importing the service
+vi.mock('../transaction.model', () => {
+  const mockTransaction = vi.fn().mockImplementation((data) => ({
+    ...data,
+    _id: '507f1f77bcf86cd799439011',
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    save: vi.fn().mockResolvedValue({
+      ...data,
+      _id: '507f1f77bcf86cd799439011',
+      createdAt: new Date('2025-01-01'),
+      updatedAt: new Date('2025-01-01'),
+    }),
+  }));
+
+  // Add static methods to the constructor
+  mockTransaction.create = vi.fn();
+  mockTransaction.find = vi.fn();
+  mockTransaction.findById = vi.fn();
+  mockTransaction.findByIdAndUpdate = vi.fn();
+  mockTransaction.findByIdAndDelete = vi.fn();
+  mockTransaction.findOne = vi.fn();
+  mockTransaction.findOneAndUpdate = vi.fn();
+  mockTransaction.findOneAndDelete = vi.fn();
+  mockTransaction.deleteOne = vi.fn();
+  mockTransaction.aggregate = vi.fn();
+  mockTransaction.countDocuments = vi.fn();
+
+  return {
+    TransactionModel: mockTransaction, // This is the constructor
+    ITransaction: {},
+  };
+});
+
+vi.mock('../../categories/category.model', () => ({
+  CategoryModel: {
+    findById: vi.fn(),
+  },
+}));
+
+vi.mock('../../payment-methods/payment-method.model', () => ({
+  PaymentMethodModel: {
+    findById: vi.fn(),
+  },
+}));
+
+// Import after mocking
+import { CategoryModel as Category } from '../../categories/category.model';
+import { PaymentMethodModel as PaymentMethod } from '../../payment-methods/payment-method.model';
+import { TransactionModel as Transaction } from '../transaction.model';
 import { transactionService } from '../transaction.service';
 
-// Mock the models
-vi.mock('../transaction.model');
-vi.mock('../../categories/category.model');
-vi.mock('../../payment-methods/payment-method.model');
-
-const mockTransaction = {
+const mockTransactionData = {
   _id: '507f1f77bcf86cd799439011',
   spaceId: '507f1f77bcf86cd799439012',
   userId: '507f1f77bcf86cd799439013',
@@ -32,10 +75,10 @@ const mockTransaction = {
 const mockCategory = {
   _id: '507f1f77bcf86cd799439014',
   spaceId: '507f1f77bcf86cd799439012',
-  name: 'Food',
+  name: 'Test Category',
   type: 'expense',
-  color: '#FF5722',
-  icon: 'food',
+  color: '#FF0000',
+  icon: 'test-icon',
   isActive: true,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
@@ -44,14 +87,9 @@ const mockCategory = {
 const mockPaymentMethod = {
   _id: '507f1f77bcf86cd799439015',
   spaceId: '507f1f77bcf86cd799439012',
-  userId: '507f1f77bcf86cd799439013',
-  name: 'Credit Card',
+  name: 'Test Payment Method',
   type: 'credit_card',
   isActive: true,
-  metadata: {
-    last4: '1234',
-    bank: 'Test Bank',
-  },
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };
@@ -66,39 +104,47 @@ describe('TransactionService', () => {
       const createData = {
         spaceId: '507f1f77bcf86cd799439012',
         userId: '507f1f77bcf86cd799439013',
-        type: 'expense',
+        type: 'expense' as const,
         amount: 100.5,
         description: 'Test Transaction',
         categoryId: '507f1f77bcf86cd799439014',
         paymentMethodId: '507f1f77bcf86cd799439015',
         date: new Date('2025-01-01'),
         tags: ['test', 'expense'],
+        isRecurring: false,
         metadata: {
           location: 'Test Location',
           notes: 'Test Notes',
         },
       };
 
-      vi.mocked(Transaction.create).mockResolvedValue(mockTransaction as any);
-      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
-      vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as any);
+      // Mock the model methods
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as unknown as Document);
+      vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as unknown as Document);
 
       const result = await transactionService.createTransaction(createData);
 
-      expect(result).toEqual(mockTransaction);
-      expect(Transaction.create).toHaveBeenCalledWith(createData);
+      expect(result).toEqual(mockTransactionData);
+      expect(Category.findById).toHaveBeenCalledWith(createData.categoryId);
+      expect(PaymentMethod.findById).toHaveBeenCalledWith(createData.paymentMethodId);
     });
 
     it('should throw error if category not found', async () => {
       const createData = {
         spaceId: '507f1f77bcf86cd799439012',
         userId: '507f1f77bcf86cd799439013',
-        type: 'expense',
+        type: 'expense' as const,
         amount: 100.5,
         description: 'Test Transaction',
-        categoryId: 'invalid-category-id',
+        categoryId: '507f1f77bcf86cd799439014',
         paymentMethodId: '507f1f77bcf86cd799439015',
         date: new Date('2025-01-01'),
+        tags: ['test', 'expense'],
+        isRecurring: false,
+        metadata: {
+          location: 'Test Location',
+          notes: 'Test Notes',
+        },
       };
 
       vi.mocked(Category.findById).mockResolvedValue(null);
@@ -112,15 +158,21 @@ describe('TransactionService', () => {
       const createData = {
         spaceId: '507f1f77bcf86cd799439012',
         userId: '507f1f77bcf86cd799439013',
-        type: 'expense',
+        type: 'expense' as const,
         amount: 100.5,
         description: 'Test Transaction',
         categoryId: '507f1f77bcf86cd799439014',
-        paymentMethodId: 'invalid-payment-method-id',
+        paymentMethodId: '507f1f77bcf86cd799439015',
         date: new Date('2025-01-01'),
+        tags: ['test', 'expense'],
+        isRecurring: false,
+        metadata: {
+          location: 'Test Location',
+          notes: 'Test Notes',
+        },
       };
 
-      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as unknown as Document);
       vi.mocked(PaymentMethod.findById).mockResolvedValue(null);
 
       await expect(transactionService.createTransaction(createData)).rejects.toThrow(
@@ -134,33 +186,32 @@ describe('TransactionService', () => {
       const filters = {
         spaceId: '507f1f77bcf86cd799439012',
         userId: '507f1f77bcf86cd799439013',
-        search: 'test',
-        categoryId: '507f1f77bcf86cd799439014',
-        paymentMethodId: '507f1f77bcf86cd799439015',
-        type: 'expense',
-        startDate: new Date('2025-01-01'),
-        endDate: new Date('2025-01-31'),
-        minAmount: 0,
-        maxAmount: 1000,
+        type: 'expense' as const,
         page: 1,
         limit: 10,
       };
 
       const mockQuery = {
-        find: vi.fn().mockReturnThis(),
-        populate: vi.fn().mockReturnThis(),
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
-        exec: vi.fn().mockResolvedValue([mockTransaction]),
+        populate: vi.fn().mockReturnThis(),
       };
 
-      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      // Mock the chained query to return the data on the final populate call
+      mockQuery.populate.mockImplementation((field) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve([mockTransactionData]);
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(1);
 
       const result = await transactionService.getTransactions(filters);
 
-      expect(result.transactions).toEqual([mockTransaction]);
+      expect(result.transactions).toEqual([mockTransactionData]);
       expect(result.pagination.total).toBe(1);
       expect(result.pagination.page).toBe(1);
       expect(result.pagination.limit).toBe(10);
@@ -170,18 +221,26 @@ describe('TransactionService', () => {
       const filters = {
         spaceId: '507f1f77bcf86cd799439012',
         userId: '507f1f77bcf86cd799439013',
+        page: 1,
+        limit: 10,
       };
 
       const mockQuery = {
-        find: vi.fn().mockReturnThis(),
-        populate: vi.fn().mockReturnThis(),
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
-        exec: vi.fn().mockResolvedValue([]),
+        populate: vi.fn().mockReturnThis(),
       };
 
-      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      // Mock the chained query to return empty array on the final populate call
+      mockQuery.populate.mockImplementation((field) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve([]);
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(0);
 
       const result = await transactionService.getTransactions(filters);
@@ -196,11 +255,11 @@ describe('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransaction as any);
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransactionData as unknown as Document);
 
       const result = await transactionService.getTransactionById(transactionId, userId);
 
-      expect(result).toEqual(mockTransaction);
+      expect(result).toEqual(mockTransactionData);
       expect(Transaction.findOne).toHaveBeenCalledWith({
         _id: transactionId,
         userId,
@@ -208,7 +267,7 @@ describe('TransactionService', () => {
     });
 
     it('should throw error if transaction not found', async () => {
-      const transactionId = 'invalid-id';
+      const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
       vi.mocked(Transaction.findOne).mockResolvedValue(null);
@@ -223,34 +282,30 @@ describe('TransactionService', () => {
     it('should update transaction successfully', async () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
-      const updateData = {
-        description: 'Updated Transaction',
-        amount: 200.0,
-      };
+      const updateData = { description: 'Updated Transaction' };
+      const updatedTransaction = { ...mockTransactionData, ...updateData };
 
-      const updatedTransaction = { ...mockTransaction, ...updateData };
+      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as unknown as Document);
 
-      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as any);
-
-      const result = await transactionService.updateTransaction(transactionId, userId, updateData);
+      const result = await transactionService.updateTransaction(transactionId, updateData, userId);
 
       expect(result).toEqual(updatedTransaction);
       expect(Transaction.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: transactionId, userId },
-        { $set: updateData },
-        { new: true, runValidators: true }
+        { ...updateData, updatedAt: expect.any(Date) },
+        { new: true }
       );
     });
 
     it('should throw error if transaction not found', async () => {
-      const transactionId = 'invalid-id';
+      const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
       const updateData = { description: 'Updated Transaction' };
 
       vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(null);
 
       await expect(
-        transactionService.updateTransaction(transactionId, userId, updateData)
+        transactionService.updateTransaction(transactionId, updateData, userId)
       ).rejects.toThrow('Transaction not found');
     });
   });
@@ -259,27 +314,37 @@ describe('TransactionService', () => {
     it('should delete transaction successfully', async () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
+      const mockTransaction = { _id: transactionId, userId, description: 'Test Transaction' };
 
-      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(mockTransaction as any);
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransaction as unknown as Document);
+      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 1 } as unknown as Document);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
       expect(result).toEqual(mockTransaction);
-      expect(Transaction.findOneAndDelete).toHaveBeenCalledWith({
+      expect(Transaction.findOne).toHaveBeenCalledWith({
+        _id: transactionId,
+        userId,
+      });
+      expect(Transaction.deleteOne).toHaveBeenCalledWith({
         _id: transactionId,
         userId,
       });
     });
 
-    it('should throw error if transaction not found', async () => {
-      const transactionId = 'invalid-id';
+    it('should return null if transaction not found', async () => {
+      const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.findOneAndDelete).mockResolvedValue(null);
+      vi.mocked(Transaction.findOne).mockResolvedValue(null);
 
-      await expect(transactionService.deleteTransaction(transactionId, userId)).rejects.toThrow(
-        'Transaction not found'
-      );
+      const result = await transactionService.deleteTransaction(transactionId, userId);
+
+      expect(result).toBe(null);
+      expect(Transaction.findOne).toHaveBeenCalledWith({
+        _id: transactionId,
+        userId,
+      });
     });
   });
 
@@ -292,30 +357,45 @@ describe('TransactionService', () => {
         endDate: new Date('2025-01-31'),
       };
 
-      const mockStats = {
-        totalIncome: 5000,
-        totalExpense: 3000,
-        netAmount: 2000,
-        transactionCount: 25,
-        averageTransaction: 320,
-        categoryBreakdown: [
-          { category: 'Food', amount: 1000, count: 10 },
-          { category: 'Transport', amount: 500, count: 5 },
-        ],
-        paymentMethodBreakdown: [
-          { paymentMethod: 'Credit Card', amount: 2000, count: 15 },
-          { paymentMethod: 'Cash', amount: 1000, count: 10 },
-        ],
-      };
+      const mockTransactions = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          type: 'income',
+          amount: 5000,
+          categoryId: { name: 'Salary' },
+          paymentMethodId: { name: 'Bank' },
+          date: new Date('2025-01-15'),
+        },
+        {
+          _id: '507f1f77bcf86cd799439012',
+          type: 'expense',
+          amount: 3000,
+          categoryId: { name: 'Rent' },
+          paymentMethodId: { name: 'Credit Card' },
+          date: new Date('2025-01-20'),
+        },
+      ];
 
-      // Mock aggregation pipeline
-      const mockAggregate = vi.fn().mockResolvedValue([mockStats]);
-      vi.mocked(Transaction.aggregate).mockImplementation(mockAggregate);
+      // Mock find method to return transactions with proper chaining
+      const mockQuery = {
+        populate: vi.fn().mockReturnThis(),
+      };
+      mockQuery.populate.mockImplementation((field) => {
+        if (field === 'paymentMethodId') {
+          return Promise.resolve(mockTransactions);
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
 
       const result = await transactionService.getTransactionStats(filters);
 
-      expect(result).toEqual(mockStats);
-      expect(Transaction.aggregate).toHaveBeenCalled();
+      expect(result.totalIncome).toBe(5000);
+      expect(result.totalExpense).toBe(3000);
+      expect(result.netAmount).toBe(2000);
+      expect(result.transactionCount).toBe(2);
+      expect(Transaction.find).toHaveBeenCalled();
     });
   });
 });

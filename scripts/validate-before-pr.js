@@ -46,7 +46,7 @@ const logWarning = (message) => {
 // Validation functions
 const validateBackend = () => {
     logStep('1', 'Validating Backend...');
-    
+
     try {
         // Check if backend directory exists
         if (!fs.existsSync('controlfin-backend')) {
@@ -55,7 +55,7 @@ const validateBackend = () => {
 
         // Run backend lint
         log('Running backend ESLint...', colors.cyan);
-        execSync('cd controlfin-backend && npm run lint', { 
+        execSync('cd controlfin-backend && npm run lint', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -71,7 +71,7 @@ const validateBackend = () => {
 
         // Run backend build
         log('Running backend build...', colors.cyan);
-        execSync('cd controlfin-backend && npm run build', { 
+        execSync('cd controlfin-backend && npm run build', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -94,7 +94,7 @@ const validateBackend = () => {
 
 const validateFrontend = () => {
     logStep('2', 'Validating Frontend...');
-    
+
     try {
         // Check if frontend directory exists
         if (!fs.existsSync('controlfin-frontend')) {
@@ -103,7 +103,7 @@ const validateFrontend = () => {
 
         // Run frontend lint
         log('Running frontend ESLint...', colors.cyan);
-        execSync('cd controlfin-frontend && npm run lint', { 
+        execSync('cd controlfin-frontend && npm run lint', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -111,7 +111,7 @@ const validateFrontend = () => {
 
         // Run frontend tests
         log('Running frontend tests...', colors.cyan);
-        execSync('cd controlfin-frontend && npm test', { 
+        execSync('cd controlfin-frontend && npm test', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -119,7 +119,7 @@ const validateFrontend = () => {
 
         // Run frontend build
         log('Running frontend build...', colors.cyan);
-        execSync('cd controlfin-frontend && npm run build', { 
+        execSync('cd controlfin-frontend && npm run build', {
             stdio: 'pipe',
             encoding: 'utf8'
         });
@@ -142,15 +142,14 @@ const validateFrontend = () => {
 
 const validateI18n = () => {
     logStep('3', 'Validating i18n Translation Files...');
-    
+
     try {
         const translationFiles = [
             'controlfin-frontend/src/locales/en/common.json',
             'controlfin-frontend/src/locales/pt/common.json',
         ];
 
-        const allKeys = new Map();
-        const duplicates = [];
+        const allDuplicates = [];
 
         for (const filePath of translationFiles) {
             if (!fs.existsSync(filePath)) {
@@ -161,6 +160,7 @@ const validateI18n = () => {
             const content = fs.readFileSync(filePath, 'utf8');
             const parsed = JSON.parse(content);
             const keys = [];
+            const keyCounts = new Map();
 
             const extractKeys = (obj, prefix = '') => {
                 for (const [key, value] of Object.entries(obj)) {
@@ -169,44 +169,36 @@ const validateI18n = () => {
                         extractKeys(value, fullKey);
                     } else {
                         keys.push(fullKey);
+                        keyCounts.set(fullKey, (keyCounts.get(fullKey) || 0) + 1);
                     }
                 }
             };
 
             extractKeys(parsed);
 
-            for (const key of keys) {
-                if (allKeys.has(key)) {
-                    const existing = allKeys.get(key);
-                    existing.count++;
-                    existing.files.push(filePath);
-                    duplicates.push({
-                        key,
-                        files: existing.files,
-                        count: existing.count,
-                    });
-                } else {
-                    allKeys.set(key, {
-                        file: filePath,
-                        count: 1,
-                        files: [filePath],
-                    });
+            // Check for duplicates within the same file
+            const fileDuplicates = [];
+            for (const [key, count] of keyCounts.entries()) {
+                if (count > 1) {
+                    fileDuplicates.push({ key, count, file: filePath });
                 }
+            }
+
+            if (fileDuplicates.length > 0) {
+                allDuplicates.push(...fileDuplicates);
             }
         }
 
-        if (duplicates.length > 0) {
-            logError(`Found ${duplicates.length} duplicate i18n keys:`);
-            duplicates.forEach(({ key, files, count }) => {
+        if (allDuplicates.length > 0) {
+            logError(`Found ${allDuplicates.length} duplicate i18n keys within files:`);
+            allDuplicates.forEach(({ key, count, file }) => {
                 log(`  - "${key}" appears ${count} times in:`, colors.red);
-                files.forEach(file => {
-                    log(`    ${file}`, colors.yellow);
-                });
+                log(`    ${file}`, colors.yellow);
             });
             return false;
         }
 
-        logSuccess('No duplicate i18n keys found');
+        logSuccess('No duplicate i18n keys found within files');
         return true;
     } catch (error) {
         logError(`i18n validation failed: ${error.message}`);
@@ -216,11 +208,11 @@ const validateI18n = () => {
 
 const validateGitStatus = () => {
     logStep('4', 'Validating Git Status...');
-    
+
     try {
         // Check if we're in a git repository
         execSync('git status', { stdio: 'pipe' });
-        
+
         // Check if there are uncommitted changes
         const status = execSync('git status --porcelain', { encoding: 'utf8' });
         if (status.trim()) {
@@ -247,12 +239,12 @@ const validateGitStatus = () => {
 
 const validateDependencies = () => {
     logStep('5', 'Validating Dependencies...');
-    
+
     try {
         // Check backend dependencies
         if (fs.existsSync('controlfin-backend/package.json')) {
             log('Checking backend dependencies...', colors.cyan);
-            execSync('cd controlfin-backend && npm audit --audit-level=high', { 
+            execSync('cd controlfin-backend && npm audit --audit-level=high', {
                 stdio: 'pipe',
                 encoding: 'utf8'
             });
@@ -262,7 +254,7 @@ const validateDependencies = () => {
         // Check frontend dependencies
         if (fs.existsSync('controlfin-frontend/package.json')) {
             log('Checking frontend dependencies...', colors.cyan);
-            execSync('cd controlfin-frontend && npm audit --audit-level=high', { 
+            execSync('cd controlfin-frontend && npm audit --audit-level=high', {
                 stdio: 'pipe',
                 encoding: 'utf8'
             });
@@ -294,7 +286,7 @@ const runValidation = async () => {
     ];
 
     const results = [];
-    
+
     for (const validation of validations) {
         try {
             const result = validation.fn();
@@ -307,10 +299,10 @@ const runValidation = async () => {
 
     // Summary
     logSection('📊 VALIDATION SUMMARY');
-    
+
     const passed = results.filter(r => r.passed).length;
     const total = results.length;
-    
+
     results.forEach(({ name, passed }) => {
         if (passed) {
             logSuccess(`${name}: PASSED`);

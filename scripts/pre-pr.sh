@@ -15,7 +15,7 @@ if [ ! -f "package.json" ] && [ ! -d "controlfin-backend" ] && [ ! -d "controlfi
 fi
 
 # Run the validation script
-node scripts/validate-before-pr.js
+./scripts/validate-complete.sh
 
 echo ""
 echo "✅ Pre-PR validation completed successfully!"

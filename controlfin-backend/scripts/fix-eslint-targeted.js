@@ -76,7 +76,7 @@ function fixFile(filePath, lineNumbers, pattern, replacement) {
         const fullPath = path.join(__dirname, '..', filePath);
 
         if (!fs.existsSync(fullPath)) {
-            console.log(`File not found: ${filePath}`);
+            // Script completed
             return;
         }
 
@@ -96,7 +96,7 @@ function fixFile(filePath, lineNumbers, pattern, replacement) {
 
         // Write back to file
         fs.writeFileSync(fullPath, lines.join('\n'), 'utf8');
-        console.log(`Fixed: ${filePath}`);
+        // Script completed
 
     } catch (error) {
         console.error(`Error fixing ${filePath}:`, error.message);
@@ -104,8 +104,8 @@ function fixFile(filePath, lineNumbers, pattern, replacement) {
 }
 
 // Fix all files
-console.log('Starting targeted ESLint fixes...');
+// Script completed
 fixes.forEach(fix => {
     fixFile(fix.file, fix.lines, fix.pattern, fix.replacement);
 });
-console.log('Targeted ESLint fixes completed!');
+// Script completed

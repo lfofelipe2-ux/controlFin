@@ -29,14 +29,11 @@ function setupGitHooks() {
   // Create pre-push hook
   const prePushHook = `#!/bin/sh
 
-# Pre-push hook for i18n validation
+# Pre-push hook for complete project validation
 echo "🚀 Running pre-push validation..."
 
-# Change to frontend directory
-cd controlfin-frontend
-
-# Run pre-PR validation
-npm run validate:pre-pr
+# Run complete validation script
+./scripts/validate-complete.sh
 
 # Check exit code
 if [ $? -ne 0 ]; then
@@ -46,7 +43,7 @@ if [ $? -ne 0 ]; then
   echo ""
   echo "💡 To fix:"
   echo "   1. Fix the issues above"
-  echo "   2. Run: npm run validate:pre-pr"
+  echo "   2. Run: ./scripts/validate-complete.sh"
   echo "   3. Try pushing again"
   echo ""
   exit 1
@@ -62,30 +59,27 @@ echo "✅ Pre-push validation passed!"
   // Create pre-commit hook (optional, lighter validation)
   const preCommitHook = `#!/bin/sh
 
-# Pre-commit hook for quick i18n validation
-echo "🔍 Running quick i18n validation..."
+# Pre-commit hook for complete project validation
+echo "🚀 Running complete project validation..."
 
-# Change to frontend directory
-cd controlfin-frontend
-
-# Run quick i18n validation
-npm run validate:i18n
+# Run complete validation script
+./scripts/validate-complete.sh
 
 # Check exit code
 if [ $? -ne 0 ]; then
   echo ""
-  echo "❌ QUICK VALIDATION FAILED!"
-  echo "🚫 Commit blocked due to i18n issues"
+  echo "❌ COMPLETE VALIDATION FAILED!"
+  echo "🚫 Commit blocked due to validation issues"
   echo ""
   echo "💡 To fix:"
-  echo "   1. Fix the i18n issues above"
-  echo "   2. Run: npm run validate:i18n"
+  echo "   1. Fix the issues above"
+  echo "   2. Run: ./scripts/validate-complete.sh"
   echo "   3. Try committing again"
   echo ""
   exit 1
 fi
 
-echo "✅ Quick validation passed!"
+echo "✅ Complete validation passed!"
 `;
 
   const preCommitPath = path.join(hooksDir, 'pre-commit');
@@ -94,16 +88,16 @@ echo "✅ Quick validation passed!"
 
   console.log('✅ Git hooks installed successfully!');
   console.log('\n📋 Hooks created:');
-  console.log('   • pre-commit: Quick i18n validation before each commit');
-  console.log('   • pre-push: Full validation before pushing to remote');
+  console.log('   • pre-commit: Complete project validation before each commit');
+  console.log('   • pre-push: Complete project validation before pushing to remote');
   console.log('\n🎯 What happens now:');
-  console.log('   • Every commit will validate i18n files and components');
-  console.log('   • Every push will run full validation including hardcoded strings');
+  console.log('   • Every commit will validate both frontend and backend');
+  console.log('   • Every push will run complete validation (TypeScript, ESLint, tests, build)');
   console.log('   • Failed validation will block the operation');
   console.log('\n💡 To disable hooks temporarily:');
   console.log('   git push --no-verify');
   console.log('   git commit --no-verify');
-  console.log('\n🚀 Ready! Your PRs will now be automatically validated!');
+  console.log('\n🚀 Ready! Your commits and pushes will now be automatically validated!');
 }
 
 function removeGitHooks() {

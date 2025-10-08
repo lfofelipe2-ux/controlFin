@@ -1,78 +1,15 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { z } from 'zod';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import {
+  CreateFromTemplateSchema,
+  CreateTemplateSchema,
+  DuplicateTemplateSchema,
+  PopularTemplatesQuerySchema,
+  TemplateQuerySchema,
+  TemplateStatsQuerySchema,
+  UpdateTemplateSchema,
+} from './template.schemas.json';
 import { templateService } from './template.service';
-
-const CreateTemplateSchema = z.object({
-  spaceId: z.string(),
-  name: z.string().min(1),
-  description: z.string().min(1),
-  type: z.enum(['income', 'expense', 'transfer']),
-  amount: z.number().positive(),
-  categoryId: z.string(),
-  paymentMethodId: z.string(),
-  tags: z.array(z.string()).optional(),
-  metadata: z
-    .object({
-      location: z.string().optional(),
-      notes: z.string().optional(),
-      attachments: z.array(z.string()).optional(),
-    })
-    .optional(),
-});
-
-const UpdateTemplateSchema = z.object({
-  name: z.string().min(1).optional(),
-  description: z.string().min(1).optional(),
-  type: z.enum(['income', 'expense', 'transfer']).optional(),
-  amount: z.number().positive().optional(),
-  categoryId: z.string().optional(),
-  paymentMethodId: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  metadata: z
-    .object({
-      location: z.string().optional(),
-      notes: z.string().optional(),
-      attachments: z.array(z.string()).optional(),
-    })
-    .optional(),
-  isActive: z.boolean().optional(),
-});
-
-const TemplateQuerySchema = z.object({
-  spaceId: z.string().optional(),
-  type: z.enum(['income', 'expense', 'transfer']).optional(),
-  isActive: z.boolean().optional(),
-  search: z.string().optional(),
-  page: z.number().min(1).optional().default(1),
-  limit: z.number().min(1).max(100).optional().default(20),
-  sortBy: z.enum(['name', 'usageCount', 'lastUsed', 'createdAt']).optional().default('name'),
-  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
-});
-
-const CreateFromTemplateSchema = z.object({
-  templateId: z.string(),
-  overrides: z
-    .object({
-      amount: z.number().positive().optional(),
-      description: z.string().optional(),
-      date: z.string().datetime().optional(),
-      tags: z.array(z.string()).optional(),
-      metadata: z
-        .object({
-          location: z.string().optional(),
-          notes: z.string().optional(),
-          attachments: z.array(z.string()).optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-});
-
-const DuplicateTemplateSchema = z.object({
-  templateId: z.string(),
-  newName: z.string().optional(),
-});
 
 export async function templateRoutes(fastify: FastifyInstance) {
   // Apply authentication middleware to all routes
@@ -561,10 +498,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
     '/popular',
     {
       schema: {
-        querystring: z.object({
-          spaceId: z.string().optional(),
-          limit: z.number().min(1).max(50).optional().default(10),
-        }),
+        querystring: PopularTemplatesQuerySchema,
         response: {
           200: {
             type: 'object',
@@ -725,9 +659,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
     '/stats',
     {
       schema: {
-        querystring: z.object({
-          spaceId: z.string().optional(),
-        }),
+        querystring: TemplateStatsQuerySchema,
         response: {
           200: {
             type: 'object',

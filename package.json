@@ -16,6 +16,13 @@
     "setup:env": "cp controlfin-frontend/env.example controlfin-frontend/.env && cp controlfin-backend/env.example controlfin-backend/.env",
     "test:mongodb": "node scripts/test-mongodb-connection.js",
     "test:config": "npm run validate:config && npm run test:mongodb",
+    "test:all": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd controlfin-backend && npm run test:all",
+    "test:frontend": "cd controlfin-frontend && npm run test:all",
+    "validate:all": "npm run validate:backend && npm run validate:frontend",
+    "validate:comprehensive": "node scripts/validate-comprehensive.js",
+    "validate:backend": "cd controlfin-backend && npm run validate:all",
+    "validate:frontend": "cd controlfin-frontend && npm run validate:all",
     "start:production": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd controlfin-backend && npm run start:production",
     "start:frontend": "cd controlfin-frontend && npm run preview"
@@ -51,7 +58,6 @@
     "doc": "docs"
   },
   "dependencies": {
-    "concurrently": "^8.2.2",
     "ajv": "^8.17.1",
     "ansi-escapes": "^7.1.1",
     "ansi-regex": "^6.2.2",
@@ -69,6 +75,7 @@
     "colorette": "^2.0.20",
     "commander": "^14.0.1",
     "compare-func": "^2.0.0",
+    "concurrently": "^8.2.2",
     "conventional-changelog-angular": "^7.0.0",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "conventional-commits-parser": "^5.0.0",
@@ -156,7 +163,8 @@
     "yaml": "^2.8.1",
     "yargs": "^17.7.2",
     "yargs-parser": "^21.1.1",
-    "yocto-queue": "^1.2.1"
+    "yocto-queue": "^1.2.1",
+    "zod-to-json-schema": "^3.24.6"
   },
   "repository": {
     "type": "git",
