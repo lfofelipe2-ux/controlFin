@@ -18,7 +18,7 @@ jobs:
       config: ${{ steps.read-config.outputs.config }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Read CI Config
         id: read-config
@@ -41,7 +41,7 @@ jobs:
         working-directory: ${{ fromJson(needs.load-config.outputs.config).projects.frontend.path }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Project
         uses: ./.github/actions/setup-project
@@ -87,7 +87,7 @@ jobs:
         working-directory: ${{ fromJson(needs.load-config.outputs.config).projects.backend.path }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Project
         uses: ./.github/actions/setup-project
@@ -134,7 +134,7 @@ jobs:
         project: ${{ fromJson(needs.load-config.outputs.config).build_matrix.projects }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Project
         uses: ./.github/actions/setup-project
@@ -155,7 +155,7 @@ jobs:
     runs-on: ${{ fromJson(needs.load-config.outputs.config).job_defaults.runs_on }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Project
         uses: ./.github/actions/setup-project
@@ -206,7 +206,7 @@ jobs:
     runs-on: ${{ fromJson(needs.load-config.outputs.config).job_defaults.runs_on }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Project
         uses: ./.github/actions/setup-project
