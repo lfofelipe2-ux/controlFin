@@ -3,7 +3,7 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-// Cores para output
+// Colors for output
 const colors = {
   red: '\x1b[31m',
   green: '\x1b[32m',
