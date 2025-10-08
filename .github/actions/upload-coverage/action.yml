@@ -7,11 +7,11 @@ inputs:
   coverage-file:
     description: 'Coverage file path'
     required: false
-    default: './controlfin-${{ inputs.project }}/coverage/lcov.info'
+    default: './controlfin-frontend/coverage/lcov.info'
   coverage-flag:
     description: 'Coverage flag for reporting'
     required: false
-    default: '${{ inputs.project }}'
+    default: 'frontend'
   continue-on-error:
     description: 'Continue on upload failure'
     required: false

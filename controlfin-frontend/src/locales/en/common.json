@@ -4,6 +4,12 @@
     "tagline": "Smart Personal Finance Management",
     "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
   },
+  "charts": {
+    "amount": "Amount",
+    "income": "Income",
+    "expense": "Expense",
+    "net": "Net"
+  },
   "buttons": {
     "submit": "Submit",
     "cancel": "Cancel",
