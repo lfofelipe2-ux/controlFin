@@ -1,10 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { CreateTransactionData } from '../../types/service.types';
 import { createErrorResponse } from '../../utils/route-helpers';
-import { zodToFastifySchema } from '../../utils/schema-converter';
 import {
   TransactionQuerySchema
-} from './transaction.schemas';
+} from './transaction.schemas.json';
 import { transactionService } from './transaction.service';
 
 export async function transactionRoutes(fastify: FastifyInstance) {
@@ -693,7 +692,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     '/search',
     {
       schema: {
-        querystring: zodToFastifySchema(TransactionQuerySchema),
+        querystring: TransactionQuerySchema,
         response: {
           200: {
             type: 'object',
