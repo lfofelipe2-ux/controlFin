@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Pre-commit hook with optimized validation for documentation-only commits
+echo "🚀 Running optimized pre-commit validation..."
+
+# Check if we have optimized validation scripts
+if [ -f "scripts/check-changes-type.js" ] && [ -f "scripts/validate-docs-only.sh" ]; then
+    echo "🔍 Checking change type for optimized validation..."
+    
+    # Run optimized validation
+    ./scripts/validate-docs-only.sh
+    
+    # Check exit code
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "❌ VALIDATION FAILED!"
+        echo "🚫 Commit blocked due to validation issues"
+        echo ""
+        echo "💡 To fix:"
+        echo "   1. Fix the issues above"
+        echo "   2. Run: ./scripts/validate-docs-only.sh"
+        echo "   3. Try committing again"
+        echo ""
+        exit 1
+    fi
+    
+    echo "✅ Optimized validation passed!"
+else
+    echo "⚠️  Optimized validation scripts not found, falling back to complete validation..."
+    
+    # Fallback to complete validation
+    ./scripts/validate-complete.sh
+    
+    # Check exit code
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "❌ COMPLETE VALIDATION FAILED!"
+        echo "🚫 Commit blocked due to validation issues"
+        echo ""
+        echo "💡 To fix:"
+        echo "   1. Fix the issues above"
+        echo "   2. Run: ./scripts/validate-complete.sh"
+        echo "   3. Try committing again"
+        echo ""
+        exit 1
+    fi
+    
+    echo "✅ Complete validation passed!"
+fi
