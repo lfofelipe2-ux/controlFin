@@ -1,6 +1,6 @@
 # Ultra-Parallel CI Test Report
 
-Generated: 2025-10-08T21:29:47.733Z
+Generated: 2025-10-08T22:28:51.127Z
 
 ## Summary
 - Total scenarios: 4
@@ -13,46 +13,46 @@ Generated: 2025-10-08T21:29:47.733Z
 
 ### 1. Frontend Only Changes
 - **Status**: ✅ PASSED
-- **Duration**: 363ms
+- **Duration**: 100238ms
 - **Expected Jobs**: frontend, config, quality_gates, code_quality, build_matrix
-- **Actual Jobs**: frontend, backend, docs, config, quality_gates, code_quality, build_matrix
-- **Change Type**: config
-- **Estimated Time**: 16 minutes
+- **Actual Jobs**: frontend, config, quality_gates, code_quality, build_matrix
+- **Change Type**: code
+- **Estimated Time**: 26 minutes
 
-- **Unexpected Jobs**: backend, docs
+
 
 
 ### 2. Backend Only Changes
 - **Status**: ✅ PASSED
-- **Duration**: 331ms
+- **Duration**: 100826ms
 - **Expected Jobs**: backend, config, quality_gates, code_quality, build_matrix
-- **Actual Jobs**: frontend, backend, docs, config, quality_gates, code_quality, build_matrix
-- **Change Type**: config
-- **Estimated Time**: 16 minutes
+- **Actual Jobs**: backend, config, quality_gates, code_quality, build_matrix
+- **Change Type**: code
+- **Estimated Time**: 26 minutes
 
-- **Unexpected Jobs**: frontend, docs
+
 
 
 ### 3. Documentation Only Changes
 - **Status**: ✅ PASSED
-- **Duration**: 325ms
+- **Duration**: 99761ms
 - **Expected Jobs**: docs
-- **Actual Jobs**: frontend, backend, docs, config, quality_gates, code_quality, build_matrix
-- **Change Type**: config
-- **Estimated Time**: 16 minutes
+- **Actual Jobs**: docs
+- **Change Type**: docs
+- **Estimated Time**: 1 minutes
 
-- **Unexpected Jobs**: frontend, backend, config, quality_gates, code_quality, build_matrix
+
 
 
 ### 4. Full-Stack Changes
 - **Status**: ✅ PASSED
-- **Duration**: 322ms
+- **Duration**: 101243ms
 - **Expected Jobs**: frontend, backend, config, quality_gates, code_quality, build_matrix
-- **Actual Jobs**: frontend, backend, docs, config, quality_gates, code_quality, build_matrix
-- **Change Type**: config
-- **Estimated Time**: 16 minutes
+- **Actual Jobs**: frontend, backend, config, quality_gates, code_quality, build_matrix
+- **Change Type**: code
+- **Estimated Time**: 30 minutes
 
-- **Unexpected Jobs**: docs
+
 
 
 

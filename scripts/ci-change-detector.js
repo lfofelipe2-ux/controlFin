@@ -73,9 +73,9 @@ function getChangedFiles() {
         // For PR events, compare with base branch
         const baseRef = process.env.GITHUB_BASE_REF || 'main';
         const headRef = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 'main';
-        
+
         let changedFiles = [];
-        
+
         if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
             // PR event - compare with base branch
             changedFiles = execSync(`git diff --name-only origin/${baseRef}...HEAD`, { encoding: 'utf8' })
@@ -89,7 +89,7 @@ function getChangedFiles() {
                 .split('\n')
                 .filter(file => file.length > 0);
         }
-        
+
         return changedFiles;
     } catch (error) {
         console.error('Error getting changed files:', error.message);
@@ -103,7 +103,7 @@ function getChangedFiles() {
 function needsValidation(component, changedFiles) {
     const config = COMPONENTS[component];
     if (!config) return false;
-    
+
     // Check if any changed files match component paths
     for (const file of changedFiles) {
         // Check paths
@@ -112,7 +112,7 @@ function needsValidation(component, changedFiles) {
                 return true;
             }
         }
-        
+
         // Check specific files
         for (const specificFile of config.files) {
             if (file.includes(specificFile)) {
@@ -120,7 +120,7 @@ function needsValidation(component, changedFiles) {
             }
         }
     }
-    
+
     return false;
 }
 
@@ -130,28 +130,28 @@ function needsValidation(component, changedFiles) {
 function getChangeType(changedFiles) {
     const docsOnlyPaths = ['docs/', 'memory-bank/', 'README.md', 'CHANGELOG.md'];
     const configPaths = ['.github/', 'scripts/', 'package.json', 'package-lock.json'];
-    
+
     let hasCodeChanges = false;
     let hasConfigChanges = false;
     let hasDocsChanges = false;
-    
+
     for (const file of changedFiles) {
         // Check for code changes
         if (file.startsWith('controlfin-frontend/') || file.startsWith('controlfin-backend/')) {
             hasCodeChanges = true;
         }
-        
+
         // Check for config changes
         if (configPaths.some(path => file.startsWith(path))) {
             hasConfigChanges = true;
         }
-        
+
         // Check for docs changes
         if (docsOnlyPaths.some(path => file.startsWith(path))) {
             hasDocsChanges = true;
         }
     }
-    
+
     if (hasCodeChanges) {
         return 'code';
     } else if (hasConfigChanges) {
@@ -169,7 +169,7 @@ function getChangeType(changedFiles) {
 function generateJobMatrix(changedFiles) {
     const hasCodeChanges = needsValidation('frontend', changedFiles) || needsValidation('backend', changedFiles);
     const hasConfigChanges = needsValidation('config', changedFiles);
-    
+
     const matrix = {
         frontend: needsValidation('frontend', changedFiles),
         backend: needsValidation('backend', changedFiles),
@@ -180,7 +180,7 @@ function generateJobMatrix(changedFiles) {
         code_quality: hasCodeChanges,
         build_matrix: hasCodeChanges
     };
-    
+
     return matrix;
 }
 
@@ -203,7 +203,7 @@ function generateNodeMatrix(changeType) {
 function generateCachingStrategy(changedFiles) {
     const needsFrontend = needsValidation('frontend', changedFiles);
     const needsBackend = needsValidation('backend', changedFiles);
-    
+
     return {
         frontend_cache: needsFrontend,
         backend_cache: needsBackend,
@@ -217,49 +217,49 @@ function generateCachingStrategy(changedFiles) {
  */
 function main() {
     console.log('🔍 CI Change Detection Starting...\n');
-    
+
     const changedFiles = getChangedFiles();
     console.log(`📁 Changed files (${changedFiles.length}):`);
     changedFiles.forEach(file => {
         console.log(`  - ${file}`);
     });
-    
+
     if (changedFiles.length === 0) {
         console.log('\n✅ No changes detected, skipping CI');
         process.exit(0);
     }
-    
+
     const changeType = getChangeType(changedFiles);
     console.log(`\n📊 Change type: ${changeType}`);
-    
+
     const jobMatrix = generateJobMatrix(changedFiles);
     console.log('\n🎯 Job execution matrix:');
     Object.entries(jobMatrix).forEach(([job, shouldRun]) => {
         const status = shouldRun ? '✅ RUN' : '⏭️  SKIP';
         console.log(`  ${status} ${job}`);
     });
-    
+
     const nodeMatrix = generateNodeMatrix(changeType);
     console.log(`\n🟢 Node.js versions: ${nodeMatrix.join(', ')}`);
-    
+
     const cachingStrategy = generateCachingStrategy(changedFiles);
     console.log('\n💾 Caching strategy:');
     Object.entries(cachingStrategy).forEach(([cache, enabled]) => {
         const status = enabled ? '✅ ENABLE' : '⏭️  SKIP';
         console.log(`  ${status} ${cache}`);
     });
-    
+
     // Set GitHub Actions outputs
     console.log('\n📤 Setting GitHub Actions outputs...');
-    
+
     // Job matrix
     const jobsToRun = Object.entries(jobMatrix)
         .filter(([, shouldRun]) => shouldRun)
         .map(([job]) => job);
-    
+
     // Performance estimation
     const estimatedTime = estimateExecutionTime(jobMatrix, changeType);
-    
+
     // Set outputs using modern GitHub Actions syntax
     setGitHubOutput('jobs', JSON.stringify(jobsToRun));
     setGitHubOutput('frontend', jobMatrix.frontend);
@@ -276,7 +276,7 @@ function main() {
     setGitHubOutput('build_cache', cachingStrategy.build_cache);
     setGitHubOutput('change_type', changeType);
     setGitHubOutput('estimated_time', estimatedTime);
-    
+
     console.log(`\n⏱️  Estimated execution time: ${estimatedTime} minutes`);
     console.log('✅ CI Change Detection Complete');
 }
@@ -295,27 +295,27 @@ function estimateExecutionTime(jobMatrix, changeType) {
         code_quality: 3,
         build_matrix: 6
     };
-    
+
     let totalTime = baseTime;
-    
+
     Object.entries(jobMatrix).forEach(([job, shouldRun]) => {
         if (shouldRun) {
             totalTime += jobTimes[job] || 0;
         }
     });
-    
+
     // Apply parallel execution benefits
     if (jobMatrix.frontend && jobMatrix.backend) {
         totalTime -= 4; // Parallel execution saves time
     }
-    
+
     // Apply change type optimizations
     if (changeType === 'docs') {
         totalTime *= 0.3; // Docs changes are much faster
     } else if (changeType === 'config') {
         totalTime *= 0.5; // Config changes are faster
     }
-    
+
     return Math.round(totalTime);
 }
 
