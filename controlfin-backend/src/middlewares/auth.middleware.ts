@@ -46,8 +46,8 @@ export async function authMiddleware(
       firstName: decoded.firstName || '',
       lastName: decoded.lastName || '',
       isEmailVerified: decoded.isEmailVerified || false,
-      avatar: decoded.avatar,
-      spaceId: decoded.spaceId
+      avatar: decoded.avatar || '',
+      spaceId: decoded.spaceId || ''
     };
 
   } catch {

@@ -114,7 +114,7 @@ export interface PaginatedResult<T> {
 class TransactionService {
   async createTransaction(data: CreateTransactionData): Promise<ITransaction> {
     // Sanitize transaction data
-    const sanitizedData = sanitizeTransactionData(data);
+    const sanitizedData = sanitizeTransactionData(data) as CreateTransactionData;
 
     // Validate category exists
     const category = await Category.findById(sanitizedData.categoryId);

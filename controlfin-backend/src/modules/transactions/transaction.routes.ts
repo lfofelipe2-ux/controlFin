@@ -112,7 +112,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         const transactionData = request.body;
         const { spaceId } = request.query as { spaceId: string };
 
-        fastify.log.info('Transaction data:', { userId, spaceId, transactionData });
+        fastify.log.info({ userId, spaceId, transactionData }, 'Transaction data');
 
         const transaction = await transactionService.createTransaction({
           ...(transactionData as Record<string, unknown>),
@@ -120,7 +120,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           spaceId,
         } as CreateTransactionData);
 
-        fastify.log.info('Transaction created successfully:', transaction._id);
+        fastify.log.info({ transactionId: transaction._id }, 'Transaction created successfully');
         
         reply.code(201).send({
           success: true,
@@ -128,12 +128,12 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           message: 'Transaction created successfully',
         });
       } catch (error) {
-        fastify.log.error('Error in POST /api/transactions:', error);
-        fastify.log.error('Error details:', {
+        fastify.log.error(error, 'Error in POST /api/transactions');
+        fastify.log.error({
           message: (error as Error)?.message,
           name: (error as Error)?.name,
           stack: (error as Error)?.stack,
-        });
+        }, 'Error details');
         
         const errorMessage = (error as Error)?.message || 'Failed to create transaction';
         const statusCode = errorMessage.includes('not found') ? 404 : 400;

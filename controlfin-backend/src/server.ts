@@ -72,14 +72,14 @@ const buildApp = () => {
     await authorizationMiddleware(request, reply);
   });
 
-  fastify.addHook('preHandler', async (request, reply) => {
+  fastify.addHook('preHandler', async (request) => {
     // Skip input sanitization for auth routes
     if (request.url.startsWith('/api/auth')) {
       return;
     }
 
     // Apply input sanitization middleware
-    await inputSanitizationMiddleware(request, reply);
+    await inputSanitizationMiddleware(request);
   });
 
   // Apply stricter rate limits to transaction routes (after authentication) - skip in test mode
@@ -94,8 +94,8 @@ const buildApp = () => {
         const max = 10; // 10 requests per 15 minutes for transactions
 
         // Simple in-memory rate limiting for transactions
-        const rateLimitStore = (fastify as { rateLimitStore?: Map<string, { count: number; resetTime: number }> }).rateLimitStore || new Map();
-        (fastify as { rateLimitStore: Map<string, { count: number; resetTime: number }> }).rateLimitStore = rateLimitStore;
+        const rateLimitStore = (fastify as unknown as { rateLimitStore?: Map<string, { count: number; resetTime: number }> }).rateLimitStore || new Map();
+        (fastify as unknown as { rateLimitStore: Map<string, { count: number; resetTime: number }> }).rateLimitStore = rateLimitStore;
 
         const currentData = rateLimitStore.get(key);
 
@@ -123,11 +123,11 @@ const buildApp = () => {
   // Global error handler - register before routes
   fastify.setErrorHandler((error, _request, reply) => {
     // Log the error for debugging
-    fastify.log.error('Global error handler caught error:');
-    fastify.log.error('Error message:', error.message);
-    fastify.log.error('Error name:', error.name);
-    fastify.log.error('Error stack:', error.stack);
-    fastify.log.error('Validation errors:', error.validation);
+    fastify.log.error(error, 'Global error handler caught error');
+    fastify.log.error({ message: error.message }, 'Error message');
+    fastify.log.error({ name: error.name }, 'Error name');
+    fastify.log.error({ stack: error.stack }, 'Error stack');
+    fastify.log.error({ validation: error.validation }, 'Validation errors');
 
     // Handle validation errors
     if (error.validation) {

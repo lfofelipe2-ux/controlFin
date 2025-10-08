@@ -8,20 +8,20 @@ export function sanitizeTransactionData(data: unknown): unknown {
     const sanitized = { ...(data as Record<string, unknown>) };
 
     // Sanitize description
-    if (sanitized.description && typeof sanitized.description === 'string') {
-        sanitized.description = sanitizeString(sanitized.description);
+    if (sanitized['description'] && typeof sanitized['description'] === 'string') {
+        sanitized['description'] = sanitizeString(sanitized['description']);
     }
 
     // Sanitize tags array
-    if (sanitized.tags && Array.isArray(sanitized.tags)) {
-        sanitized.tags = sanitized.tags.map((tag: unknown) =>
+    if (sanitized['tags'] && Array.isArray(sanitized['tags'])) {
+        sanitized['tags'] = sanitized['tags'].map((tag: unknown) =>
             typeof tag === 'string' ? sanitizeString(tag) : tag
         );
     }
 
     // Sanitize metadata
-    if (sanitized.metadata && typeof sanitized.metadata === 'object') {
-        sanitized.metadata = sanitizeObject(sanitized.metadata);
+    if (sanitized['metadata'] && typeof sanitized['metadata'] === 'object') {
+        sanitized['metadata'] = sanitizeObject(sanitized['metadata']);
     }
 
     return sanitized;

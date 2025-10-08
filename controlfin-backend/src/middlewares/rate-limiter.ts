@@ -69,7 +69,7 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 export interface RateLimitInstance {
     windowMs: number;
     max: number;
-    message: string;
+    message: string | { success: boolean; error: string; code: string; statusCode: number };
 }
 
 async function rateLimitMiddleware(
