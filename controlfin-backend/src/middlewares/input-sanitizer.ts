@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import mongoSanitize from 'mongo-sanitize';
 
 export async function inputSanitizationMiddleware(
