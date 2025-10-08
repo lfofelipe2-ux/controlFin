@@ -119,8 +119,8 @@ describe('TransactionService', () => {
       };
 
       // Mock the model methods
-      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
-      vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as any);
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as unknown as Document);
+      vi.mocked(PaymentMethod.findById).mockResolvedValue(mockPaymentMethod as unknown as Document);
 
       const result = await transactionService.createTransaction(createData);
 
@@ -172,7 +172,7 @@ describe('TransactionService', () => {
         },
       };
 
-      vi.mocked(Category.findById).mockResolvedValue(mockCategory as any);
+      vi.mocked(Category.findById).mockResolvedValue(mockCategory as unknown as Document);
       vi.mocked(PaymentMethod.findById).mockResolvedValue(null);
 
       await expect(transactionService.createTransaction(createData)).rejects.toThrow(
@@ -206,7 +206,7 @@ describe('TransactionService', () => {
         return mockQuery;
       });
 
-      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(1);
 
       const result = await transactionService.getTransactions(filters);
@@ -240,7 +240,7 @@ describe('TransactionService', () => {
         return mockQuery;
       });
 
-      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
       vi.mocked(Transaction.countDocuments).mockResolvedValue(0);
 
       const result = await transactionService.getTransactions(filters);
@@ -255,7 +255,7 @@ describe('TransactionService', () => {
       const transactionId = '507f1f77bcf86cd799439011';
       const userId = '507f1f77bcf86cd799439013';
 
-      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransactionData as any);
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransactionData as unknown as Document);
 
       const result = await transactionService.getTransactionById(transactionId, userId);
 
@@ -285,7 +285,7 @@ describe('TransactionService', () => {
       const updateData = { description: 'Updated Transaction' };
       const updatedTransaction = { ...mockTransactionData, ...updateData };
 
-      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as any);
+      vi.mocked(Transaction.findOneAndUpdate).mockResolvedValue(updatedTransaction as unknown as Document);
 
       const result = await transactionService.updateTransaction(transactionId, updateData, userId);
 
@@ -316,8 +316,8 @@ describe('TransactionService', () => {
       const userId = '507f1f77bcf86cd799439013';
       const mockTransaction = { _id: transactionId, userId, description: 'Test Transaction' };
 
-      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransaction as any);
-      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 1 } as any);
+      vi.mocked(Transaction.findOne).mockResolvedValue(mockTransaction as unknown as Document);
+      vi.mocked(Transaction.deleteOne).mockResolvedValue({ deletedCount: 1 } as unknown as Document);
 
       const result = await transactionService.deleteTransaction(transactionId, userId);
 
@@ -387,7 +387,7 @@ describe('TransactionService', () => {
         return mockQuery;
       });
 
-      vi.mocked(Transaction.find).mockReturnValue(mockQuery as any);
+      vi.mocked(Transaction.find).mockReturnValue(mockQuery as unknown as Document);
 
       const result = await transactionService.getTransactionStats(filters);
 
