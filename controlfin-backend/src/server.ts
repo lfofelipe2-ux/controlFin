@@ -94,8 +94,8 @@ const buildApp = () => {
         const max = 10; // 10 requests per 15 minutes for transactions
 
         // Simple in-memory rate limiting for transactions
-        const rateLimitStore = (fastify as any).rateLimitStore || new Map();
-        (fastify as any).rateLimitStore = rateLimitStore;
+        const rateLimitStore = (fastify as { rateLimitStore?: Map<string, { count: number; resetTime: number }> }).rateLimitStore || new Map();
+        (fastify as { rateLimitStore: Map<string, { count: number; resetTime: number }> }).rateLimitStore = rateLimitStore;
 
         const currentData = rateLimitStore.get(key);
 

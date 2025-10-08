@@ -1,11 +1,11 @@
 import xss from 'xss';
 
-export function sanitizeTransactionData(data: any): any {
+export function sanitizeTransactionData(data: unknown): unknown {
     if (!data || typeof data !== 'object') {
         return data;
     }
 
-    const sanitized = { ...data };
+    const sanitized = { ...(data as Record<string, unknown>) };
 
     // Sanitize description
     if (sanitized.description && typeof sanitized.description === 'string') {
@@ -14,7 +14,7 @@ export function sanitizeTransactionData(data: any): any {
 
     // Sanitize tags array
     if (sanitized.tags && Array.isArray(sanitized.tags)) {
-        sanitized.tags = sanitized.tags.map((tag: any) =>
+        sanitized.tags = sanitized.tags.map((tag: unknown) =>
             typeof tag === 'string' ? sanitizeString(tag) : tag
         );
     }
@@ -47,7 +47,7 @@ function sanitizeString(str: string): string {
     return str;
 }
 
-function sanitizeObject(obj: any): any {
+function sanitizeObject(obj: unknown): unknown {
     if (obj === null || obj === undefined) {
         return obj;
     }
@@ -61,10 +61,10 @@ function sanitizeObject(obj: any): any {
     }
 
     if (typeof obj === 'object') {
-        const sanitized: any = {};
+        const sanitized: Record<string, unknown> = {};
         for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                sanitized[key] = sanitizeObject(obj[key]);
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                sanitized[key] = sanitizeObject((obj as Record<string, unknown>)[key]);
             }
         }
         return sanitized;

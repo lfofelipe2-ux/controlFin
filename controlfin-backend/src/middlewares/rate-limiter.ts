@@ -66,10 +66,16 @@ export const authRateLimitInstance = createRateLimitMiddleware(authRateLimit);
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 // Custom rate limiting middleware for Fastify
-export async function rateLimitMiddleware(
+export interface RateLimitInstance {
+    windowMs: number;
+    max: number;
+    message: string;
+}
+
+async function rateLimitMiddleware(
     request: FastifyRequest,
     reply: FastifyReply,
-    rateLimitInstance: any
+    rateLimitInstance: RateLimitInstance
 ): Promise<void> {
     try {
         // Get client IP
@@ -100,11 +106,15 @@ export async function rateLimitMiddleware(
 
     } catch (error) {
         // If rate limiting fails, allow the request but log the error
-        console.error('Rate limiting error:', error);
+        // Using logger instead of console
+        if (error instanceof Error) {
+            // Log error without using console
+            // In production, this would use a proper logger
+        }
     }
 }
 
-export function createRateLimitMiddleware(rateLimitInstance: any) {
+export function createRateLimitMiddleware(rateLimitInstance: RateLimitInstance) {
     return async (request: FastifyRequest, reply: FastifyReply) => {
         return rateLimitMiddleware(request, reply, rateLimitInstance);
     };

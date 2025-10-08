@@ -9,7 +9,7 @@ export function validateUserOwnership(request: AuthenticatedRequest, resourceUse
         return false;
     }
 
-    return request.user!._id === resourceUserId;
+    return request.user?._id === resourceUserId;
 }
 
 export function isValidObjectId(id: string): boolean {
@@ -22,5 +22,5 @@ export function extractUserId(request: AuthenticatedRequest): string | null {
         return null;
     }
 
-    return request.user!._id;
+    return request.user?._id || null;
 }
