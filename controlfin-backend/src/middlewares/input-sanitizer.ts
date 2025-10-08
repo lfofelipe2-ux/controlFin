@@ -2,8 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import mongoSanitize from 'mongo-sanitize';
 
 export async function inputSanitizationMiddleware(
-    request: FastifyRequest,
-    _: FastifyReply
+    request: FastifyRequest
 ): Promise<void> {
     try {
         // Sanitize request body
