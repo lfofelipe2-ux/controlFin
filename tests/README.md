@@ -21,11 +21,14 @@ This document summarizes the comprehensive testing infrastructure created for th
 - **Purpose**: Standardized React component testing
 - **Features**:
   - BlockAI theme integration
-  - Comprehensive test categories (Basic Rendering, User Interactions, State Management, Accessibility, BlockAI Theme Integration, Edge Cases, Performance, Integration)
+  - Comprehensive test categories (Basic Rendering, User Interactions, Form Testing Patterns, Translation and i18n, State Management, Accessibility, BlockAI Theme Integration, Edge Cases, Performance, Integration)
   - Ant Design theme wrapper
   - Mock setup for react-i18next
   - Accessibility testing patterns
   - Performance testing patterns
+  - **NEW**: Key learnings from RegisterForm testing experience
+  - **NEW**: Form testing patterns with real-world examples
+  - **NEW**: Translation key management best practices
 
 #### Service Test Template (`service-test-template.ts`)
 - **Purpose**: Standardized service class testing
@@ -83,7 +86,24 @@ This document summarizes the comprehensive testing infrastructure created for th
 - Date handling helpers
 - BlockAI theme validation helpers
 
-### 3. Test Configuration ⚙️
+### 3. Testing Guidelines 📖
+
+**Location**: `tests/guidelines/`
+
+#### Testing Troubleshooting Guide (`testing-troubleshooting-guide.md`)
+- **Purpose**: Solutions for common testing problems
+- **Features**:
+  - Real-world problem solutions from RegisterForm testing
+  - Translation key management issues
+  - Element selection problems
+  - Form validation testing challenges
+  - Loading state testing issues
+  - Mock management best practices
+  - Debugging tools and techniques
+  - Testing checklist
+  - Recommended patterns
+
+### 4. Test Configuration ⚙️
 
 **Location**: `tests/config/test-config.ts`
 
@@ -268,22 +288,48 @@ expectElementToHaveBlockAIColors(container.firstChild);
 - Comprehensive documentation
 - Integrated reporting and debugging
 
+## Troubleshooting Common Issues 🔧
+
+### Quick Reference
+When encountering testing issues, refer to the comprehensive troubleshooting guide:
+
+**📖 [Testing Troubleshooting Guide](guidelines/testing-troubleshooting-guide.md)**
+
+This guide contains solutions for common problems encountered during testing development, including:
+
+- **Translation Key Errors**: Solutions for incorrect translation key usage
+- **Element Selection Issues**: Handling multiple elements with similar roles
+- **Form Validation Testing**: CSS class-based validation testing
+- **Form Submission Failures**: Proper field completion and validation
+- **Loading State Testing**: Correct component behavior testing
+- **Mock Management**: Proper mock setup and cleanup
+
+### Most Common Issues
+1. **Translation Keys**: Always verify actual translation files (e.g., `auth.json`)
+2. **Element Selection**: Use specific selectors when multiple elements match
+3. **Form Validation**: Test CSS classes instead of specific error messages
+4. **Form Submission**: Fill ALL required fields with valid data
+5. **Loading States**: Test actual component behavior, not assumptions
+
 ## Next Steps
 
 ### 1. Implementation
 - Use templates to create tests for existing components
 - Apply testing patterns to new features
 - Integrate with CI/CD pipeline
+- **NEW**: Reference troubleshooting guide when encountering issues
 
 ### 2. Maintenance
 - Regular template updates
 - Documentation updates
 - Performance optimization
+- **NEW**: Update troubleshooting guide with new learnings
 
 ### 3. Expansion
 - Additional test types as needed
 - More specialized testing utilities
 - Enhanced reporting features
+- **NEW**: Expand troubleshooting guide with additional patterns
 
 ## Conclusion
 

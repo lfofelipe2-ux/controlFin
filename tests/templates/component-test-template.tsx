@@ -9,6 +9,49 @@
  * 2. Replace [ComponentName] with your actual component name
  * 3. Update imports and test cases according to your component
  * 4. Follow the testing patterns established in this template
+ * 
+ * KEY LEARNINGS FROM REGISTERFORM TESTING:
+ * ======================================
+ * 
+ * 1. TRANSLATION KEY MANAGEMENT
+ *    - Always verify actual translation files (e.g., auth.json) when writing tests
+ *    - Use exact keys from translation files, not assumed patterns
+ *    - Example: Use 'register.title' not 'auth.register.title'
+ * 
+ * 2. FORM VALIDATION TESTING
+ *    - CSS class checking is more reliable than text content checking
+ *    - Use 'ant-form-item-has-error' class instead of specific error messages
+ *    - Form validation messages may not appear in DOM during testing
+ * 
+ * 3. ELEMENT SELECTION BEST PRACTICES
+ *    - Use specific selectors (IDs, data attributes) when multiple elements have similar roles
+ *    - Example: document.querySelector('form[id="register"]') instead of getByRole('form')
+ *    - Use getAllByRole() when multiple elements match the same criteria
+ * 
+ * 4. FORM SUBMISSION TESTING
+ *    - Always include ALL required fields in form submission tests
+ *    - Use strong passwords that meet validation requirements
+ *    - Ensure proper form validation before testing submission
+ * 
+ * 5. COMPONENT BEHAVIOR TESTING
+ *    - Test actual component behavior rather than assumptions
+ *    - Example: Only submit button disabled during loading, not form inputs
+ *    - Verify loading state button text changes (e.g., 'loadingregister.registering')
+ * 
+ * 6. MOCK MANAGEMENT
+ *    - Always clear mocks in beforeEach to avoid test interference
+ *    - Mock external dependencies consistently across all tests
+ *    - Use vi.mocked() for TypeScript-safe mock assertions
+ * 
+ * 7. ASYNC TESTING
+ *    - Use waitFor() for asynchronous operations
+ *    - Be patient with form validation and submission timing
+ *    - Consider using longer timeouts for complex interactions
+ * 
+ * 8. ACCESSIBILITY TESTING
+ *    - Test ARIA attributes and labels properly
+ *    - Verify keyboard navigation works correctly
+ *    - Check for proper form field associations
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -17,14 +60,23 @@ import { ConfigProvider } from 'antd';
 import { [ComponentName] } from '../[ComponentName]';
 
 // Mock react-i18next for consistent translation testing
+// IMPORTANT: Always verify actual translation keys from translation files
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) => key,
+        t: (key: string) => key, // Returns the key itself for testing
         i18n: {
             changeLanguage: vi.fn(),
         },
     }),
 }));
+
+// TRANSLATION TESTING HELPER
+// Use this helper to test actual translation keys
+const testTranslationKey = (key: string, expectedText: string) => {
+    // This would be used with a real translation setup
+    // For now, we test that the key is used correctly
+    expect(screen.getByText(key)).toBeInTheDocument();
+};
 
 // Mock any external dependencies
 vi.mock('@/services/api', () => ({
@@ -135,6 +187,95 @@ describe('[ComponentName] Component', () => {
         });
     });
 
+    // FORM TESTING PATTERNS (Based on RegisterForm learnings)
+    describe('Form Testing Patterns', () => {
+        // Example: Testing form validation with CSS classes
+        it('should show validation errors using CSS classes', async () => {
+            renderWithTheme(< [ComponentName] />);
+
+            const emailInput = screen.getByPlaceholderText('form.emailPlaceholder');
+            const submitButton = screen.getByRole('button', { name: 'form.submitButton' });
+
+            fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
+            fireEvent.click(submitButton);
+
+            // Check for validation state using CSS classes (more reliable than text)
+            await waitFor(() => {
+                expect(emailInput.closest('.ant-form-item')).toHaveClass('ant-form-item-has-error');
+            });
+        });
+
+        // Example: Testing form submission with all required fields
+        it('should submit form with all required fields', async () => {
+            const mockSubmit = vi.fn().mockResolvedValue(undefined);
+
+            renderWithTheme(< [ComponentName] onSubmit = { mockSubmit } />);
+
+            // Fill ALL required fields (don't assume which are required)
+            const firstNameInput = screen.getByPlaceholderText('form.firstNamePlaceholder');
+            const lastNameInput = screen.getByPlaceholderText('form.lastNamePlaceholder');
+            const emailInput = screen.getByPlaceholderText('form.emailPlaceholder');
+            const passwordInput = screen.getByPlaceholderText('form.passwordPlaceholder');
+            const termsCheckbox = screen.getByRole('checkbox');
+            const submitButton = screen.getByRole('button', { name: 'form.submitButton' });
+
+            fireEvent.change(firstNameInput, { target: { value: 'John' } });
+            fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+            fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+            fireEvent.change(passwordInput, { target: { value: 'Password123!' } });
+            fireEvent.click(termsCheckbox);
+            fireEvent.click(submitButton);
+
+            await waitFor(() => {
+                expect(mockSubmit).toHaveBeenCalledWith({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'test@example.com',
+                    password: 'Password123!',
+                });
+            });
+        });
+
+        // Example: Testing password visibility toggle
+        it('should toggle password visibility', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            const passwordInput = screen.getByPlaceholderText('form.passwordPlaceholder');
+            const toggleButtons = screen.getAllByRole('img', { name: 'eye-invisible' });
+            const toggleButton = toggleButtons[0]; // First password field
+
+            expect(passwordInput).toHaveAttribute('type', 'password');
+            fireEvent.click(toggleButton);
+            expect(passwordInput).toHaveAttribute('type', 'text');
+        });
+
+        // Example: Testing loading states correctly
+        it('should show loading state correctly', () => {
+            renderWithTheme(< [ComponentName] loading />);
+
+            // Only submit button should be disabled, not form inputs
+            const submitButton = screen.getByRole('button', { name: 'loadingform.submitting' });
+            expect(submitButton).toBeDisabled();
+
+            // Form inputs should remain enabled for error correction
+            const emailInput = screen.getByPlaceholderText('form.emailPlaceholder');
+            expect(emailInput).not.toBeDisabled();
+        });
+
+        // Example: Testing element selection with specific selectors
+        it('should use specific selectors for form elements', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            // Use specific selectors when multiple elements have similar roles
+            const form = document.querySelector('form[id="specific-form"]');
+            expect(form).toBeInTheDocument();
+
+            // Or use data attributes for more specific selection
+            const specificInput = screen.getByTestId('specific-input');
+            expect(specificInput).toBeInTheDocument();
+        });
+    });
+
     // STATE MANAGEMENT TESTS
     describe('State Management', () => {
         it('should update state correctly', async () => {
@@ -159,6 +300,47 @@ describe('[ComponentName] Component', () => {
 
             expect(screen.getByText('Test error message')).toBeInTheDocument();
             expect(screen.getByText('Test error message')).toHaveClass('error-message');
+        });
+    });
+
+    // TRANSLATION AND INTERNATIONALIZATION TESTS
+    describe('Translation and i18n', () => {
+        it('should use correct translation keys', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            // ALWAYS verify actual translation keys from translation files
+            // Example: Check that the component uses 'register.title' not 'auth.register.title'
+            expect(screen.getByText('[component].title')).toBeInTheDocument();
+            expect(screen.getByText('[component].subtitle')).toBeInTheDocument();
+        });
+
+        it('should handle missing translation keys gracefully', () => {
+            // Test that component doesn't crash with missing keys
+            renderWithTheme(< [ComponentName] />);
+
+            // Component should render even if some translations are missing
+            expect(screen.getByTestId('[component-name]')).toBeInTheDocument();
+        });
+
+        it('should use consistent translation key patterns', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            // Verify that translation keys follow consistent patterns
+            // Example: All form labels should use 'form.fieldName' pattern
+            expect(screen.getByText('[component].emailLabel')).toBeInTheDocument();
+            expect(screen.getByText('[component].passwordLabel')).toBeInTheDocument();
+        });
+
+        it('should handle validation message translations', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            // Test that validation messages use correct translation keys
+            // Example: 'register.validation.emailInvalid' not 'auth.register.validation.emailInvalid'
+            const submitButton = screen.getByRole('button', { name: '[component].submitButton' });
+            fireEvent.click(submitButton);
+
+            // Validation messages should use proper translation keys
+            expect(screen.getByText('[component].validation.required')).toBeInTheDocument();
         });
     });
 
@@ -188,6 +370,19 @@ describe('[ComponentName] Component', () => {
 
             // This would need a proper contrast checking utility
             expect(computedStyle.color).toBeDefined();
+        });
+
+        it('should have proper form field associations', () => {
+            renderWithTheme(< [ComponentName] />);
+
+            // Test that form fields are properly associated with labels
+            const emailInput = screen.getByLabelText('[component].emailLabel');
+            const passwordInput = screen.getByLabelText('[component].passwordLabel');
+
+            expect(emailInput).toBeInTheDocument();
+            expect(passwordInput).toBeInTheDocument();
+            expect(emailInput).toHaveAttribute('aria-required', 'true');
+            expect(passwordInput).toHaveAttribute('aria-required', 'true');
         });
     });
 

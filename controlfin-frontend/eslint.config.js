@@ -9,15 +9,13 @@ import noDuplicateI18nKeys from '../eslint-plugins/no-duplicate-i18n-keys/index.
 
 export default defineConfig([
   globalIgnores(['dist', 'coverage']),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
     plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
       'no-hardcoded-strings': noHardcodedStrings,
       'no-duplicate-i18n-keys': noDuplicateI18nKeys,
     },
@@ -26,6 +24,11 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
       'no-console': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       'no-hardcoded-strings/no-hardcoded-strings': 'error',
