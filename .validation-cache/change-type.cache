@@ -1,6 +1,8 @@
 {
-  "key": "change-type-b2a413c177e5319aa346b647a1be1614c49b076d8f971c9ca06803c3cd0f00e7",
+  "key": "change-type-1295cade279f4fcbf2d7159851fb0b71a8309679704771917bd84d91fe921bc0",
   "files": [
+    ".validation-cache/backend_validation.cache",
+    ".validation-cache/change-type.cache",
     "CI_OPTIMIZATION_SUMMARY.md",
     "PERFORMANCE_OPTIMIZATION_SUMMARY.md",
     "ULTRA_PARALLEL_CI_FINAL_ANALYSIS.md",
@@ -29,5 +31,5 @@
     "scripts/fix-unknown-types.js",
     "test-file.txt"
   ],
-  "timestamp": 1759969559853
+  "timestamp": 1759969742882
 }

@@ -25,7 +25,7 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: function () {
+      required: function (this: any): boolean {
         return !this.googleId; // Password required only if not Google OAuth user
       },
       minlength: 8,

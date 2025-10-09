@@ -258,9 +258,11 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await authService.logout();
+        // Extract token ID from request (set by auth middleware)
+        const tokenId = (request as any).user?.tokenId;
+        await authService.logout(tokenId);
 
         return reply.send({
           message: 'Logout successful',

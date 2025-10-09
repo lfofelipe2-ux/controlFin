@@ -290,22 +290,89 @@ export const useTransactionStore = create<TransactionState>()(
       exportData: async (options: any) => {
         set({ isExporting: true, error: null });
         try {
-          // TODO: Implement export functionality when backend endpoints are ready
           logger.info('Exporting data with options:', options);
 
-          // Temporary implementation - export current transactions to CSV
+          // Filter transactions based on options
           const { transactions } = get();
-          const csvContent = transactions.map((t: Transaction) =>
-            `${t.date},${t.description},${t.amount},${t.type},${t.categoryId}`
-          ).join('\n');
+          let filteredTransactions = transactions;
 
-          const blob = new Blob([csvContent], { type: 'text/csv' });
+          // Apply date filter
+          if (options.dateRange) {
+            const startDate = new Date(options.dateRange.start);
+            const endDate = new Date(options.dateRange.end);
+            filteredTransactions = transactions.filter(t => {
+              const transactionDate = new Date(t.date);
+              return transactionDate >= startDate && transactionDate <= endDate;
+            });
+          }
+
+          // Apply type filter
+          if (options.filters?.types) {
+            filteredTransactions = filteredTransactions.filter(t =>
+              options.filters.types.includes(t.type)
+            );
+          }
+
+          // Apply category filter
+          if (options.filters?.categories?.length > 0) {
+            filteredTransactions = filteredTransactions.filter(t =>
+              options.filters.categories.includes(t.categoryId)
+            );
+          }
+
+          // Apply amount filter
+          if (options.filters?.amountRange) {
+            filteredTransactions = filteredTransactions.filter(t =>
+              t.amount >= options.filters.amountRange.min &&
+              t.amount <= options.filters.amountRange.max
+            );
+          }
+
+          // Generate file content based on format
+          let content: string;
+          let filename: string;
+          let mimeType: string;
+
+          if (options.format === 'csv') {
+            const headers = ['Date', 'Description', 'Amount', 'Type', 'Category ID'];
+            if (options.includeMetadata) {
+              headers.push('Tags', 'Notes');
+            }
+
+            const rows = filteredTransactions.map(t => {
+              const baseRow = [t.date, t.description, t.amount, t.type, t.categoryId];
+              if (options.includeMetadata) {
+                baseRow.push(t.tags.join(';'), t.metadata.notes || '');
+              }
+              return baseRow.join(',');
+            });
+
+            content = [headers.join(','), ...rows].join('\n');
+            filename = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+            mimeType = 'text/csv';
+          } else if (options.format === 'json') {
+            content = JSON.stringify(filteredTransactions, null, 2);
+            filename = `transactions-${new Date().toISOString().split('T')[0]}.json`;
+            mimeType = 'application/json';
+          } else {
+            // Default to CSV
+            content = filteredTransactions.map(t =>
+              `${t.date},${t.description},${t.amount},${t.type},${t.categoryId}`
+            ).join('\n');
+            filename = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+            mimeType = 'text/csv';
+          }
+
+          // Download file
+          const blob = new Blob([content], { type: mimeType });
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`; // eslint-disable-line no-hardcoded-strings/no-hardcoded-strings
+          a.download = filename;
           a.click();
           window.URL.revokeObjectURL(url);
+
+          logger.info(`Exported ${filteredTransactions.length} transactions`);
         } catch (error) {
           set({ error: error instanceof Error ? error.message : 'Export failed' });
         } finally {
@@ -313,48 +380,82 @@ export const useTransactionStore = create<TransactionState>()(
         }
       },
 
-      importData: async (file: File) => {
+      importData: async (file: File, options?: any) => {
         set({ isImporting: true, error: null });
         try {
-          // TODO: Implement import functionality when backend endpoints are ready
           logger.info('Importing file:', file.name);
 
-          // Temporary implementation - parse CSV file
+          // Parse file based on extension
           const text = await file.text();
-          const lines = text.split('\n').filter(line => line.trim());
-          const importedTransactions: Transaction[] = lines.map((line: string) => {
-            const [date, description, amount, type, categoryId] = line.split(',');
-            return {
+          let parsedData: any[] = [];
+
+          if (file.name.endsWith('.csv')) {
+            // Parse CSV
+            const lines = text.split('\n').filter(line => line.trim());
+            parsedData = lines.map((line: string) => {
+              const [date, description, amount, type, categoryId] = line.split(',');
+              return {
+                date: date?.trim(),
+                description: description?.trim(),
+                amount: parseFloat(amount?.trim() || '0'),
+                type: type?.trim(),
+                categoryId: categoryId?.trim(),
+              };
+            });
+          } else if (file.name.endsWith('.json')) {
+            // Parse JSON
+            parsedData = JSON.parse(text);
+          } else {
+            throw new Error('Unsupported file format');
+          }
+
+          // Convert to Transaction objects
+          const importedTransactions: Transaction[] = parsedData
+            .filter(item => item.date && item.description && !isNaN(item.amount))
+            .map((item: any) => ({
               id: Math.random().toString(36).substr(2, 9),
               spaceId: 'default-space', // Temporary default
               userId: 'current-user', // Temporary default
-              type: type as 'income' | 'expense',
-              amount: parseFloat(amount) || 0,
-              description: description || '',
-              categoryId: categoryId || '',
+              type: item.type as 'income' | 'expense',
+              amount: item.amount,
+              description: item.description,
+              categoryId: item.categoryId || '',
               paymentMethodId: 'default-payment', // Temporary default
-              date: new Date(date).toISOString(),
+              date: new Date(item.date).toISOString(),
               tags: [],
               isRecurring: false,
               metadata: {},
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
-            };
-          });
+            }));
+
+          // Check for duplicates if option is enabled
+          let finalTransactions = importedTransactions;
+          if (options?.skipDuplicates) {
+            const { transactions } = get();
+            finalTransactions = importedTransactions.filter(newT =>
+              !transactions.some(existingT =>
+                existingT.description === newT.description &&
+                existingT.amount === newT.amount &&
+                existingT.date === newT.date
+              )
+            );
+          }
 
           const result: ImportResult = {
             success: true,
-            imported: importedTransactions.length,
+            imported: finalTransactions.length,
             errors: [],
             warnings: [],
           };
 
           // Add imported transactions to current state
           set(state => ({
-            transactions: [...state.transactions, ...importedTransactions],
+            transactions: [...state.transactions, ...finalTransactions],
             importResult: result
           }));
 
+          logger.info(`Imported ${finalTransactions.length} transactions`);
           return result;
         } catch (error) {
           const result: ImportResult = {

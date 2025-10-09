@@ -4,6 +4,7 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { connectDatabase } from './config/database';
 import { env } from './config/env';
+import { tokenBlacklistMiddleware } from './middleware/tokenBlacklist.middleware';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { authorizationMiddleware } from './middlewares/authorization.middleware';
 import { inputSanitizationMiddleware } from './middlewares/input-sanitizer';
@@ -60,6 +61,17 @@ const buildApp = () => {
 
     // Apply auth middleware
     await authMiddleware(request, reply);
+  });
+
+  // Apply token blacklist middleware after authentication
+  fastify.addHook('preHandler', async (request, reply) => {
+    // Skip blacklist check for auth routes
+    if (request.url.startsWith('/api/auth')) {
+      return;
+    }
+
+    // Apply token blacklist middleware
+    await tokenBlacklistMiddleware(request as any, reply);
   });
 
   fastify.addHook('preHandler', async (request, reply) => {

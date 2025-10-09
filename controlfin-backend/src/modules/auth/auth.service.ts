@@ -145,7 +145,7 @@ export class AuthService {
     await user.save();
 
     return {
-      user: user.toJSON(),
+      user: user.toJSON() as unknown as Omit<IUser, 'password'>,
       tokens,
     };
   }
@@ -181,7 +181,7 @@ export class AuthService {
     await user.save();
 
     return {
-      user: user.toJSON(),
+      user: user.toJSON() as unknown as Omit<IUser, 'password'>,
       tokens,
     };
   }
@@ -212,10 +212,14 @@ export class AuthService {
   /**
    * Logout user (invalidate refresh token)
    */
-  async logout(): Promise<void> {
-    // In a production app, you might want to blacklist the refresh token
-    // For now, we'll just return success
-    // TODO: Implement token blacklisting with Redis
+  async logout(tokenId?: string): Promise<void> {
+    if (tokenId) {
+      // Blacklist the token using Redis
+      const { redisService } = await import('../../services/redis.service');
+      await redisService.blacklistToken(tokenId);
+    }
+    // Note: In a production app, you might also want to blacklist the refresh token
+    // For now, we'll just blacklist the access token
   }
 
   /**
@@ -227,7 +231,7 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    return user.toJSON();
+    return user.toJSON() as unknown as Omit<IUser, 'password'>;
   }
 
   /**
@@ -248,7 +252,7 @@ export class AuthService {
 
     await user.save();
 
-    return user.toJSON();
+    return user.toJSON() as unknown as Omit<IUser, 'password'>;
   }
 
   /**
