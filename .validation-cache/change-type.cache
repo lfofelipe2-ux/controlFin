@@ -1,9 +1,7 @@
 {
-  "key": "change-type-c6fd67b64d6d3815e051770d6d142d4454b0dd52ab930cccdee8d63e0223facb",
+  "key": "change-type-ca64a894b6eec5b0349675566b9d6ae4ed32f313c92ffa93ca5506a6d4e61801",
   "files": [
-    ".validation-cache/backend_validation.cache",
-    ".validation-cache/change-type.cache",
-    ".validation-cache/frontend_validation.cache"
+    ".validation-cache/change-type.cache"
   ],
-  "timestamp": 1759988140916
+  "timestamp": 1759988147423
 }
