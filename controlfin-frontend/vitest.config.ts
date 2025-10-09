@@ -12,5 +12,36 @@ export default defineConfig({
         bail: 0,
         // Continue on errors
         passWithNoTests: true,
+        // Enable parallel execution for 4x speed improvement
+        pool: 'threads',
+        poolOptions: {
+            threads: {
+                singleThread: false,
+                minThreads: 1,
+                maxThreads: 4
+            }
+        },
+        // Test timeout
+        testTimeout: 30000,
+        // Coverage configuration
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            exclude: [
+                'node_modules/',
+                'src/test-setup.ts',
+                '**/*.d.ts',
+                '**/*.config.*',
+                'dist/'
+            ],
+            thresholds: {
+                global: {
+                    branches: 70,
+                    functions: 70,
+                    lines: 70,
+                    statements: 70
+                }
+            }
+        }
     },
 });

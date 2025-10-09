@@ -4,6 +4,10 @@ process.env.PORT = '0'; // Use random port for tests
 process.env.JWT_SECRET = 'test-jwt-secret';
 process.env.MONGODB_URI = 'mongodb://localhost:27017/test-controlfin';
 
+// Redis configuration for tests (use mock or disable)
+process.env.REDIS_URL = 'redis://localhost:6379';
+process.env.REDIS_ENABLED = 'false'; // Disable Redis for tests
+
 // Mock OAuth environment variables to prevent server startup errors
 process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
 process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret';
@@ -20,8 +24,8 @@ process.env.LOG_LEVEL = 'error';
 const originalConsoleLog = console.log;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 console.log = (...args: any[]) => {
-  if (!args[0]?.includes?.('Connected to MongoDB') && 
-      !args[0]?.includes?.('🛑 Shutting down server')) {
+  if (!args[0]?.includes?.('Connected to MongoDB') &&
+    !args[0]?.includes?.('🛑 Shutting down server')) {
     originalConsoleLog(...args);
   }
 };

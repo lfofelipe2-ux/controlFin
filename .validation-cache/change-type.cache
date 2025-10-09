@@ -1,7 +1,17 @@
 {
-  "key": "change-type-ca64a894b6eec5b0349675566b9d6ae4ed32f313c92ffa93ca5506a6d4e61801",
+  "key": "change-type-9185f960915ef26d38db229f4b36ae00697b9c6d0c77a42119d6fa2a8b8094ba",
   "files": [
-    ".validation-cache/change-type.cache"
+    "memory-bank/activeContext.md",
+    "memory-bank/tasks.md",
+    "controlfin-backend/package-lock.json",
+    "controlfin-backend/package.json",
+    "controlfin-backend/src/services/redis.service.ts",
+    "controlfin-backend/tests/test-env.ts",
+    "controlfin-backend/vitest.config.ts",
+    "controlfin-frontend/vitest.config.ts",
+    "node_modules/.package-lock.json",
+    "package-lock.json",
+    "package.json"
   ],
-  "timestamp": 1759988147423
+  "timestamp": 1759998320555
 }
