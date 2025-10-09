@@ -5,31 +5,22 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./tests/test-env.ts'],
-    testTimeout: 30000, // 30 seconds for unit tests
-    hookTimeout: 30000,
-    teardownTimeout: 30000,
+    testTimeout: 120000, // 2 minutes for integration tests
+    hookTimeout: 120000,
+    teardownTimeout: 120000,
     // Run all tests even if some fail
     bail: 0,
     // Continue on errors
     passWithNoTests: true,
-    // Enable parallel execution for unit tests
-    pool: 'threads',
+    // Run integration tests sequentially
+    pool: 'forks',
     poolOptions: {
-      threads: {
-        singleThread: false,
-        minThreads: 1,
-        maxThreads: 4
+      forks: {
+        singleFork: true,
       }
     },
-    // Exclude integration tests that require MongoDB (deferred to TASK-041)
-    // and node_modules tests
-    exclude: [
-      'tests/integration/**/*.test.ts',
-      'tests/security/**/*.test.ts',
-      'tests/performance/**/*.test.ts',
-      '**/node_modules/**',
-      '**/dist/**'
-    ],
+    // Include only integration tests
+    include: ['tests/integration/**/*.test.ts', 'tests/security/**/*.test.ts', 'tests/performance/**/*.test.ts'],
     // Coverage configuration
     coverage: {
       provider: 'v8',
