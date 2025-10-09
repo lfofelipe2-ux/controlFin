@@ -11,6 +11,12 @@ import type {
   TransactionStats,
 } from '../types/transaction';
 
+// Logger utility
+const logger = {
+  info: (message: string, ...args: any[]) => console.log(`[TransactionStore] ${message}`, ...args),
+  error: (message: string, ...args: any[]) => console.error(`[TransactionStore] ${message}`, ...args),
+};
+
 interface TransactionState {
   // Data
   transactions: Transaction[];
@@ -117,7 +123,7 @@ const defaultFormData: TransactionFormData = {
 
 export const useTransactionStore = create<TransactionState>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       // Initial State
       transactions: [],
       categories: [],
@@ -210,16 +216,16 @@ export const useTransactionStore = create<TransactionState>()(
           formMode,
           formData: transaction
             ? {
-                type: transaction.type,
-                amount: transaction.amount,
-                description: transaction.description,
-                categoryId: transaction.categoryId,
-                paymentMethodId: transaction.paymentMethodId,
-                date: transaction.date.split('T')[0],
-                tags: transaction.tags,
-                isRecurring: transaction.isRecurring,
-                metadata: transaction.metadata,
-              }
+              type: transaction.type,
+              amount: transaction.amount,
+              description: transaction.description,
+              categoryId: transaction.categoryId,
+              paymentMethodId: transaction.paymentMethodId,
+              date: transaction.date.split('T')[0],
+              tags: transaction.tags,
+              isRecurring: transaction.isRecurring,
+              metadata: transaction.metadata,
+            }
             : defaultFormData,
           selectedTransaction: transaction || null,
         }),
@@ -248,7 +254,7 @@ export const useTransactionStore = create<TransactionState>()(
       refreshData: async () => {
         set({ loading: true, error: null });
         try {
-          // TODO: Implement API calls
+          // TODO: Implement API calls when backend endpoints are ready
           // const [transactions, categories, paymentMethods, stats] = await Promise.all([
           //   fetchTransactions(),
           //   fetchCategories(),
@@ -256,6 +262,24 @@ export const useTransactionStore = create<TransactionState>()(
           //   fetchStats(),
           // ]);
           // set({ transactions, categories, paymentMethods, stats });
+
+          // Temporary mock data for development
+          set({
+            transactions: [],
+            categories: [],
+            paymentMethods: [],
+            stats: {
+              totalIncome: 0,
+              totalExpense: 0,
+              totalTransfer: 0,
+              netAmount: 0,
+              transactionCount: 0,
+              averageAmount: 0,
+              categoryBreakdown: [],
+              paymentMethodBreakdown: [],
+              monthlyTrend: []
+            }
+          });
         } catch (error) {
           set({ error: error instanceof Error ? error.message : 'Unknown error' });
         } finally {
@@ -263,49 +287,93 @@ export const useTransactionStore = create<TransactionState>()(
         }
       },
 
-      // exportData: async (options) => {
-      //     set({ isExporting: true, error: null });
-      //     try {
-      //         // TODO: Implement export functionality
-      //         logger.info('Exporting data with options:', options);
-      //     } catch (error) {
-      //         set({ error: error instanceof Error ? error.message : 'Export failed' });
-      //     } finally {
-      //         set({ isExporting: false });
-      //     }
-      // },
+      exportData: async (options: any) => {
+        set({ isExporting: true, error: null });
+        try {
+          // TODO: Implement export functionality when backend endpoints are ready
+          logger.info('Exporting data with options:', options);
 
-      // importData: async (file) => {
-      //     set({ isImporting: true, error: null });
-      //     try {
-      //         // TODO: Implement import functionality
-      //         logger.info('Importing file:', file.name);
-      //         const result: ImportResult = {
-      //             success: true,
-      //             imported: 0,
-      //             errors: [],
-      //             warnings: [],
-      //         };
-      //         set({ importResult: result });
-      //         return result;
-      //     } catch (error) {
-      //         const result: ImportResult = {
-      //             success: false,
-      //             imported: 0,
-      //             errors: [{
-      //                 row: 0,
-      //                 field: 'file',
-      //                 message: error instanceof Error ? error.message : 'Import failed',
-      //                 value: file.name,
-      //             }],
-      //             warnings: [],
-      //         };
-      //         set({ importResult: result, error: result.errors[0].message });
-      //         return result;
-      //     } finally {
-      //         set({ isImporting: false });
-      //     }
-      // },
+          // Temporary implementation - export current transactions to CSV
+          const { transactions } = get();
+          const csvContent = transactions.map((t: Transaction) =>
+            `${t.date},${t.description},${t.amount},${t.type},${t.categoryId}`
+          ).join('\n');
+
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`; // eslint-disable-line no-hardcoded-strings/no-hardcoded-strings
+          a.click();
+          window.URL.revokeObjectURL(url);
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Export failed' });
+        } finally {
+          set({ isExporting: false });
+        }
+      },
+
+      importData: async (file: File) => {
+        set({ isImporting: true, error: null });
+        try {
+          // TODO: Implement import functionality when backend endpoints are ready
+          logger.info('Importing file:', file.name);
+
+          // Temporary implementation - parse CSV file
+          const text = await file.text();
+          const lines = text.split('\n').filter(line => line.trim());
+          const importedTransactions: Transaction[] = lines.map((line: string) => {
+            const [date, description, amount, type, categoryId] = line.split(',');
+            return {
+              id: Math.random().toString(36).substr(2, 9),
+              spaceId: 'default-space', // Temporary default
+              userId: 'current-user', // Temporary default
+              type: type as 'income' | 'expense',
+              amount: parseFloat(amount) || 0,
+              description: description || '',
+              categoryId: categoryId || '',
+              paymentMethodId: 'default-payment', // Temporary default
+              date: new Date(date).toISOString(),
+              tags: [],
+              isRecurring: false,
+              metadata: {},
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+          });
+
+          const result: ImportResult = {
+            success: true,
+            imported: importedTransactions.length,
+            errors: [],
+            warnings: [],
+          };
+
+          // Add imported transactions to current state
+          set(state => ({
+            transactions: [...state.transactions, ...importedTransactions],
+            importResult: result
+          }));
+
+          return result;
+        } catch (error) {
+          const result: ImportResult = {
+            success: false,
+            imported: 0,
+            errors: [{
+              row: 0,
+              field: 'file',
+              message: error instanceof Error ? error.message : 'Import failed',
+              value: file.name,
+            }],
+            warnings: [],
+          };
+          set({ importResult: result, error: result.errors[0].message });
+          return result;
+        } finally {
+          set({ isImporting: false });
+        }
+      },
     }),
     {
       name: 'transaction-store',

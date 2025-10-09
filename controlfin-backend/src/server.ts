@@ -230,33 +230,3 @@ process.on('SIGTERM', async () => {
 if (process.env['NODE_ENV'] !== 'test') {
   start();
 }
-// test comment
-// test comment
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes
-
-// Test comment for backend changes
-
-// Test comment for full-stack changes

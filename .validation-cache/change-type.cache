@@ -1,9 +1,33 @@
 {
-  "key": "change-type-e93ffa13804590237de4a29fde059e4888f3580238af671daf471a0d5514891f",
+  "key": "change-type-b2a413c177e5319aa346b647a1be1614c49b076d8f971c9ca06803c3cd0f00e7",
   "files": [
-    "memory-bank/activeContext.md",
-    "memory-bank/progress.md",
-    "memory-bank/tasks.md"
+    "CI_OPTIMIZATION_SUMMARY.md",
+    "PERFORMANCE_OPTIMIZATION_SUMMARY.md",
+    "ULTRA_PARALLEL_CI_FINAL_ANALYSIS.md",
+    "ULTRA_PARALLEL_CI_PERFORMANCE_ANALYSIS.md",
+    "ULTRA_PARALLEL_CI_SUCCESS_REPORT.md",
+    "ULTRA_PARALLEL_CI_TEST_REPORT.md",
+    "controlfin-backend/src/server.ts",
+    "controlfin-frontend/src/stores/transactionStore.ts",
+    "memory-bank/analysis-reports/project-cleanup-report-2025-01-27.md",
+    "memory-bank/creative/creative-export-import-ui.md",
+    "memory-bank/implementation-plans/task-036-phase2-plan.md",
+    "memory-bank/tasks.md",
+    "scripts/add-ts-nocheck.js",
+    "scripts/clean-eslint-disable.js",
+    "scripts/fix-backend-comprehensive.js",
+    "scripts/fix-backend-eslint-errors.js",
+    "scripts/fix-backend-types-final.js",
+    "scripts/fix-backend-types-properly.js",
+    "scripts/fix-comprehensive-types.js",
+    "scripts/fix-console-logs.js",
+    "scripts/fix-error-codes.js",
+    "scripts/fix-final-types.js",
+    "scripts/fix-logger-imports.js",
+    "scripts/fix-specific-types.js",
+    "scripts/fix-ultimate-types.js",
+    "scripts/fix-unknown-types.js",
+    "test-file.txt"
   ],
-  "timestamp": 1759952371038
+  "timestamp": 1759969559853
 }
