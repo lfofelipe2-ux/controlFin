@@ -1,25 +1,9 @@
 {
-  "key": "change-type-8e5bd36c7bc9fa10ce653852ccc54854a2069041f29afc6ecd3f65c3b4b0f812",
+  "key": "change-type-c6fd67b64d6d3815e051770d6d142d4454b0dd52ab930cccdee8d63e0223facb",
   "files": [
+    ".validation-cache/backend_validation.cache",
     ".validation-cache/change-type.cache",
-    ".validation-cache/frontend_validation.cache",
-    "controlfin-backend/env.example",
-    "controlfin-backend/package-lock.json",
-    "controlfin-backend/package.json",
-    "controlfin-backend/src/middleware/tokenBlacklist.middleware.ts",
-    "controlfin-backend/src/modules/auth/auth.routes.ts",
-    "controlfin-backend/src/modules/auth/auth.service.ts",
-    "controlfin-backend/src/modules/users/user.model.ts",
-    "controlfin-backend/src/server.ts",
-    "controlfin-backend/src/services/redis.service.ts",
-    "controlfin-frontend/package-lock.json",
-    "controlfin-frontend/package.json",
-    "controlfin-frontend/src/components/ExportModal.tsx",
-    "controlfin-frontend/src/components/ImportModal.tsx",
-    "controlfin-frontend/src/components/ProgressIndicator.tsx",
-    "controlfin-frontend/src/stores/transactionStore.ts",
-    "memory-bank/.qa_validation_status",
-    "memory-bank/tasks.md"
+    ".validation-cache/frontend_validation.cache"
   ],
-  "timestamp": 1759987939719
+  "timestamp": 1759988140916
 }
