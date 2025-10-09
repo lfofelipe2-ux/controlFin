@@ -4,8 +4,8 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import noHardcodedStrings from '../eslint-plugins/no-hardcoded-strings/index.js';
 import noDuplicateI18nKeys from '../eslint-plugins/no-duplicate-i18n-keys/index.js';
+import noHardcodedStrings from '../eslint-plugins/no-hardcoded-strings/index.js';
 
 export default defineConfig([
   globalIgnores(['dist', 'coverage']),
