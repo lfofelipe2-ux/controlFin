@@ -11,7 +11,7 @@ class RedisService {
 
     private async initializeRedis() {
         // Skip Redis initialization in test environment if disabled
-        if (process.env.NODE_ENV === 'test' && process.env.REDIS_ENABLED === 'false') {
+        if (process.env['NODE_ENV'] === 'test' && process.env['REDIS_ENABLED'] === 'false') {
             logger.info('Redis disabled for tests');
             return;
         }
