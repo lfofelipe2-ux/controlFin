@@ -112,6 +112,11 @@ temp/
 # Memory bank (if needed)
 # memory-bank/
 
+# Testing and validation cache
+.validation-cache/
+playwright-report/
+test-results/
+
 # IDE
 .vscode/
 .idea/
