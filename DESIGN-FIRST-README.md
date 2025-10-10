@@ -1,4 +1,4 @@
-# ControlFin - DESIGN FIRST
+# ControlFin - DESIGN FIRST Approach
 
 ## 🎨 Filosofia
 
@@ -6,6 +6,7 @@
 - Interface e UX são prioridade máxima
 - Programar apenas o necessário
 - Máxima eficiência, mínimo código
+- Foco em resultados, não tecnologia
 
 ## 🚀 Scripts Principais
 
@@ -27,9 +28,6 @@ npm run test:backend     # Testes backend
 
 # Validação
 npm run validate         # Validação UI completa
-
-# Limpeza
-npm run clean            # Limpeza do projeto
 ```
 
 ## 🎨 Design System
@@ -51,6 +49,13 @@ npm run clean            # Limpeza do projeto
 - **Integrações essenciais** (OAuth, MongoDB)
 - **Validações críticas** de segurança
 - **Performance básica** para UX
+
+## 📊 Métricas de Sucesso
+
+- **Tempo de carregamento**: < 2 segundos
+- **Usabilidade**: Score > 90
+- **Acessibilidade**: WCAG 2.1 AA
+- **Responsividade**: Perfeita em todos os dispositivos
 
 ---
 

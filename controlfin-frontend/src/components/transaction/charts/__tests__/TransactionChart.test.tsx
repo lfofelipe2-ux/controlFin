@@ -4,27 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTransactionStore } from '../../../../stores/transactionStore';
 import { TransactionChart } from '../TransactionChart';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: vi.fn(),
-}));
+// Mock react-i18next using centralized mock
+vi.mock('react-i18next', () => import('../../../../__mocks__/react-i18next'));
 
 // Mock the transaction store
 vi.mock('../../../../stores/transactionStore', () => ({
     useTransactionStore: vi.fn(),
 }));
 
-// Mock dayjs
-vi.mock('dayjs', () => ({
-    default: vi.fn(() => ({
-        format: vi.fn(() => '2024-01-01'),
-        toDate: vi.fn(() => new Date('2024-01-01')),
-        subtract: vi.fn(() => ({
-            format: vi.fn(() => '2023-12-01'),
-            toDate: vi.fn(() => new Date('2023-12-01')),
-        })),
-    })),
-}));
+// Mock dayjs using centralized mock
+vi.mock('dayjs', () => import('../../../../__mocks__/dayjs'));
 
 // Mock Highcharts
 vi.mock('highcharts', () => ({
@@ -49,20 +38,23 @@ describe('TransactionChart', () => {
 
     const mockStats = {
         totalIncome: 5000,
-        totalExpenses: 3000,
+        totalExpense: 3000,
+        totalTransfer: 0,
         netAmount: 2000,
+        transactionCount: 10,
+        averageAmount: 500,
         categoryBreakdown: [
-            { category: 'Food', amount: 1000, percentage: 33.33 },
-            { category: 'Transport', amount: 800, percentage: 26.67 },
-            { category: 'Entertainment', amount: 1200, percentage: 40 },
+            { categoryId: '1', categoryName: 'Food', amount: 1000, percentage: 33.33 },
+            { categoryId: '2', categoryName: 'Transport', amount: 800, percentage: 26.67 },
+            { categoryId: '3', categoryName: 'Entertainment', amount: 1200, percentage: 40 },
         ],
         monthlyTrend: [
-            { month: '2024-01', income: 2500, expenses: 1500 },
-            { month: '2024-02', income: 2500, expenses: 1500 },
+            { month: '2024-01', income: 2500, expense: 1500, net: 1000 },
+            { month: '2024-02', income: 2500, expense: 1500, net: 1000 },
         ],
         paymentMethodBreakdown: [
-            { method: 'Credit Card', amount: 2000, percentage: 66.67 },
-            { method: 'Cash', amount: 1000, percentage: 33.33 },
+            { paymentMethodId: '1', paymentMethodName: 'Credit Card', amount: 2000, percentage: 66.67 },
+            { paymentMethodId: '2', paymentMethodName: 'Cash', amount: 1000, percentage: 33.33 },
         ],
     };
 
@@ -70,7 +62,16 @@ describe('TransactionChart', () => {
         vi.clearAllMocks();
 
         mockUseTranslation.mockReturnValue({
-            t: (key: string) => key,
+            t: (key: string) => {
+                const mockT = (key: string) => key;
+                Object.defineProperty(mockT, '$TFunctionBrand', {
+                    value: Symbol('TFunctionBrand'),
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                });
+                return mockT;
+            },
             i18n: {} as any,
             ready: true,
         });
@@ -274,8 +275,11 @@ describe('TransactionChart', () => {
     it('should handle empty stats', () => {
         const emptyStats = {
             totalIncome: 0,
-            totalExpenses: 0,
+            totalExpense: 0,
+            totalTransfer: 0,
             netAmount: 0,
+            transactionCount: 0,
+            averageAmount: 0,
             categoryBreakdown: [],
             monthlyTrend: [],
             paymentMethodBreakdown: [],

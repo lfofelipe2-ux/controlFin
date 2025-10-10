@@ -4,23 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTransactionStore } from '../../../../stores/transactionStore';
 import { FilterPanel } from '../FilterPanel';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: vi.fn(),
-}));
+// Mock react-i18next using centralized mock
+vi.mock('react-i18next', () => import('../../../../__mocks__/react-i18next'));
 
 // Mock the transaction store
 vi.mock('../../../../stores/transactionStore', () => ({
     useTransactionStore: vi.fn(),
 }));
 
-// Mock dayjs
-vi.mock('dayjs', () => ({
-    default: vi.fn(() => ({
-        format: vi.fn(() => '2024-01-01'),
-        toDate: vi.fn(() => new Date('2024-01-01')),
-    })),
-}));
+// Mock dayjs using centralized mock
+vi.mock('dayjs', () => import('../../../../__mocks__/dayjs'));
 
 const mockUseTranslation = vi.mocked(useTranslation);
 const mockUseTransactionStore = vi.mocked(useTransactionStore);
@@ -32,8 +25,32 @@ describe('FilterPanel', () => {
     const mockOnLoadPreset = vi.fn();
 
     const mockPresets = [
-        { name: 'Recent Expenses', filters: { type: 'expense', dateRange: { start: '2024-01-01', end: '2024-01-31' } } },
-        { name: 'High Amount', filters: { minAmount: 1000 } },
+        {
+            name: 'Recent Expenses',
+            filters: {
+                search: '',
+                category: null,
+                paymentMethod: null,
+                type: 'expense' as const,
+                dateRange: ['2024-01-01', '2024-01-31'] as [string, string],
+                amountRange: null,
+                tags: [],
+                isRecurring: null
+            }
+        },
+        {
+            name: 'High Amount',
+            filters: {
+                search: '',
+                category: null,
+                paymentMethod: null,
+                type: 'all' as const,
+                dateRange: null,
+                amountRange: [1000, 10000] as [number, number],
+                tags: [],
+                isRecurring: null
+            }
+        },
     ];
 
     const mockCategories = [
@@ -63,7 +80,16 @@ describe('FilterPanel', () => {
         vi.clearAllMocks();
 
         mockUseTranslation.mockReturnValue({
-            t: (key: string) => key,
+            t: (key: string) => {
+                const mockT = (key: string) => key;
+                Object.defineProperty(mockT, '$TFunctionBrand', {
+                    value: Symbol('TFunctionBrand'),
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                });
+                return mockT;
+            },
             i18n: {} as any,
             ready: true,
         });

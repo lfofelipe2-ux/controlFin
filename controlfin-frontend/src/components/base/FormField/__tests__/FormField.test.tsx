@@ -85,6 +85,7 @@ describe('FormField Component', () => {
                 name="textField"
                 type="text"
                 placeholder="Text input"
+                label="Text Field"
             />
         );
         expect(screen.getByPlaceholderText('Text input')).toHaveAttribute('type', 'text');
@@ -94,6 +95,7 @@ describe('FormField Component', () => {
                 name="emailField"
                 type="email"
                 placeholder="Email input"
+                label="Email Field"
             />
         );
         expect(screen.getByPlaceholderText('Email input')).toHaveAttribute('type', 'email');
@@ -103,6 +105,7 @@ describe('FormField Component', () => {
                 name="numberField"
                 type="number"
                 placeholder="Number input"
+                label="Number Field"
             />
         );
         expect(screen.getByPlaceholderText('Number input')).toHaveAttribute('type', 'number');
@@ -114,6 +117,7 @@ describe('FormField Component', () => {
                 name="disabledField"
                 disabled
                 placeholder="Disabled input"
+                label="Disabled Field"
             />
         );
 

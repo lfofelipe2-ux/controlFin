@@ -4,46 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTransactionStore } from '../../../../stores/transactionStore';
 import { TransactionForm } from '../TransactionForm';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: vi.fn(),
-}));
+// Mock react-i18next using centralized mock
+vi.mock('react-i18next', () => import('../../../../__mocks__/react-i18next'));
 
 // Mock the transaction store
 vi.mock('../../../../stores/transactionStore', () => ({
     useTransactionStore: vi.fn(),
 }));
 
-// Mock dayjs
-vi.mock('dayjs', () => ({
-    default: vi.fn(() => ({
-        format: vi.fn(() => '2024-01-01'),
-        toDate: vi.fn(() => new Date('2024-01-01')),
-        isValid: vi.fn(() => true),
-        hour: vi.fn(() => 0),
-        minute: vi.fn(() => 0),
-        second: vi.fn(() => 0),
-        millisecond: vi.fn(() => 0),
-        setHour: vi.fn(() => ({
-            format: vi.fn(() => '2024-01-01'),
-            toDate: vi.fn(() => new Date('2024-01-01')),
-            isValid: vi.fn(() => true),
-            hour: vi.fn(() => 0),
-            minute: vi.fn(() => 0),
-            second: vi.fn(() => 0),
-            millisecond: vi.fn(() => 0),
-        })),
-        subtract: vi.fn(() => ({
-            format: vi.fn(() => '2023-12-01'),
-            toDate: vi.fn(() => new Date('2023-12-01')),
-            isValid: vi.fn(() => true),
-            hour: vi.fn(() => 0),
-            minute: vi.fn(() => 0),
-            second: vi.fn(() => 0),
-            millisecond: vi.fn(() => 0),
-        })),
-    })),
-}));
+// Mock dayjs using centralized mock
+vi.mock('dayjs', () => import('../../../../__mocks__/dayjs'));
 
 const mockUseTranslation = vi.mocked(useTranslation);
 const mockUseTransactionStore = vi.mocked(useTransactionStore);
@@ -84,7 +54,16 @@ describe('TransactionForm', () => {
         vi.clearAllMocks();
 
         mockUseTranslation.mockReturnValue({
-            t: (key: string) => key,
+            t: (key: string) => {
+                const mockT = (key: string) => key;
+                Object.defineProperty(mockT, '$TFunctionBrand', {
+                    value: Symbol('TFunctionBrand'),
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                });
+                return mockT;
+            },
             i18n: {} as any,
             ready: true,
         });

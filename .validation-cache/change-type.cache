@@ -1,0 +1,14 @@
+{
+  "key": "change-type-ddd3dc78502d1334163d4f25dfc9d3ce7d824d9fd685def94842027ba5127c65",
+  "files": [
+    "controlfin-backend/src/services/__tests__/redis.service.test.ts",
+    "controlfin-frontend/src/components/__tests__/ExportModal.test.tsx",
+    "controlfin-frontend/src/components/__tests__/ImportModal.test.tsx",
+    "controlfin-frontend/src/components/__tests__/ProgressIndicator.test.tsx",
+    "controlfin-frontend/src/components/transaction/charts/__tests__/TransactionChart.test.tsx",
+    "controlfin-frontend/src/components/transaction/filters/__tests__/FilterPanel.test.tsx",
+    "controlfin-frontend/src/components/transaction/forms/__tests__/TransactionForm.test.tsx",
+    "memory-bank/tasks.md"
+  ],
+  "timestamp": 1760047731903
+}

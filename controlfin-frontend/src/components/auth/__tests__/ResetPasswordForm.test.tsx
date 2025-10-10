@@ -8,7 +8,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import { BrowserRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ResetPasswordForm from '../ResetPasswordForm';
 
 // Mock react-i18next for consistent translation testing
