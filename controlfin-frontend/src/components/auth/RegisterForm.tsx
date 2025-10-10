@@ -143,8 +143,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       style={{
         background: colors.backgroundCards,
         border: `1px solid rgba(255, 255, 255, 0.1)`,
-        borderRadius: '12px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+        borderRadius: '16px',
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2)',
+        backdropFilter: 'blur(20px)',
         ...style,
       }}
     >
@@ -183,9 +184,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             closable
             onClose={clearError}
             style={{
-              background: 'rgba(255, 51, 102, 0.1)',
-              border: `1px solid ${colors.error}`,
-              borderRadius: '8px',
+              background: 'rgba(255, 51, 102, 0.08)',
+              border: `1px solid ${colors.error}40`,
+              borderRadius: '12px',
+              backdropFilter: 'blur(10px)',
+              boxShadow: `0 4px 16px ${colors.error}20`,
             }}
           />
         )}
@@ -232,10 +235,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   }
                   placeholder={t('register.firstNamePlaceholder')}
                   style={{
-                    background: colors.backgroundCards,
-                    border: `1px solid rgba(255, 255, 255, 0.1)`,
-                    borderRadius: '8px',
-                    height: '48px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: `1px solid rgba(255, 255, 255, 0.15)`,
+                    borderRadius: '12px',
+                    height: '52px',
+                    fontSize: typography.sizes.desktop.body,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = colors.accentPrimary;
+                    e.target.style.boxShadow = `0 0 0 2px ${colors.accentPrimary}20`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                    e.target.style.boxShadow = 'none';
                   }}
                 />
               </Form.Item>
@@ -271,10 +284,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   }
                   placeholder={t('register.lastNamePlaceholder')}
                   style={{
-                    background: colors.backgroundCards,
-                    border: `1px solid rgba(255, 255, 255, 0.1)`,
-                    borderRadius: '8px',
-                    height: '48px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: `1px solid rgba(255, 255, 255, 0.15)`,
+                    borderRadius: '12px',
+                    height: '52px',
+                    fontSize: typography.sizes.desktop.body,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = colors.accentPrimary;
+                    e.target.style.boxShadow = `0 0 0 2px ${colors.accentPrimary}20`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                    e.target.style.boxShadow = 'none';
                   }}
                 />
               </Form.Item>
@@ -310,10 +333,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               prefix={<MailOutlined style={{ color: colors.textSecondary, marginRight: '8px' }} />}
               placeholder={t('register.emailPlaceholder')}
               style={{
-                background: colors.backgroundCards,
-                border: `1px solid rgba(255, 255, 255, 0.1)`,
-                borderRadius: '8px',
-                height: '48px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: `1px solid rgba(255, 255, 255, 0.15)`,
+                borderRadius: '12px',
+                height: '52px',
+                fontSize: typography.sizes.desktop.body,
+                transition: 'all 0.3s ease',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = colors.accentPrimary;
+                e.target.style.boxShadow = `0 0 0 2px ${colors.accentPrimary}20`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </Form.Item>
@@ -359,10 +392,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               }
               onChange={handlePasswordChange}
               style={{
-                background: colors.backgroundCards,
-                border: `1px solid rgba(255, 255, 255, 0.1)`,
-                borderRadius: '8px',
-                height: '48px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: `1px solid rgba(255, 255, 255, 0.15)`,
+                borderRadius: '12px',
+                height: '52px',
+                fontSize: typography.sizes.desktop.body,
+                transition: 'all 0.3s ease',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = colors.accentPrimary;
+                e.target.style.boxShadow = `0 0 0 2px ${colors.accentPrimary}20`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </Form.Item>
@@ -477,10 +520,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 )
               }
               style={{
-                background: colors.backgroundCards,
-                border: `1px solid rgba(255, 255, 255, 0.1)`,
-                borderRadius: '8px',
-                height: '48px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: `1px solid rgba(255, 255, 255, 0.15)`,
+                borderRadius: '12px',
+                height: '52px',
+                fontSize: typography.sizes.desktop.body,
+                transition: 'all 0.3s ease',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = colors.accentPrimary;
+                e.target.style.boxShadow = `0 0 0 2px ${colors.accentPrimary}20`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </Form.Item>
@@ -567,12 +620,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               disabled={isLoading || isSubmitting || !passwordStrength.isValid}
               style={{
                 width: '100%',
-                height: '48px',
-                background: colors.accentPrimary,
+                height: '52px',
+                background: `linear-gradient(135deg, ${colors.accentPrimary} 0%, ${colors.accentPrimary}dd 100%)`,
                 borderColor: colors.accentPrimary,
-                borderRadius: '8px',
+                borderRadius: '12px',
                 fontSize: typography.sizes.desktop.body,
                 fontWeight: typography.weights.semibold,
+                boxShadow: `0 4px 16px ${colors.accentPrimary}40`,
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading && !isSubmitting && passwordStrength.isValid) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${colors.accentPrimary}50`;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading && !isSubmitting && passwordStrength.isValid) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = `0 4px 16px ${colors.accentPrimary}40`;
+                }
               }}
             >
               {isLoading || isSubmitting ? t('register.registering') : t('register.registerButton')}
