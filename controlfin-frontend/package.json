@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",
-    "@types/loglevel": "^1.5.4",
+    "@types/loglevel": "^1.6.3",
     "@types/papaparse": "^5.3.16",
     "@types/react-i18next": "^7.8.3",
     "@types/xlsx": "^0.0.35",
