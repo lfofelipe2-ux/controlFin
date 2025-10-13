@@ -32,7 +32,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.7.2",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/winston": "^2.4.4",
