@@ -31,7 +31,7 @@
     "@types/loglevel": "^1.5.4",
     "@types/papaparse": "^5.3.16",
     "@types/react-i18next": "^7.8.3",
-    "@types/xlsx": "^0.0.35",
+    "@types/xlsx": "^0.0.36",
     "antd": "^5.27.4",
     "dayjs": "^1.11.18",
     "highcharts": "^12.4.0",
